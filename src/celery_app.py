@@ -1,13 +1,13 @@
 from celery import Celery
 
-celery_app: Celery = Celery(
+task_queue: Celery = Celery(
     main="src",
     broker="redis://localhost:6379/0",
     backend="redis://localhost:6379/0",
     include=["src.tasks"]
 )
 
-celery_app.conf.update(
+task_queue.conf.update(
     task_track_started=True,
     task_serializer="json",
     result_serializer="json",

@@ -1,6 +1,10 @@
-from fastapi import FastAPI
-from src.tasks import long_running_task
-from src.celery_app import celery_app
+from src.celery_app import task_queue
+from src.tasks import image_task, video_task
+from fastapi import FastAPI, UploadFile
+from pydantic import BaseModel
+
+class TurnStileToken(BaseModel):
+    token: str
 
 app = FastAPI()
 
@@ -9,18 +13,32 @@ app = FastAPI()
 def home():
     return {"status": "running"}
 
-
-@app.post("/start-task")
-async def start_task(x: int):
-    task = long_running_task.delay(x)
+@app.post("/start-task-image")
+async def start_task_image(image: UploadFile):
+    content = await image.read()
+    task_data = image_task.delay(image.filename, content)
     return {
-        "task_id": task.id,
+        "task_id": task_data.id,
+        "name": image.filename
     }
 
 
+@app.post("verify-captcha")
+async def verify_captcha(turnstile_token: TurnStileToken):
+    pass
+
+@app.post("/start-task-video")
+async def start_task_video(video: UploadFile):
+    content = await video.read()
+    task_data = video_task.delay(video.filename, content)
+    return {
+        "task_id": task_data.id,
+        "name": video.filename
+    }
+
 @app.get("/task-status/{task_id}")
 async def check_task_status(task_id: str):
-    task_result = celery_app.AsyncResult(task_id)
+    task_result = task_queue.AsyncResult(task_id)
     if task_result.state == "SUCCESS":
         return {
             "status": "completed",

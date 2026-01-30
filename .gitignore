@@ -2,3 +2,4 @@
 .venv
 .vscode
 uv.lock
+__pycache__

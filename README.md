@@ -13,11 +13,11 @@ This is a FastAPI server with celery for background processing. The current prog
 # Todo
 
 - Configure FastAPI and celery and script runner using Make [Done]
-- Create FastAPI endpoint for receiving image/video data [Partial Done]
+- Create FastAPI endpoint for receiving image/video data [Done]
 - Create Celery async task queue [Done]
 - Create endpoint for checking status of task [Done]
-- Rate Limiting [Done]
-- Add model [Not done]
+- Rate Limiting [Pending]
+- Add model [Pending]
 
 # How to Run
 

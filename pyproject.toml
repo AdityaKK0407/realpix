@@ -9,6 +9,8 @@ dependencies = [
     "celery-types>=0.24.0",
     "fastapi>=0.128.0",
     "mypy>=1.19.1",
+    "pydantic>=2.12.5",
+    "python-multipart>=0.0.22",
     "redis>=7.1.0",
     "uvicorn>=0.40.0",
 ]
