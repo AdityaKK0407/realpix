@@ -3,3 +3,4 @@
 .vscode
 uv.lock
 __pycache__
+.env

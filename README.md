@@ -16,7 +16,7 @@ This is a FastAPI server with celery for background processing. The current prog
 - Create FastAPI endpoint for receiving image/video data [Done]
 - Create Celery async task queue [Done]
 - Create endpoint for checking status of task [Done]
-- Rate Limiting [Pending]
+- Rate Limiting [Done]
 - Add model [Pending]
 
 # How to Run
