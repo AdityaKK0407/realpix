@@ -1,6 +1,7 @@
 from src.celery_app import task_queue
 import time
 
+
 @task_queue.task
 def image_task(filepath: str, content: bytes) -> dict[str, str | int]:
     time.sleep(10)
@@ -8,6 +9,7 @@ def image_task(filepath: str, content: bytes) -> dict[str, str | int]:
         "filepath": filepath,
         "content-size": len(content)
     }
+
 
 @task_queue.task
 def video_task(filepath: str, content: bytes) -> dict[str, str | int]:

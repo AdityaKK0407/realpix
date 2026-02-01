@@ -19,4 +19,4 @@ dependencies = [
 
 [tool.mypy]
 strict = true
-disallow_untyped_defs = false
+disallow_untyped_defs = true

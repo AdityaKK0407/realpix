@@ -9,7 +9,7 @@ local last_refill = tonumber(redis.call("HGET", key, "last_refill"))
 
 if not token_quota or token_quota <= 0 then
     redis.call("DEL", key)
-    return 0
+    return -1
 end
 
 local time_now = tonumber(redis.call("TIME")[1])
