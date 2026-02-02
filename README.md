@@ -82,7 +82,7 @@ backend task processing.
 ```json
     {"detail":  "Invalid CAPTCHA token"}
 ```
-- `500` - Client doesn't exist
+- `500` - Client doesn't exist or unexpected server error
 ```json lines
     // Client doesn't exist
     {"detail": "Client not available"}
@@ -249,7 +249,7 @@ Content-Type: video/extension
 ```json
     {"detail":  "Invalid rate limiter token"}
 ```
-- `403` - Rate limit token expired, CAPTCHA required with inactive token as header
+- `403` - Rate limit token inactive, CAPTCHA required with inactive token as header to reactivate it
 ```json
     {"detail":  "Rate limiter token inactive"}
 ```
