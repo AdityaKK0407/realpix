@@ -1,53 +1,72 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi import APIRouter, Request, Header, Depends, HTTPException, status
 
 import redis
 import os
 import httpx
 
-from src.redis_client import create_rate_limiter_token
-from src.dependencies import get_redis, get_create_sha
+from src.redis_client.rate_limiter import create_rate_limiter_token, activate_rate_limiter_token
+from src.dependencies import get_redis, get_create_sha, get_activate_token_sha
 
 router = APIRouter(prefix="/verify", tags=["Verification"])
 
 
 @router.post("/captcha")
-async def verify_captcha(payload: dict[str, str], request: Request, redis_client: redis.Redis = Depends(get_redis),
-                         create_sha: str = Depends(get_create_sha)) -> dict[str, str]:
-    cloudflare_token = payload["token"]
+async def verify_captcha(payload: dict[str, str],
+                         request: Request,
+                         x_ratelimit_token: str | None = Header(None),
+                         redis_client: redis.Redis = Depends(get_redis),
+                         create_sha: str = Depends(get_create_sha),
+                         activate_token_sha: str = Depends(get_activate_token_sha)) -> dict[str, str]:
+    cloudflare_token = payload.get("token", None)
 
     if not cloudflare_token:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Missing CloudFlare Turnstile Token"
+            detail="Missing CAPTCHA token"
         )
 
     url = os.getenv("CLOUDFLARE_URL")
     secret_key = os.getenv("CLOUDFLARE_SECRET_KEY")
 
+    if not url or not secret_key:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected server error"
+        )
+
+    user = request.client
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Client not available"
+        )
+
     async with httpx.AsyncClient() as client:
-        resp = await client.post(url, data={
-            "secret": secret_key,
-            "response": cloudflare_token,
-            "remoteip": request.client.host
-        })
-        result: dict = resp.json()
+        try:
+            resp = await client.post(url, data=dict(secret=secret_key, response=cloudflare_token,
+                                                    remoteip=user.host))
+            result: dict[str, bool | str | list[str] | dict[str, str]] = resp.json()
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Unable to verify request at this time. Please try again later"
+            )
 
         if not result.get("success"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Invalid captcha"
+                detail="Invalid CAPTCHA token"
             )
 
-    server_token = request.headers.get("X-RateLimit-Token")
-
-    if server_token:
-        return {"user_token": server_token}
-
     try:
+        if x_ratelimit_token and activate_rate_limiter_token(redis_client, activate_token_sha, x_ratelimit_token):
+            return {"user_token": x_ratelimit_token}
+
         uuid_token = create_rate_limiter_token(redis_client, create_sha)
         return {"user_token": uuid_token}
+
     except Exception:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Redis failed"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Service temporarily unavailable"
         )

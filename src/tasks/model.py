@@ -1,4 +1,4 @@
-from src.celery_app import task_queue
+from src.tasks.app import task_queue
 import time
 
 

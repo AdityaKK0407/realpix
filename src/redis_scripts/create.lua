@@ -9,7 +9,8 @@ local time_now = tonumber(redis.call("TIME")[1])
 redis.call("HSET", key,
     "token_quota", token_quota_left,
     "tokens_left", initial_tokens,
-    "last_refill", time_now
+    "last_refill", time_now,
+    "active_token", 1
 )
 
 redis.call("EXPIRE", key, ttl_seconds)

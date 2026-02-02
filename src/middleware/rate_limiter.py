@@ -1,0 +1,47 @@
+from fastapi import Header, Depends, HTTPException, status
+
+import redis
+from redis.exceptions import RedisError
+
+from src.redis_client.rate_limiter import verify_rate_limiter_token, VerifyTokenResult
+from src.dependencies import get_redis, get_verify_sha
+
+
+async def rate_limiter_middleware(x_ratelimit_token: str | None = Header(default=None),
+                                  redis_client: redis.Redis = Depends(get_redis),
+                                  verify_sha: str = Depends(get_verify_sha)) -> None:
+    if not x_ratelimit_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing rate limiter token"
+        )
+
+    try:
+        match verify_rate_limiter_token(redis_client, verify_sha, x_ratelimit_token):
+            case VerifyTokenResult.TOKEN_LIMIT_EXCEEDED:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid rate limiter token"
+                )
+            case VerifyTokenResult.RATE_LIMITED:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Rate limit exceeded"
+                )
+            case VerifyTokenResult.SUCCESS:
+                ...
+            case VerifyTokenResult.INACTIVE_TOKEN:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Rate limiter token inactive"
+                )
+            case VerifyTokenResult.UNREACHABLE:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Unexpected server error"
+                )
+    except RedisError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Service temporarily unavailable"
+        )

@@ -1,0 +1,2 @@
+worker: celery -A src.tasks.app worker --loglevel=info
+api: uvicorn src.main:app --reload

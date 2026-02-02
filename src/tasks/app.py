@@ -4,7 +4,7 @@ task_queue: Celery = Celery(
     main="src",
     broker="redis://localhost:6379/0",
     backend="redis://localhost:6379/0",
-    include=["src.model"]
+    include=["src.tasks.model"]
 )
 
 task_queue.conf.update(
