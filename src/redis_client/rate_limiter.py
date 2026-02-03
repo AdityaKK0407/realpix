@@ -1,7 +1,8 @@
-import redis
 import uuid
 from enum import Enum
-from typing import cast
+from typing import Awaitable
+
+import redis.asyncio as redis
 
 TOTAL_QUOTA = 100
 BUCKET_SIZE = 10
@@ -18,34 +19,32 @@ class VerifyTokenResult(Enum):
     UNREACHABLE = 3
 
 
-def create_rate_limiter_token(client: redis.Redis, create_script_sha: str) -> str:
+async def create_rate_limiter_token(client: redis.Redis, create_script_sha: str) -> str:
     token_id = uuid.uuid4()
-    key = f'rate_limiter:token:{token_id}'
+    key = f"rate_limiter:token:{token_id}"
 
     initial_tokens = BUCKET_SIZE
 
-    client.evalsha(
-        create_script_sha,
-        1,
-        key,
-        TOTAL_QUOTA,
-        initial_tokens,
-        TTL_SECONDS
+    result = client.evalsha(
+        create_script_sha, 1, key, TOTAL_QUOTA, initial_tokens, TTL_SECONDS
     )
+
+    if isinstance(result, Awaitable):
+        await result
 
     return str(token_id)
 
 
-def verify_rate_limiter_token(client: redis.Redis, verify_script_sha: str, uuid_key: str) -> VerifyTokenResult:
-    key = f'rate_limiter:token:{uuid_key}'
+async def verify_rate_limiter_token(
+    client: redis.Redis, verify_script_sha: str, uuid_key: str
+) -> VerifyTokenResult:
+    key = f"rate_limiter:token:{uuid_key}"
 
-    match int(cast(str, client.evalsha(
-        verify_script_sha,
-        1,
-        key,
-        BUCKET_SIZE,
-        RATE_PER_SECOND
-    ))):
+    result = client.evalsha(verify_script_sha, 1, key, BUCKET_SIZE, RATE_PER_SECOND)
+    if isinstance(result, Awaitable):
+        result = await result
+
+    match int(result):
         case -1:
             return VerifyTokenResult.TOKEN_LIMIT_EXCEEDED
         case 0:
@@ -58,12 +57,13 @@ def verify_rate_limiter_token(client: redis.Redis, verify_script_sha: str, uuid_
             return VerifyTokenResult.UNREACHABLE
 
 
-def activate_rate_limiter_token(client: redis.Redis, activate_token_sha: str, uuid_key: str) -> bool:
-    key = f'rate_limiter:token:{uuid_key}'
+async def activate_rate_limiter_token(
+    client: redis.Redis, activate_token_sha: str, uuid_key: str
+) -> bool:
+    key = f"rate_limiter:token:{uuid_key}"
 
-    result = client.evalsha(
-        activate_token_sha,
-        1,
-        key
-    )
-    return int(cast(str, result)) == 1
+    result = client.evalsha(activate_token_sha, 1, key)
+    if isinstance(result, Awaitable):
+        result = await result
+
+    return int(result) == 1
