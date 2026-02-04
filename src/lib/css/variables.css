@@ -1,0 +1,57 @@
+:root {
+    --color-bg-app: #F8F6F2;
+    --color-bg-surface: #fafafa;
+    --color-bg-subtle: #e8d8c3;
+
+    --app-padding-inline: 1.4rem;
+    --app-padding-block: 1.2rem;
+
+    --panel-padding-inline: 1.34rem;
+    --panel-padding-block: 1.1rem;
+
+    --file-upload-padding-inline: 1.5rem;
+    --file-upload-padding-block: 4rem;
+
+    --color-border-default: #b8ada4;
+
+    --color-text-primary: #4a4a4a;
+    --color-text-body: #555;
+    --color-text-muted: #8c827a;
+
+    --color-primary: #3e5f96;
+    --color-primary-hover: #354f80;
+    --color-primary-active: #2e456f;
+    --color-primary-text: #fafafa;
+
+    --color-border-neutral: #a1a1a1;
+    --color-bg-neutral: #d9d5ce;
+    --color-border-dragover: #005ea2;
+    --color-bg-dragover: rgba(0 94 162 / 0.15);
+    --color-text-dragover: #005ea2;
+
+    --color-border-success: #188038;
+    --color-bg-success: rgba(24 128 56 / 0.1);
+    --color-text-success: #188038;
+
+    --color-border-error: #d93025;
+    --color-bg-error: rgba(217 48 37 / 0.1);
+    --color-text-error: #d93025;
+
+    --layout-panel-gap: 1.624rem;
+    --layout-panel-rounded: 1.5rem;
+
+    --text-gap: 0.6rem;
+
+    --panel-opacity-active: 1;
+    --panel-opacity-inactive: 0.8;
+
+    --shadow-panel-inactive: 0 5px 16px rgba(0 0 0 / 0.09);
+    --shadow-panel-active: 0 15px 30px rgba(0 0 0 / 0.27);
+
+/*    Fonts */
+    --font-lg-2: 2rem;
+    --font-md-1: 1.5rem;
+    --font-md-2: 1.55rem;
+    --font-sm-2: 1.2rem;
+    --font-sm-1: 1.1rem;
+}

@@ -1,0 +1,47 @@
+.sr-only{
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none;
+}
+
+.active-layout {
+    filter: drop-shadow(var(--shadow-panel-active));
+    opacity: var(--panel-opacity-active);
+}
+
+.items-center {
+    align-items: center;
+}
+
+.inactive-layout {
+    filter: drop-shadow(var(--shadow-panel-inactive));
+    opacity: var(--panel-opacity-inactive);
+}
+
+.lg-font-2 {
+    font-size: var(--font-lg-2);
+}
+
+.md-font-1 {
+    font-size: var(--font-md-1);
+}
+
+.md-font-2 {
+    font-size: var(--font-md-2);
+}
+
+.sm-font-2 {
+    font-size: var(--font-sm-2);
+}
+
+.sm-font-1 {
+    font-size: var(--font-sm-1);
+}
+
+.bold {
+    font-weight: 600;
+}
