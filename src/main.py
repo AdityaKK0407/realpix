@@ -26,13 +26,13 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
         sys.exit(1)
     try:
         fastapi_app.state.redis_client = create_redis_client(host, int(port))
-        fastapi_app.state.create_sha = load_lua_script(
+        fastapi_app.state.create_sha = await load_lua_script(
             fastapi_app.state.redis_client, "src/redis_scripts/create.lua"
         )
-        fastapi_app.state.verify_sha = load_lua_script(
+        fastapi_app.state.verify_sha = await load_lua_script(
             fastapi_app.state.redis_client, "src/redis_scripts/verify.lua"
         )
-        fastapi_app.state.activate_token_sha = load_lua_script(
+        fastapi_app.state.activate_token_sha = await load_lua_script(
             fastapi_app.state.redis_client, "src/redis_scripts/activate_token.lua"
         )
     except Exception as e:

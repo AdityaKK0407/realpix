@@ -20,12 +20,12 @@ class TurnstileResult(BaseModel):
 
 @router.post("/captcha")
 async def verify_captcha(
-    payload: dict[str, str],
-    request: Request,
-    x_ratelimit_token: str | None = Header(None),
-    redis_client: redis.Redis = Depends(get_redis),
-    create_sha: str = Depends(get_create_sha),
-    activate_token_sha: str = Depends(get_activate_token_sha),
+        payload: dict[str, str],
+        request: Request,
+        x_ratelimit_token: str | None = Header(None),
+        redis_client: redis.Redis = Depends(get_redis),
+        create_sha: str = Depends(get_create_sha),
+        activate_token_sha: str = Depends(get_activate_token_sha),
 ) -> dict[str, str]:
     cloudflare_token = payload.get("token", None)
 
@@ -50,29 +50,22 @@ async def verify_captcha(
             detail="Client not available",
         )
 
-    async with httpx.AsyncClient() as client:
-        try:
-            resp = await client.post(
-                url,
-                data=dict(
-                    secret=secret_key, response=cloudflare_token, remoteip=user.host
-                ),
-            )
-            result = TurnstileResult.model_validate(resp.json())
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Unable to verify request at this time. Please try again later",
-            )
+    try:
+        success = await verify_turnstile(url, secret_key, cloudflare_token, user.host)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Unable to verify request at this time. Please try again later",
+        )
 
-        if not result.success:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CAPTCHA token"
-            )
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CAPTCHA token"
+        )
 
     try:
         if x_ratelimit_token and await activate_rate_limiter_token(
-            redis_client, activate_token_sha, x_ratelimit_token
+                redis_client, activate_token_sha, x_ratelimit_token
         ):
             return {"user_token": x_ratelimit_token}
 
@@ -84,3 +77,16 @@ async def verify_captcha(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Service temporarily unavailable",
         )
+
+
+async def verify_turnstile(url: str, secret_key: str, cloudflare_token: str, host: str) -> bool:
+    async with httpx.AsyncClient() as client:
+        resp = await client.post(
+            url,
+            data=dict(
+                secret=secret_key, response=cloudflare_token, remoteip=host
+            ),
+        )
+        result = TurnstileResult.model_validate(resp.json())
+
+    return result.success

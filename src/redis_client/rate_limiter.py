@@ -19,14 +19,20 @@ class VerifyTokenResult(Enum):
     UNREACHABLE = 3
 
 
-async def create_rate_limiter_token(client: redis.Redis, create_script_sha: str) -> str:
+async def create_rate_limiter_token(
+    client: redis.Redis,
+    create_script_sha: str,
+    total_quota: int = TOTAL_QUOTA,
+    bucket_size: int = BUCKET_SIZE,
+    ttl_seconds: int = TTL_SECONDS,
+) -> str:
     token_id = uuid.uuid4()
     key = f"rate_limiter:token:{token_id}"
 
-    initial_tokens = BUCKET_SIZE
+    initial_tokens = bucket_size
 
     result = client.evalsha(
-        create_script_sha, 1, key, TOTAL_QUOTA, initial_tokens, TTL_SECONDS
+        create_script_sha, 1, key, total_quota, initial_tokens, ttl_seconds
     )
 
     if isinstance(result, Awaitable):
@@ -36,11 +42,15 @@ async def create_rate_limiter_token(client: redis.Redis, create_script_sha: str)
 
 
 async def verify_rate_limiter_token(
-    client: redis.Redis, verify_script_sha: str, uuid_key: str
+    client: redis.Redis,
+    verify_script_sha: str,
+    uuid_key: str,
+    bucket_size: int = BUCKET_SIZE,
+    rate_per_second: float = RATE_PER_SECOND,
 ) -> VerifyTokenResult:
     key = f"rate_limiter:token:{uuid_key}"
 
-    result = client.evalsha(verify_script_sha, 1, key, BUCKET_SIZE, RATE_PER_SECOND)
+    result = client.evalsha(verify_script_sha, 1, key, bucket_size, rate_per_second)
     if isinstance(result, Awaitable):
         result = await result
 
