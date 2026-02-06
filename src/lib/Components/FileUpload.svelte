@@ -1,19 +1,27 @@
 <script lang="ts">
 
-	import { Check, Upload } from 'lucide-svelte';
+	import { Check, CircleAlert } from 'lucide-svelte';
 	import { validateFiles } from '$lib/scripts/validatingFiles';
+	import type { FileUploadOptions } from '$lib/types/fileupload.types';
 
-	let props = $props();
+
+	interface Props {
+		onSelect: (newFiles: File[], fileType: 'image' | 'video') => void;
+		fileType: 'image' | 'video';
+		extensions: 'PNG, JPG, JPEG' | 'Video';
+	}
+
+	let props: Props = $props();
 
 	let fileInput: HTMLInputElement;
-	let button: HTMLButtonElement;
-	let isOver: boolean = $state(false);
-	let uploadSuccess: boolean = $state(false);
+	let uploadState: FileUploadOptions = $state('resetState');
 	let successText: string = $state('');
 	let screenReaderMessage: string = $state('');
-	let errorOccurred: boolean = $state(false);
-	let firstText: string = $state('Click to Upload');
-	let secondText: string = $state('or drag and drop');
+	let headerText: string = $state(`Upload ${props.fileType}`);
+
+	function getFileOrFiles(files: File[]) {
+		return files.length > 1 ? 'Files' : 'File';
+	}
 
 	function handleFiles(files: FileList) {
 		if (files.length > 0) {
@@ -21,26 +29,21 @@
 				const filesArray = Array.from(files);
 				const filteredFilesArray = validateFiles(filesArray);
 				if (filteredFilesArray.length > 0) {
-					uploadSuccess = true;
-					successText = `${files.length === 1 ? 'File' : 'Files'} uploaded successfully.`;
+					uploadState = 'successState';
+					successText = `${getFileOrFiles(filteredFilesArray)} uploaded successfully.`;
 					screenReaderMessage = `${files.length === 1 ? 'One' : files.length} files have been selected successfully.`;
-					button.blur();
-					props.onSelect(Array.from(filteredFilesArray));
-					if(errorOccurred) {
-						errorOccurred = false;
-					}
+					props.onSelect(Array.from(filteredFilesArray), props.fileType);
+					headerText = `Uploaded ${getFileOrFiles(filteredFilesArray)}`;
 				} else {
-					errorOccurred = true;
-					firstText = 'An Error occurred.'
-					secondText = 'Please upload a file with the correct extensions'
+					uploadState = 'errorState';
 				}
 			}
 		}
 	}
 
-	function setOver(e: DragEvent, value: boolean) {
+	function setState(e: DragEvent, value: FileUploadOptions) {
 		e.preventDefault();
-		isOver = value;
+		uploadState = value;
 	}
 
 	function keyBoardEvent(e: KeyboardEvent) {
@@ -50,6 +53,7 @@
 	}
 
 	function inputChange(e: Event) {
+		e.preventDefault();
 		const target = e.target as HTMLInputElement;
 		if (target.files) {
 			handleFiles(target.files);
@@ -59,27 +63,29 @@
 	function drop(e: DragEvent) {
 		if (e.dataTransfer) {
 			e.preventDefault();
-			isOver = false;
 			handleFiles(e.dataTransfer.files);
 		}
 	}
 </script>
 
-<section class:error={errorOccurred}>
-	<button
-		bind:this={button}
+<section class="flex-column uploadSection">
+	<h2 class="lg-font-1">
+		{headerText}
+	</h2>
+	<div
+		role="button"
+		tabindex={uploadState === 'successState' ? -1 : 0}
 		class='dropzone'
-		class:drop-area={!errorOccurred}
-		class:dropping={isOver}
-		class:neutral={!isOver}
-		class:success={uploadSuccess}
-		class:error={errorOccurred}
-		ondragover={(e) => setOver(e, true)}
-		ondragleave={(e) => setOver(e, false)}
+		class:error={uploadState === 'errorState'}
+		class:dropping={uploadState === 'draggingState'}
+		class:neutral={uploadState === 'resetState'}
+		class:success={uploadState === 'successState'}
+		ondragover={(e) => setState(e, 'draggingState')}
+		ondragleave={(e) => setState(e, 'resetState')}
 		ondrop={drop}
 		onkeydown={keyBoardEvent}
 		onclick={() => {
-			if(!isOver && !uploadSuccess) {
+			if(uploadState === 'resetState' || uploadState === 'errorState') {
 				fileInput.click()
 			}}}
 		aria-label="Drag and drop images area"
@@ -93,28 +99,45 @@
 			multiple
 		/>
 
-		{#if !isOver && !uploadSuccess}
-			<section class="dropzone-text">
-				<strong class="lg-font-2">{firstText}</strong>
-				<p class="md-font-1">{secondText}</p>
-			</section>
-			<small class="sm-font-1">{props.extensions}</small>
+		{#if uploadState === 'resetState'}
+			<section class="dropzone-text flex-column">
+				<span class="material-symbols-outlined uploadIcon muted">
+					image_inset
+				</span>
+				<section class="dropzone-secondary-text flex-column">
+					<strong class="lg-font-2 primary">Drop images here</strong>
+					<p class="md-font-1 bodycolor">or click to browse</p>
+				</section>
 
-		{:else if uploadSuccess }
-			<section>
+			</section>
+
+		{:else if uploadState === 'successState' }
+			<section class="flex-column successText">
 				<p class="sr-only" aria-live="polite">{screenReaderMessage}</p>
 				<Check size="40" aria-hidden="true" />
 				<p class="md-font-2 bold" aria-hidden="true">{successText}</p>
 			</section>
 
-		{:else }
-			<section class="drop-field">
-				<Upload size="25" />
-				<p class="md-font-2 bold">Drop the file</p>
+		{:else if uploadState === 'draggingState' }
+			<section class="drop-field flex-column">
+				<span class="material-symbols-outlined uploadIcon">
+					image_inset
+				</span>
+				<p class="md-font-1 bold">Drop the file</p>
+			</section>
+
+		{:else if uploadState === 'errorState'}
+			<section class="dropzone-text flex-column errorSection">
+				<CircleAlert size="48" />
+				<section class="dropzone-secondary-text flex-column">
+					<strong class="lg-font-2">Upload failed</strong>
+					<p class="md-font-1">Please select a valid {props.fileType} file</p>
+				</section>
 			</section>
 		{/if}
 
-	</button>
+	</div>
+	<small class="sm-font-1 muted">{props.extensions}</small>
 </section>
 
 <style>
@@ -122,9 +145,11 @@
         width: 100%;
     }
 
-    .drop-area {
-        border-width: 0.25rem;
-        border-color: var(--color-border-neutral);
+    .uploadSection {
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-evenly;
+        height: 100%;
     }
 
     .dropzone {
@@ -132,20 +157,29 @@
         flex-direction: column;
         gap: 0.9rem;
         justify-content: center;
+        align-items: center;
         padding-inline: var(--file-upload-padding-inline);
         padding-block: var(--file-upload-padding-block);
         border-radius: 0.6rem;
         height: 15rem;
+        border-width: 0.25rem;
+        width: 100%;
     }
 
     .dropzone-text {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .dropzone-secondary-text {
+        gap: 0.27rem;
+        align-items: center;
     }
 
     .neutral {
         border-style: dashed;
+        border-color: var(--color-border-neutral);
+				cursor: pointer;
     }
 
     .dropping {
@@ -153,6 +187,7 @@
         border-color: var(--color-border-dragover);
         border-style: solid;
         cursor: default;
+				color: var(--color-text-dragover);
     }
 
     .drop-field {
@@ -162,21 +197,29 @@
         gap: var(--text-gap);
     }
 
-    button {
-        width: 100%;
-        background-color: var(--color-bg-neutral);
-    }
-
     .success {
         border-color: var(--color-border-success);
         background-color: var(--color-bg-success);
         color: var(--color-text-success);
         pointer-events: none;
+				border-style: dotted;
     }
 
-		.error {
-				border-color: var(--color-border-error);
-				background-color: var(--color-bg-error);
-				color: var(--color-text-error);
-		}
+    .successText {
+        align-items: center;
+    }
+
+    .error {
+        background-color: var(--color-bg-error);
+        border-color: var(--color-border-error);
+        border-style: dotted;
+    }
+
+    .errorSection {
+        color: var(--color-text-error);
+    }
+
+    .uploadIcon {
+        font-size: 3.2rem;
+    }
 </style>

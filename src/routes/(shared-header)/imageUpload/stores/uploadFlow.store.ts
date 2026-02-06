@@ -1,3 +1,9 @@
 import { writable} from 'svelte/store';
 
-export const uploadedFiles = writable<File[]>([])
+export interface FileUploader {
+	id: string
+	type: 'image' | 'video'
+	src: File
+}
+
+export const uploadedFiles = writable<FileUploader[]>([])

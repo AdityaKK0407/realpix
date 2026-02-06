@@ -22,6 +22,10 @@
     opacity: var(--panel-opacity-inactive);
 }
 
+.lg-font-1 {
+    font-size: var(--font-lg-1);
+}
+
 .lg-font-2 {
     font-size: var(--font-lg-2);
 }
@@ -44,4 +48,21 @@
 
 .bold {
     font-weight: 600;
+}
+
+.primary {
+    color: var(--color-text-primary);
+}
+
+.bodycolor {
+    color: var(--color-text-body);
+}
+
+.muted {
+    color: var(--color-text-muted);
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
 }
