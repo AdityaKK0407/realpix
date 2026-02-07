@@ -1,11 +1,14 @@
 <script lang="ts">
-	import '$lib/css/variables.css'
-	import '$lib/css/styles.css'
-	import '$lib/css/utilities.css'
+	import '$lib/css/variables.css';
+	import '$lib/css/styles.css';
+	import '$lib/css/utilities.css';
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=image_inset" />
+	<link
+		rel="stylesheet"
+		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=image_inset"
+	/>
 </svelte:head>
 
 <section>
@@ -15,11 +18,11 @@
 
 <style>
 	section {
-			display: grid;
-			grid-template-rows: 0.15fr 0.85fr;
-			height: 100dvh;
-			background-color: var(--color-bg-app);
-			padding-inline: var(--app-padding-inline);
-			padding-block: var(--app-padding-block);
+		display: grid;
+		grid-template-rows: 0.08fr 0.95fr;
+		height: 100dvh;
+		background-color: var(--color-bg-app);
+		padding-inline: var(--app-padding-inline);
+		padding-block: var(--app-padding-block);
 	}
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import FileUpload from '$lib/Components/FileUpload.svelte';
-	import { type FileUploader, uploadedFiles } from './stores/uploadFlow.store';
+	import { type FileUploader, uploadedFiles } from '$lib/state/uploadFlow.store';
 	import { transition, uploadState } from '$lib/upload/upload.store';
 	import Reset from '$lib/Panels/Reset.svelte';
 	import ReadyPanel from '$lib/Panels/ReadyPanel.svelte';
@@ -13,9 +13,9 @@
 				id: nanoid(),
 				type: fileType,
 				src: file
-			}
-		})
-		uploadedFiles.update(file => [...file, ...newItems]);
+			};
+		});
+		uploadedFiles.update((file) => [...file, ...newItems]);
 		transition('SELECT_IMAGE');
 		activePanel = Panel.Processing_Panel;
 	}
@@ -39,29 +39,29 @@
 		{#if $uploadState === 'idle'}
 			<Reset text="Select images to start the process" />
 		{:else if $uploadState === 'ready'}
-			<ReadyPanel fileType="image"/>
+			<ReadyPanel fileType="image" />
 		{/if}
 	</section>
 </main>
 
 <style>
-    main {
-        display: grid;
-        grid-template-columns: 0.26fr 0.74fr;
-        gap: var(--layout-panel-gap);
-				transition: grid-template-columns 300ms ease-in-out;
-    }
+	main {
+		display: grid;
+		grid-template-columns: 0.3fr 0.7fr;
+		gap: var(--layout-panel-gap);
+		transition: grid-template-columns 500ms ease-in-out;
+	}
 
-		.reduce-grid {
-				grid-template-columns: 0.14fr 0.86fr;
-		}
+	.reduce-grid {
+		grid-template-columns: 0.26fr 0.84fr;
+	}
 
-    section {
-        background-color: var(--color-bg-surface);
-        border-radius: var(--layout-panel-rounded);
-        padding-inline: var(--app-padding-inline);
-        padding-block: var(--app-padding-block);
-        transition: filter 400ms ease-in-out;
-        display: flex;
-    }
+	section {
+		background-color: var(--color-bg-surface);
+		border-radius: var(--layout-panel-rounded);
+		padding-inline: var(--app-padding-inline);
+		padding-block: var(--app-padding-block);
+		transition: filter 400ms ease-in-out;
+		display: flex;
+	}
 </style>

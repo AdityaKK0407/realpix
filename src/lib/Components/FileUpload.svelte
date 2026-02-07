@@ -1,9 +1,8 @@
 <script lang="ts">
-
-	import { Check, CircleAlert } from 'lucide-svelte';
+	import { Check, CircleAlert, Sparkles } from 'lucide-svelte';
 	import { validateFiles } from '$lib/scripts/validatingFiles';
 	import type { FileUploadOptions } from '$lib/types/fileupload.types';
-
+	import UploadingMetrics from './UploadingMetrics.svelte';
 
 	interface Props {
 		onSelect: (newFiles: File[], fileType: 'image' | 'video') => void;
@@ -66,6 +65,13 @@
 			handleFiles(e.dataTransfer.files);
 		}
 	}
+
+	function handleClick(e: Event) {
+		e.preventDefault();
+		if (uploadState === 'resetState' || uploadState === 'errorState') {
+			fileInput.click();
+		}
+	}
 </script>
 
 <section class="flex-column uploadSection">
@@ -75,7 +81,7 @@
 	<div
 		role="button"
 		tabindex={uploadState === 'successState' ? -1 : 0}
-		class='dropzone'
+		class="dropzone"
 		class:error={uploadState === 'errorState'}
 		class:dropping={uploadState === 'draggingState'}
 		class:neutral={uploadState === 'resetState'}
@@ -84,10 +90,6 @@
 		ondragleave={(e) => setState(e, 'resetState')}
 		ondrop={drop}
 		onkeydown={keyBoardEvent}
-		onclick={() => {
-			if(uploadState === 'resetState' || uploadState === 'errorState') {
-				fileInput.click()
-			}}}
 		aria-label="Drag and drop images area"
 	>
 		<input
@@ -101,31 +103,38 @@
 
 		{#if uploadState === 'resetState'}
 			<section class="dropzone-text flex-column">
-				<span class="material-symbols-outlined uploadIcon muted">
-					image_inset
-				</span>
+				<div class="iconField neutralIconField">
+					<span class="material-symbols-outlined uploadIcon"> image_inset </span>
+				</div>
 				<section class="dropzone-secondary-text flex-column">
-					<strong class="lg-font-2 primary">Drop images here</strong>
-					<p class="md-font-1 bodycolor">or click to browse</p>
+					<strong class="lg-font-2 primary">Drop {props.fileType}s here</strong>
+					<p class="sm-font-2 bodycolor">Max file limit: 5</p>
+					<small class="sm-font-1 muted">{props.extensions}</small>
 				</section>
-
+				<button
+					onclick={handleClick}
+					class="click-button bold sm-font-1"
+					aria-label={`This button opens the file explorer to select the ${props.fileType}s`}
+				>
+					Select {props.fileType}s
+				</button>
 			</section>
-
-		{:else if uploadState === 'successState' }
+		{:else if uploadState === 'successState'}
 			<section class="flex-column successText">
 				<p class="sr-only" aria-live="polite">{screenReaderMessage}</p>
 				<Check size="40" aria-hidden="true" />
 				<p class="md-font-2 bold" aria-hidden="true">{successText}</p>
 			</section>
-
-		{:else if uploadState === 'draggingState' }
+		{:else if uploadState === 'draggingState'}
 			<section class="drop-field flex-column">
-				<span class="material-symbols-outlined uploadIcon">
-					image_inset
-				</span>
-				<p class="md-font-1 bold">Drop the file</p>
+				<div class="iconField draggingIconField">
+					<span class="material-symbols-outlined uploadIcon"> image_inset </span>
+				</div>
+				<section class="flex-column dropzone-secondary-text">
+					<p class="md-font-2 bold">Drop the {props.fileType}</p>
+					<p class="sm-font-2 bold">Max file limit: 5</p>
+				</section>
 			</section>
-
 		{:else if uploadState === 'errorState'}
 			<section class="dropzone-text flex-column errorSection">
 				<CircleAlert size="48" />
@@ -135,91 +144,119 @@
 				</section>
 			</section>
 		{/if}
-
 	</div>
-	<small class="sm-font-1 muted">{props.extensions}</small>
+	<UploadingMetrics />
 </section>
 
 <style>
-    section {
-        width: 100%;
-    }
+	section {
+		width: 100%;
+	}
 
-    .uploadSection {
-        gap: 1rem;
-        align-items: center;
-        justify-content: space-evenly;
-        height: 100%;
-    }
+	.uploadSection {
+		gap: 1rem;
+		align-items: center;
+		justify-content: space-evenly;
+		height: 100%;
+	}
 
-    .dropzone {
-        display: flex;
-        flex-direction: column;
-        gap: 0.9rem;
-        justify-content: center;
-        align-items: center;
-        padding-inline: var(--file-upload-padding-inline);
-        padding-block: var(--file-upload-padding-block);
-        border-radius: 0.6rem;
-        height: 15rem;
-        border-width: 0.25rem;
-        width: 100%;
-    }
+	.dropzone {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+		justify-content: center;
+		align-items: center;
+		padding-inline: var(--file-upload-padding-inline);
+		padding-block: var(--file-upload-padding-block);
+		border-radius: 0.6rem;
+		border-width: 0.25rem;
+		width: 100%;
+		height: 18rem;
+	}
 
-    .dropzone-text {
-        gap: 1rem;
-        align-items: center;
-    }
+	.dropzone-text {
+		gap: 1rem;
+		align-items: center;
+	}
 
-    .dropzone-secondary-text {
-        gap: 0.27rem;
-        align-items: center;
-    }
+	.dropzone-secondary-text {
+		gap: 0.27rem;
+		align-items: center;
+	}
 
-    .neutral {
-        border-style: dashed;
-        border-color: var(--color-border-neutral);
-				cursor: pointer;
-    }
+	.neutral {
+		border-style: dashed;
+		border-color: var(--color-border-neutral);
+		cursor: pointer;
+	}
 
-    .dropping {
-        background-color: var(--color-bg-dragover);
-        border-color: var(--color-border-dragover);
-        border-style: solid;
-        cursor: default;
-				color: var(--color-text-dragover);
-    }
+	.dropping {
+		background-color: var(--color-bg-dragover);
+		border-color: var(--color-border-dragover);
+		border-style: solid;
+		cursor: default;
+		color: var(--color-text-dragover);
+	}
 
-    .drop-field {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--text-gap);
-    }
+	.dropping > * {
+		pointer-events: none;
+	}
 
-    .success {
-        border-color: var(--color-border-success);
-        background-color: var(--color-bg-success);
-        color: var(--color-text-success);
-        pointer-events: none;
-				border-style: dotted;
-    }
+	.drop-field {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--text-gap);
+	}
 
-    .successText {
-        align-items: center;
-    }
+	.success {
+		border-color: var(--color-border-success);
+		background-color: var(--color-bg-success);
+		color: var(--color-text-success);
+		pointer-events: none;
+		border-style: dotted;
+	}
 
-    .error {
-        background-color: var(--color-bg-error);
-        border-color: var(--color-border-error);
-        border-style: dotted;
-    }
+	.successText {
+		align-items: center;
+	}
 
-    .errorSection {
-        color: var(--color-text-error);
-    }
+	.error {
+		background-color: var(--color-bg-error);
+		border-color: var(--color-border-error);
+		border-style: dotted;
+	}
 
-    .uploadIcon {
-        font-size: 3.2rem;
-    }
+	.errorSection {
+		color: var(--color-text-error);
+	}
+
+	.uploadIcon {
+		font-size: 3rem;
+	}
+
+	.neutralIconField {
+		background-color: rgba(0 0 0 / 0.08);
+	}
+
+	.draggingIconField {
+		background-color: #fafafa;
+	}
+
+	.click-button {
+		background-color: var(--color-primary);
+		color: var(--color-primary-text);
+		padding-inline: var(--primary-button-padding-inline);
+		padding-block: var(--primary-button-padding-inline);
+		border-radius: 1.4rem;
+		filter: drop-shadow(0 0.125rem 0.5rem rgba(82 105 143 / 0.3));
+		transition:
+			background-color 400ms ease-in-out,
+			filter 385ms ease-in-out;
+	}
+
+	.click-button:hover {
+		background-color: var(--color-primary-hover);
+		filter: drop-shadow(0px 0.25rem 0.75rem rgba(82 105 143 / 0.35));
+	}
 </style>
