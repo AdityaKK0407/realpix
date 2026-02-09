@@ -53,7 +53,7 @@
 	}
 
 	.reduce-grid {
-		grid-template-columns: 0.26fr 0.84fr;
+		grid-template-columns: 0.27fr 0.83fr;
 	}
 
 	section {

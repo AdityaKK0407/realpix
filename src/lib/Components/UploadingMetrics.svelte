@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Sparkles, Shield } from 'lucide-svelte';
+	import { Bot, Shield } from 'lucide-svelte';
 	import { fileUploadFooterData } from '$lib/data/FileUploadingMetrics.data';
 
 	const elementProps = {
@@ -16,10 +16,10 @@
 				class:blue={metric.color === 'blue'}
 				class:green={metric.color === 'green'}
 			>
-				{#if metric.icon === 'Sparkles'}
-					<Sparkles {...elementProps} fill="#6b88ab" />
+				{#if metric.icon === 'Ai'}
+					<Bot {...elementProps} stroke="currentColor" strokeWidth={2} />
 				{:else if metric.icon === 'Shield'}
-					<Shield {...elementProps} fill="#6b9178" />
+					<Shield {...elementProps} fill="currentColor" />
 				{/if}
 			</div>
 			<div class="text-wrapper">
@@ -54,12 +54,14 @@
 	}
 
 	.blue {
-		background-color: var(--color-info-blue-bg);
-		filter: drop-shadow(0 0 0.5rem var(--color-info-blue-shadow));
+		background-color: var(--color-primary-100);
+		filter: drop-shadow(0 0 0.5rem var(--color-primary-300));
+		color: var(--color-primary-900);
 	}
 
 	.green {
-		background-color: var(--color-success-green-bg);
-		filter: drop-shadow(0 0 0.5rem var(--color-success-green-shadow));
+		background-color: var(--color-success-100);
+		filter: drop-shadow(0 0 0.5rem var(--color-success-300));
+		color: var(--color-success-900);
 	}
 </style>

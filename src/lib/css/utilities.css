@@ -38,6 +38,10 @@
 	font-size: var(--font-md-2);
 }
 
+.sm-font-3 {
+	font-size: var(--font-sm-3);
+}
+
 .sm-font-2 {
 	font-size: var(--font-sm-2);
 }
@@ -50,7 +54,7 @@
 	font-weight: 600;
 }
 
-.primary {
+.primary-text {
 	color: var(--color-text-primary);
 }
 
@@ -72,6 +76,84 @@
 	justify-content: center;
 	border-radius: 50vw;
 	padding: var(--small-padding);
-	opacity: 0.8;
+}
+
+.color-pri {
 	color: var(--color-primary);
+}
+
+.color-pri-900 {
+	color: var(--color-primary-900);
+}
+
+.color-pri-800 {
+	color: var(--color-primary-800);
+}
+
+.color-pri-700 {
+	color: var(--color-primary-700);
+}
+
+.color-pri-600 {
+	color: var(--color-primary-600);
+}
+
+.color-pri-500 {
+	color: var(--color-primary-500);
+}
+
+.color-pri-400 {
+	color: var(--color-primary-400);
+}
+
+.color-pri-300 {
+	color: var(--color-primary-300);
+}
+
+.color-pri-200 {
+	color: var(--color-primary-200);
+}
+
+.color-pri-100 {
+	color: var(--color-primary-100);
+}
+
+.color-text-pri {
+	color: var(--color-primary-text);
+}
+
+.background-color-pri-900 {
+	background-color: var(--color-primary-900);
+}
+
+.background-color-pri-800 {
+	background-color: var(--color-primary-800);
+}
+
+.background-color-pri-700 {
+	background-color: var(--color-primary-700);
+}
+
+.background-color-pri-600 {
+	background-color: var(--color-primary-600);
+}
+
+.background-color-pri-500 {
+	background-color: var(--color-primary-500);
+}
+
+.background-color-pri-400 {
+	background-color: var(--color-primary-400);
+}
+
+.background-color-pri-300 {
+	background-color: var(--color-primary-300);
+}
+
+.background-color-pri-200 {
+	background-color: var(--color-primary-200);
+}
+
+.background-color-pri-100 {
+	background-color: var(--color-primary-100);
 }

@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 export const fileUploadFooterData = [
 	{
 		id: nanoid(),
-		icon: 'Sparkles',
+		icon: 'Ai',
 		heading: 'Model',
 		text: 'Real Pix V.1',
 		color: 'blue'

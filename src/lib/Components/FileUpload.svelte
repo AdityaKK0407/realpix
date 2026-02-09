@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { Check, CircleAlert, Sparkles } from 'lucide-svelte';
+	import { Check, CircleAlert, CircleCheckBigIcon, Info } from 'lucide-svelte';
 	import { validateFiles } from '$lib/scripts/validatingFiles';
 	import type { FileUploadOptions } from '$lib/types/fileupload.types';
 	import UploadingMetrics from './UploadingMetrics.svelte';
+	import { range } from '$lib/scripts/utils';
+	import { toTitleCase } from '$lib/types/RealString';
 
 	interface Props {
 		onSelect: (newFiles: File[], fileType: 'image' | 'video') => void;
@@ -17,6 +19,7 @@
 	let successText: string = $state('');
 	let screenReaderMessage: string = $state('');
 	let headerText: string = $state(`Upload ${props.fileType}`);
+	const numbers = range(1, 8);
 
 	function getFileOrFiles(files: File[]) {
 		return files.length > 1 ? 'Files' : 'File';
@@ -103,11 +106,11 @@
 
 		{#if uploadState === 'resetState'}
 			<section class="dropzone-text flex-column">
-				<div class="iconField neutralIconField">
+				<div class="iconField background-color-pri-100 color-pri">
 					<span class="material-symbols-outlined uploadIcon"> image_inset </span>
 				</div>
 				<section class="dropzone-secondary-text flex-column">
-					<strong class="lg-font-2 primary">Drop {props.fileType}s here</strong>
+					<strong class="lg-font-2 primary-text">Drop {props.fileType}s here</strong>
 					<p class="sm-font-2 bodycolor">Max file limit: 5</p>
 					<small class="sm-font-1 muted">{props.extensions}</small>
 				</section>
@@ -122,13 +125,18 @@
 		{:else if uploadState === 'successState'}
 			<section class="flex-column successText">
 				<p class="sr-only" aria-live="polite">{screenReaderMessage}</p>
-				<Check size="40" aria-hidden="true" />
+				<section class="successIcon" aria-hidden="true">
+					<CircleCheckBigIcon size="40" />
+				</section>
 				<p class="md-font-2 bold" aria-hidden="true">{successText}</p>
 			</section>
 		{:else if uploadState === 'draggingState'}
 			<section class="drop-field flex-column">
-				<div class="iconField draggingIconField">
+				<div class="iconField background-color-pri-900 color-text-pri pulse">
 					<span class="material-symbols-outlined uploadIcon"> image_inset </span>
+					{#each numbers as number (number)}
+						<span style={`--i: ${number}`} class="animate-element"></span>
+					{/each}
 				</div>
 				<section class="flex-column dropzone-secondary-text">
 					<p class="md-font-2 bold">Drop the {props.fileType}</p>
@@ -146,6 +154,13 @@
 		{/if}
 	</div>
 	<UploadingMetrics />
+	<section class="footer-content">
+		<Info size="24" stroke="currentColor" />
+		<p class="sm-font-3">
+			<strong>Note: </strong>
+			{toTitleCase(props.fileType)} are deleted after processing
+		</p>
+	</section>
 </section>
 
 <style>
@@ -154,10 +169,9 @@
 	}
 
 	.uploadSection {
-		gap: 1rem;
+		gap: var(--text-gap-large);
 		align-items: center;
 		justify-content: space-evenly;
-		height: 100%;
 	}
 
 	.dropzone {
@@ -187,15 +201,13 @@
 	.neutral {
 		border-style: dashed;
 		border-color: var(--color-border-neutral);
-		cursor: pointer;
 	}
 
 	.dropping {
-		background-color: var(--color-bg-dragover);
+		background-color: var(--color-primary-lowest);
 		border-color: var(--color-border-dragover);
 		border-style: solid;
-		cursor: default;
-		color: var(--color-text-dragover);
+		color: var(--color-primary);
 	}
 
 	.dropping > * {
@@ -206,19 +218,30 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: var(--text-gap);
+		gap: var(--text-gap-large);
 	}
 
 	.success {
 		border-color: var(--color-border-success);
-		background-color: var(--color-bg-success);
+		background-color: var(--color-success-lowest);
 		color: var(--color-text-success);
 		pointer-events: none;
 		border-style: dotted;
 	}
 
 	.successText {
+		gap: var(--text-gap);
 		align-items: center;
+		justify-content: center;
+	}
+
+	.successIcon {
+		width: max-content;
+		background-color: var(--color-success-100);
+		display: flex;
+		justify-content: center;
+		border-radius: 50vw;
+		padding: var(--small-padding);
 	}
 
 	.error {
@@ -235,12 +258,44 @@
 		font-size: 3rem;
 	}
 
-	.neutralIconField {
-		background-color: rgba(0 0 0 / 0.08);
+	.pulse {
+		display: grid;
+		border: 1px solid var(--color-primary-500);
+		box-shadow:
+			inset 0 0 2.5rem var(--color-primary-500),
+			0 0 3.125rem var(--color-primary-500);
 	}
 
-	.draggingIconField {
-		background-color: #fafafa;
+	.pulse > * {
+		grid-row-start: 1;
+		grid-column-start: 1;
+	}
+
+	.pulse > .animate-element {
+		width: 100%;
+		height: 100%;
+		background-color: transparent;
+		border: 1px solid var(--color-primary-400);
+		border-radius: 50vw;
+		animation: animate 6s linear infinite;
+		animation-delay: calc(var(--i) * -1.2s);
+	}
+
+	@keyframes animate {
+		0% {
+			scale: 1;
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.6;
+		}
+		75% {
+			opacity: 0.2;
+		}
+		100% {
+			scale: 3;
+			opacity: 0;
+		}
 	}
 
 	.click-button {
@@ -249,7 +304,7 @@
 		padding-inline: var(--primary-button-padding-inline);
 		padding-block: var(--primary-button-padding-inline);
 		border-radius: 1.4rem;
-		filter: drop-shadow(0 0.125rem 0.5rem rgba(82 105 143 / 0.3));
+		filter: drop-shadow(0 0.125rem 0.55rem var(--color-primary-400));
 		transition:
 			background-color 400ms ease-in-out,
 			filter 385ms ease-in-out;
@@ -257,6 +312,14 @@
 
 	.click-button:hover {
 		background-color: var(--color-primary-hover);
-		filter: drop-shadow(0px 0.25rem 0.75rem rgba(82 105 143 / 0.35));
+		filter: drop-shadow(0px 0.25rem 0.6rem var(--color-primary-600));
+	}
+
+	.footer-content {
+		display: flex;
+		gap: var(--text-gap);
+		justify-content: center;
+		align-items: center;
+		color: var(--color-primary-900);
 	}
 </style>
