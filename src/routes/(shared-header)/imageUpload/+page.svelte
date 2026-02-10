@@ -1,21 +1,13 @@
 <script lang="ts">
 	import FileUpload from '$lib/Components/FileUpload.svelte';
-	import { type FileUploader, uploadedFiles } from '$lib/state/uploadFlow.store';
+	import { type FileType, uploadFiles } from '$lib/state/uploadFlow.store';
 	import { transition, uploadState } from '$lib/upload/upload.store';
 	import Reset from '$lib/Panels/Reset.svelte';
 	import ReadyPanel from '$lib/Panels/ReadyPanel.svelte';
-	import { nanoid } from 'nanoid';
 	import { Panel } from '$lib/types/Panel';
 
-	function setFiles(newFiles: File[], fileType: 'image' | 'video') {
-		const newItems: FileUploader[] = newFiles.map((file: File) => {
-			return {
-				id: nanoid(),
-				type: fileType,
-				src: file
-			};
-		});
-		uploadedFiles.update((file) => [...file, ...newItems]);
+	function setFiles(newFiles: File[], fileType: FileType) {
+		uploadFiles(newFiles, fileType);
 		transition('SELECT_IMAGE');
 		activePanel = Panel.Processing_Panel;
 	}
@@ -37,7 +29,11 @@
 	</section>
 	<section class={setClassNames(Panel.Processing_Panel)}>
 		{#if $uploadState === 'idle'}
-			<Reset text="Select images to start the process" />
+			<Reset
+				text={['AI Model is ready to complete your request.', 'Please select an image to get started']}
+				serverStatus={true}
+				inactiveText={['Please wait for the AI Model to be activated.', 'We are sorry for the inconvenience caused.']}
+			/>
 		{:else if $uploadState === 'ready'}
 			<ReadyPanel fileType="image" />
 		{/if}

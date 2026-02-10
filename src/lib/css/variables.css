@@ -10,6 +10,7 @@
 	--panel-padding-block: 0.7rem;
 
 	--small-padding: 0.5rem 0.5rem;
+	--medium-padding: 1.01rem 1.1rem;
 	--primary-button-padding-inline: 0.9rem;
 	--primary-button-padding-block: 0.7rem;
 
@@ -92,6 +93,7 @@
 	--font-lg-2: 1.5rem;
 	--font-md-1: 1.25rem;
 	--font-md-2: 1.27rem;
+	--font-sm-4: 0.75rem;
 	--font-sm-3: 0.98rem;
 	--font-sm-2: 1.1rem;
 	--font-sm-1: 0.85rem;

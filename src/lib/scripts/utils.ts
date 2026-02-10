@@ -6,4 +6,14 @@ function range(start: number, end: number) {
 	return array;
 }
 
-export { range };
+function toTitleCase(stringVal: string) {
+	const words = stringVal.split('');
+	words[0] = words[0].toUpperCase();
+	return words.join('');
+}
+
+function addSBasedOnCondition(condition: boolean, value: string) {
+		return condition ? `${value}s` : value
+}
+
+export { range, toTitleCase, addSBasedOnCondition };
