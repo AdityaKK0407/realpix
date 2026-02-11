@@ -161,3 +161,15 @@
 .background-color-pri-100 {
 	background-color: var(--color-primary-100);
 }
+
+.background_color_pri_lowest {
+	background-color: var(--color-primary-lowest);
+}
+
+.transparent {
+	background-color: transparent;
+}
+
+.align-center {
+	text-align: center;
+}

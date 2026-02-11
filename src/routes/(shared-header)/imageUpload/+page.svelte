@@ -1,13 +1,13 @@
 <script lang="ts">
 	import FileUpload from '$lib/Components/FileUpload.svelte';
-	import { type FileType, uploadFiles } from '$lib/state/uploadFlow.store';
+	import { type FileType, uploadData } from '$lib/state/uploadFlow.store';
 	import { transition, uploadState } from '$lib/upload/upload.store';
 	import Reset from '$lib/Panels/Reset.svelte';
 	import ReadyPanel from '$lib/Panels/ReadyPanel.svelte';
 	import { Panel } from '$lib/types/Panel';
 
 	function setFiles(newFiles: File[], fileType: FileType) {
-		uploadFiles(newFiles, fileType);
+		uploadData.uploadFiles(newFiles, fileType);
 		transition('SELECT_IMAGE');
 		activePanel = Panel.Processing_Panel;
 	}
@@ -49,7 +49,7 @@
 	}
 
 	.reduce-grid {
-		grid-template-columns: 0.27fr 0.83fr;
+		grid-template-columns: 0.26fr 0.84fr;
 	}
 
 	section {
