@@ -82,6 +82,7 @@
 		class="dropzone"
 		class:error={uploadState === 'errorState'}
 		class:dropping={uploadState === 'draggingState'}
+		class:background_color_pri_lowest={uploadState === 'draggingState'}
 		class:neutral={uploadState === 'resetState'}
 		class:success={uploadState === 'successState'}
 		ondragover={(e) => setState(e, 'draggingState')}
@@ -123,7 +124,7 @@
 				<section class="successIcon" aria-hidden="true">
 					<CircleCheckBigIcon size="40" />
 				</section>
-				<p class="md-font-2 bold" aria-hidden="true">{successText}</p>
+				<p class="md-font-2 bold align-center" aria-hidden="true">{successText}</p>
 			</section>
 		{:else if uploadState === 'draggingState'}
 			<section class="drop-field flex-column">
@@ -159,161 +160,162 @@
 </section>
 
 <style>
-    section {
-        width: 100%;
-    }
+	section {
+		width: 100%;
+	}
 
-    .uploadSection {
-        gap: var(--text-gap-large);
-        align-items: center;
-        justify-content: space-evenly;
-    }
+	.uploadSection {
+		gap: var(--text-gap-large);
+		align-items: center;
+		justify-content: space-evenly;
+	}
 
-    .dropzone {
-        display: flex;
-        flex-direction: column;
-        gap: 0.9rem;
-        justify-content: center;
-        align-items: center;
-        padding-inline: var(--file-upload-padding-inline);
-        padding-block: var(--file-upload-padding-block);
-        border-radius: 0.6rem;
-        border-width: 0.25rem;
-        width: 100%;
-        height: 18rem;
-    }
+	.dropzone {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+		justify-content: center;
+		align-items: center;
+		padding-inline: var(--file-upload-padding-inline);
+		padding-block: var(--file-upload-padding-block);
+		border-radius: 0.6rem;
+		border-width: 0.25rem;
+		width: 100%;
+		height: 18rem;
+	}
 
-    .dropzone-text {
-        gap: 1rem;
-        align-items: center;
-    }
+	.dropzone-text {
+		gap: 1rem;
+		align-items: center;
+	}
 
-    .dropzone-secondary-text {
-        gap: 0.27rem;
-        align-items: center;
-    }
+	.dropzone-secondary-text {
+		gap: 0.27rem;
+		align-items: center;
+	}
 
-    .neutral {
-        border-style: dashed;
-        border-color: var(--color-border-neutral);
-    }
+	.neutral {
+		border-style: dashed;
+		border-color: var(--color-border-neutral);
+	}
 
-    .dropping {
-        background-color: var(--color-primary-lowest);
-        border-color: var(--color-border-dragover);
-        border-style: solid;
-        color: var(--color-primary);
-    }
+	.dropping {
+		border-color: var(--color-border-dragover);
+		border-style: solid;
+		color: var(--color-primary);
+	}
 
-    .dropping > * {
-        pointer-events: none;
-    }
+	.dropping > * {
+		pointer-events: none;
+	}
 
-    .drop-field {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--text-gap-large);
-    }
+	.drop-field {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--text-gap-large);
+	}
 
-    .success {
-        border-color: var(--color-border-success);
-        background-color: var(--color-success-lowest);
-        color: var(--color-text-success);
-        pointer-events: none;
-        border-width: 0.19rem;
-        border-style: dotted;
-    }
+	.success {
+		border-color: var(--color-border-success);
+		background-color: var(--color-success-lowest);
+		color: var(--color-text-success);
+		pointer-events: none;
+		border-width: 0.19rem;
+		border-style: dotted;
+	}
 
-    .successText {
-        gap: var(--text-gap);
-        align-items: center;
-        justify-content: center;
-    }
+	.successText {
+		gap: var(--text-gap);
+		align-items: center;
+		justify-content: center;
+	}
 
-    .successIcon {
-        width: max-content;
-        background-color: var(--color-success-100);
-        display: flex;
-        justify-content: center;
-        border-radius: 50vw;
-        padding: var(--small-padding);
-    }
+	.successIcon {
+		width: max-content;
+		background-color: var(--color-success-100);
+		display: flex;
+		justify-content: center;
+		border-radius: 50vw;
+		padding: var(--small-padding);
+	}
 
-    .error {
-        background-color: var(--color-bg-error);
-        border-color: var(--color-border-error);
-        border-style: dotted;
-    }
+	.error {
+		background-color: var(--color-bg-error);
+		border-color: var(--color-border-error);
+		border-style: dotted;
+	}
 
-    .errorSection {
-        color: var(--color-text-error);
-    }
+	.errorSection {
+		color: var(--color-text-error);
+	}
 
-    .uploadIcon {
-        font-size: 3rem;
-    }
+	.uploadIcon {
+		font-size: 3rem;
+	}
 
-    .pulse {
-        display: grid;
-        border: 1px solid var(--color-primary-500);
-        box-shadow: inset 0 0 2.5rem var(--color-primary-500),
-        0 0 3.125rem var(--color-primary-500);
-    }
+	.pulse {
+		display: grid;
+		border: 1px solid var(--color-primary-500);
+		box-shadow:
+			inset 0 0 2.5rem var(--color-primary-500),
+			0 0 3.125rem var(--color-primary-500);
+	}
 
-    .pulse > * {
-        grid-row-start: 1;
-        grid-column-start: 1;
-    }
+	.pulse > * {
+		grid-row-start: 1;
+		grid-column-start: 1;
+	}
 
-    .pulse > .animate-element {
-        width: 100%;
-        height: 100%;
-        background-color: transparent;
-        border: 1px solid var(--color-primary-400);
-        border-radius: 50vw;
-        animation: animate 6s linear infinite;
-        animation-delay: calc(var(--i) * -1.2s);
-    }
+	.pulse > .animate-element {
+		width: 100%;
+		height: 100%;
+		background-color: transparent;
+		border: 1px solid var(--color-primary-400);
+		border-radius: 50vw;
+		animation: animate 6s linear infinite;
+		animation-delay: calc(var(--i) * -1.2s);
+	}
 
-    @keyframes animate {
-        0% {
-            scale: 1;
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.6;
-        }
-        75% {
-            opacity: 0.2;
-        }
-        100% {
-            scale: 3;
-            opacity: 0;
-        }
-    }
+	@keyframes animate {
+		0% {
+			scale: 1;
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.6;
+		}
+		75% {
+			opacity: 0.2;
+		}
+		100% {
+			scale: 3;
+			opacity: 0;
+		}
+	}
 
-    .click-button {
-        background-color: var(--color-primary);
-        color: var(--color-primary-text);
-        padding-inline: var(--primary-button-padding-inline);
-        padding-block: var(--primary-button-padding-inline);
-        border-radius: 1.4rem;
-        filter: drop-shadow(0 0.125rem 0.55rem var(--color-primary-400));
-        transition: background-color 400ms ease-in-out,
-        filter 385ms ease-in-out;
-    }
+	.click-button {
+		background-color: var(--color-primary);
+		color: var(--color-primary-text);
+		padding-inline: var(--primary-button-padding-inline);
+		padding-block: var(--primary-button-padding-inline);
+		border-radius: 1.4rem;
+		filter: drop-shadow(0 0.125rem 0.55rem var(--color-primary-400));
+		transition:
+			background-color 400ms ease-in-out,
+			filter 385ms ease-in-out;
+	}
 
-    .click-button:hover {
-        background-color: var(--color-primary-hover);
-        filter: drop-shadow(0px 0.25rem 0.6rem var(--color-primary-600));
-    }
+	.click-button:hover {
+		background-color: var(--color-primary-hover);
+		filter: drop-shadow(0px 0.25rem 0.6rem var(--color-primary-600));
+	}
 
-    .footer-content {
-        display: flex;
-        gap: var(--text-gap);
-        justify-content: center;
-        align-items: center;
-        color: var(--color-primary-900);
-    }
+	.footer-content {
+		display: flex;
+		gap: var(--text-gap);
+		justify-content: center;
+		align-items: center;
+		color: var(--color-primary-900);
+	}
 </style>

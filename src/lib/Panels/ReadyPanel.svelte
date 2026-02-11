@@ -1,39 +1,41 @@
 <script lang="ts">
-	import {
-		getNamesOfType,
-		returnBlobs,
-		returnFileType,
-		returnLength,
-		returnLengthOne
-	} from '$lib/state/uploadFlow.store';
-	import { onDestroy } from 'svelte';
-	import { range } from '$lib/scripts/utils';
+	import { browser } from '$app/environment';
+	import { uploadData, type FileType } from '$lib/state/uploadFlow.store';
 	import { ImagePlus } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
-		fileType: 'image' | 'video';
+		fileType: FileType;
 	}
 
-	const index = $state(0);
 	const props: Props = $props();
-	const fileType = returnFileType(props.fileType);
-	const urls = returnBlobs(props.fileType);
-	const names = getNamesOfType(props.fileType);
-	const selectedImage = $derived(urls[index]);
-	const selectedName = $derived(names[index]);
-	const oneImage = returnLengthOne(props.fileType);
-	const length = returnLength(props.fileType);
-	const remainingLength = range(length + 1, 5);
+	let index: string = $state('');
 
-	onDestroy(() => {
-		urls.forEach((url) => URL.revokeObjectURL(url));
-	});
+	onMount(() => {
+		index = uploadData.getFileTypeFirstId(props.fileType)
+	})
+
+	const fileType = uploadData.getFileType(props.fileType);
+	let selectedImage = $derived(browser && index ? uploadData.getFileBlob(index) : '')
+	const selectedName = $derived(browser && index ? uploadData.getName(index) : "");
+	const length = uploadData.getLength(props.fileType);
+	const oneImage = length === 1;
+	const remainingLength = uploadData.getMaxLength();
+
+	function changeIndex(num: string) {
+		index = num;
+	}
 </script>
 
 <section class="ready-container" class:bigImage={oneImage} class:smallImage={!oneImage}>
 	<section class="image-container">
-		<img src={selectedImage} alt={`Image:- ${selectedName}`} aria-hidden="true" class:max={oneImage}
-				 class:small={!oneImage} />
+		<img
+			src={selectedImage}
+			alt={`Image:- ${selectedName}`}
+			aria-hidden="true"
+			class:max={oneImage}
+			class:small={!oneImage}
+		/>
 	</section>
 	<section class:oneLayout={oneImage}>
 		{#if oneImage}
@@ -41,20 +43,20 @@
 		{:else if !oneImage}
 			<section class="flex-column">
 				<section>
-					<p class="sm-font-3 bold">{index + 1} / {length} images filled</p>
+					<p class="sm-font-3 bold">{length} / {remainingLength} images filled</p>
 				</section>
 				<section class="buttons">
 					{#each fileType as image (image.id)}
-						<button class="sm-font-4 iconImage">
-							<img src={image.blob} alt={`Image:- ${image.name}`} />
-							{image.name}
+						<button class="sm-font-4 iconImage transparent" onclick={() => changeIndex(image.id)}>
+							<img src={image.blob} alt={`Image:- ${image.name}`} class="buttonImg"/>
+							{image.name}0
 						</button>
 					{/each}
-					{#each remainingLength as no (no)}
-						<button>
-							<ImagePlus />
+					{#if length !== remainingLength}
+						<button class="sm-font-2 addButton background-color-pri-lowest color-pri">
+							<ImagePlus color="currentColor" />
 						</button>
-					{/each}
+					{/if}
 				</section>
 			</section>
 		{/if}
@@ -62,63 +64,76 @@
 </section>
 
 <style>
-    .ready-container {
-        flex-grow: 1;
-        display: grid;
-    }
+	.ready-container {
+		flex-grow: 1;
+		display: grid;
+	}
 
-    .bigImage {
-        grid-template-rows: 0.7fr 0.15fr 0.15fr;
-    }
+	.bigImage {
+		grid-template-rows: 0.7fr 0.15fr 0.15fr;
+	}
 
-    .smallImage {
-        grid-template-rows: 0.55fr 0.34fr 0.11fr;
-    }
+	.smallImage {
+		grid-template-rows: 0.55fr 0.34fr 0.11fr;
+	}
 
-    .image-container {
-        background-color: var(--color-primary-lowest);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 2rem;
-        padding: var(--small-padding);
-    }
+	.image-container {
+		background-color: var(--color-primary-lowest);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 2rem;
+		padding: var(--small-padding);
+	}
 
-    .oneLayout {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+	.oneLayout {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
 
-    .buttons {
-        display: flex;
-        gap: var(--text-gap);
-        justify-content: center;
-        align-items: center;
-    }
+	.buttons {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+		gap: var(--text-gap);
+		justify-content: center;
+	}
 
-    .iconImage {
-        width: 17%;
-        letter-spacing: 0.01em;
-        line-height: 1.3;
-        padding: var(--small-padding);
-        border-radius: 1rem;
-        background-color: transparent;
-    }
+	.iconImage {
+		width: clamp(1.5rem, 13vw, 18rem);
+		height: clamp(1.6rem, 8.7vw, 12rem);
+		letter-spacing: 0.01em;
+		line-height: 1.3;
+		border-radius: 1rem;
+	}
 
-    img {
-        max-width: 100%;
-        max-height: 100%;
-        height: auto;
-        object-fit: contain;
-        display: block;
-    }
+	.addButton {
+		padding: var(--medium2-padding);
+		border: 0.16rem var(--color-primary-300) dotted;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 1.2rem;
+	}
 
-    img.small {
-        width: 55%;
-    }
+	.buttonImg {
+		display: block;
+		object-fit: cover;
+		height: clamp(1.4rem, 7vw, 8rem);
+	}
 
-    img.max {
-        width: 60%;
-    }
+	img {
+		max-width: 100%;
+		height: auto;
+		object-fit: cover;
+		display: block;
+	}
+
+	img.small {
+		max-height: 20rem;
+	}
+
+	img.max {
+		max-height: 23rem;
+	}
 </style>
