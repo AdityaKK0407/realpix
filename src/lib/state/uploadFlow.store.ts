@@ -1,6 +1,6 @@
 import { get, writable, type Writable } from 'svelte/store';
 import { nanoid } from 'nanoid';
-import { files } from '$service-worker';
+import { browser } from '$app/environment';
 
 export interface FileUploader {
 	id: string
@@ -27,37 +27,39 @@ class UploadState {
 	}
 
 	uploadFiles(newFiles: File[], fileType: FileType) {
-		if (fileType === 'image') {
-			this.imageLength += newFiles.length
-		} else if (fileType === 'video') {
-			this.videoLength += newFiles.length
-		}
+		if (browser) {
+			if (fileType === 'image') {
+				this.imageLength += newFiles.length
+			} else if (fileType === 'video') {
+				this.videoLength += newFiles.length
+			}
 
-		const newItems: FileUploader[] = newFiles.map((file: File) => {
-			return {
-				id: nanoid(),
-				type: fileType,
-				src: file,
-				blob: URL.createObjectURL(file),
-				name: file.name
-			};
-		});
-		this.uploadFilesWritable.update((file) => [...file, ...newItems]);
-		this.uploadedFiles = get(this.uploadFilesWritable);
+			const newItems: FileUploader[] = newFiles.map((file: File) => {
+				return {
+					id: nanoid(),
+					type: fileType,
+					src: file,
+					blob: URL.createObjectURL(file),
+					name: file.name
+				};
+			});
+			this.uploadFilesWritable.update((file) => [...file, ...newItems]);
+			this.uploadedFiles = get(this.uploadFilesWritable);
+		}
 	}
 
 	getFileType(fileType: FileType) {
-		return this.uploadedFiles.filter((file: FileUploader) => file.type === fileType)
+		return browser ? this.uploadedFiles.filter((file: FileUploader) => file.type === fileType) : undefined
 	}
 
 	getBlobs(fileType: FileType) {
 		const files = this.getFileType(fileType)
-		return files.map((file: FileUploader) => file.blob)
+		return files && files.map((file: FileUploader) => file.blob);
 	}
 
 	getNamesOfType(fileType: FileType) {
 		const files = this.getFileType(fileType);
-		return files.map((file: FileUploader) => file.name)
+		return files && files.map((file: FileUploader) => file.name);
 	}
 
 	getName(id: string) {
@@ -70,7 +72,7 @@ class UploadState {
 
 	getFileBlob(id: string) {
 		const file = this.getFile(id)
-		if(file) {
+		if (file) {
 			return file.blob;
 		} else {
 			return this.uploadedFiles[0].blob
@@ -79,7 +81,7 @@ class UploadState {
 
 	getFileTypeFirstId(fileType: FileType) {
 		const files = this.getFileType(fileType)
-		return files[0].id
+		return files && files[0].id
 	}
 
 	getLength(fileType: FileType) {

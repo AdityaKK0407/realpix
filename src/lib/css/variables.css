@@ -19,6 +19,9 @@
 	--file-upload-padding-inline: 1.5rem;
 	--file-upload-padding-block: 2rem;
 
+	--button-radius: 1rem;
+	--button-gap: 0.75rem;
+
 	--color-border-default: #b8ada4;
 
 	--color-text-primary: #4a4a4a;
