@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { uploadData, type FileType } from '$lib/state/uploadFlow.store';
-	import { ImagePlus } from 'lucide-svelte';
+	import { CircleX, ImagePlus, ScanSearch, X } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -12,12 +12,12 @@
 	let index: string = $state('');
 
 	onMount(() => {
-		index = uploadData.getFileTypeFirstId(props.fileType)
-	})
+		index = uploadData.getFileTypeFirstId(props.fileType)!;
+	});
 
 	const fileType = uploadData.getFileType(props.fileType);
-	let selectedImage = $derived(browser && index ? uploadData.getFileBlob(index) : '')
-	const selectedName = $derived(browser && index ? uploadData.getName(index) : "");
+	let selectedImage = $derived(uploadData.getFileBlob(index));
+	const selectedName = $derived(uploadData.getName(index));
 	const length = uploadData.getLength(props.fileType);
 	const oneImage = length === 1;
 	const remainingLength = uploadData.getMaxLength();
@@ -41,15 +41,19 @@
 		{#if oneImage}
 			<p class="md-font-2 bold">Image 1 ({selectedName})</p>
 		{:else if !oneImage}
-			<section class="flex-column">
+			<section class="flex-column imageDisplay">
 				<section>
 					<p class="sm-font-3 bold">{length} / {remainingLength} images filled</p>
 				</section>
 				<section class="buttons">
 					{#each fileType as image (image.id)}
-						<button class="sm-font-4 iconImage transparent" onclick={() => changeIndex(image.id)}>
-							<img src={image.blob} alt={`Image:- ${image.name}`} class="buttonImg"/>
-							{image.name}0
+						<button
+							class="sm-font-4 iconImage transparent flex-column bold"
+							class:selected={image.id === index}
+							onclick={() => changeIndex(image.id)}
+						>
+							<img src={image.blob} alt={`Image:- ${image.name}`} class="buttonImg" />
+							{image.name}
 						</button>
 					{/each}
 					{#if length !== remainingLength}
@@ -61,12 +65,20 @@
 			</section>
 		{/if}
 	</section>
+	<section class="btn-container">
+		<button class="btn primary-btn md-font-1 medium-bold">
+			Analyze
+			<ScanSearch stroke-width={2}/>
+		</button>
+		<button class="btn secondary-btn md-font-1">Clear <CircleX /></button>
+	</section>
 </section>
 
 <style>
 	.ready-container {
 		flex-grow: 1;
 		display: grid;
+		gap: var(--text-gap);
 	}
 
 	.bigImage {
@@ -99,12 +111,23 @@
 		justify-content: center;
 	}
 
+	.imageDisplay {
+		gap: 0.5rem;
+	}
+
 	.iconImage {
-		width: clamp(1.5rem, 13vw, 18rem);
-		height: clamp(1.6rem, 8.7vw, 12rem);
+		gap: var(--text-gap);
+		align-items: center;
 		letter-spacing: 0.01em;
 		line-height: 1.3;
 		border-radius: 1rem;
+		padding: var(--small-padding);
+		outline: transparent 0.15rem solid;
+		transition: outline-color 450ms ease-in-out;
+	}
+
+	.iconImage.selected {
+		outline-color: var(--color-primary-800);
 	}
 
 	.addButton {
@@ -124,16 +147,22 @@
 
 	img {
 		max-width: 100%;
-		height: auto;
 		object-fit: cover;
 		display: block;
 	}
 
 	img.small {
-		max-height: 20rem;
+		height: 20rem;
 	}
 
 	img.max {
-		max-height: 23rem;
+		height: 23rem;
+	}
+
+	.btn-container {
+		display: flex;
+		flex-direction: row-reverse;
+		gap: var(--text-gap-large);
+		align-items: center;
 	}
 </style>

@@ -58,6 +58,10 @@
 	font-weight: 600;
 }
 
+.medium-bold {
+	font-weight: 500;
+}
+
 .primary-text {
 	color: var(--color-text-primary);
 }
@@ -172,4 +176,17 @@
 
 .align-center {
 	text-align: center;
+}
+
+.btn {
+	display: flex;
+	gap: var(--button-gap);
+	border-radius: var(--button-radius);
+}
+
+.primary-btn {
+	background-color: var(--color-primary);
+	color: var(--color-primary-text);
+	padding-inline: var(--primary-button-padding-inline);
+	padding-block: var(--primary-button-padding-block);
 }
