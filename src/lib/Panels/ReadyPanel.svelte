@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { uploadData, type FileType } from '$lib/state/uploadFlow.store';
-	import { CircleX, ImagePlus, ScanSearch, X } from 'lucide-svelte';
+	import { transition } from '$lib/upload/upload.store';
+	import { CircleX, ImagePlus, ScanSearch } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -24,6 +24,10 @@
 
 	function changeIndex(num: string) {
 		index = num;
+	}
+
+	function handleAnaylzeClick(): void {
+		transition('START_UPLOAD');
 	}
 </script>
 
@@ -57,20 +61,26 @@
 						</button>
 					{/each}
 					{#if length !== remainingLength}
-						<button class="sm-font-2 addButton background-color-pri-lowest color-pri">
-							<ImagePlus color="currentColor" />
-						</button>
+						<section class="addButton__container">
+							<button class="sm-font-2 addButton background-color-pri-lowest color-pri">
+								<ImagePlus color="currentColor" />
+								<p class="sr-only">To add more files, click this button</p>
+							</button>
+						</section>
 					{/if}
 				</section>
 			</section>
 		{/if}
 	</section>
 	<section class="btn-container">
-		<button class="btn primary-btn md-font-1 medium-bold">
+		<button class="btn primary-btn md-font-1 medium-bold" onclick={handleAnaylzeClick}>
+			<ScanSearch stroke-width={2} />
 			Analyze
-			<ScanSearch stroke-width={2}/>
 		</button>
-		<button class="btn secondary-btn md-font-1">Clear <CircleX /></button>
+		<button class="btn secondary-btn md-font-1">
+			<CircleX />
+			Cancel
+		</button>
 	</section>
 </section>
 
@@ -128,6 +138,12 @@
 
 	.iconImage.selected {
 		outline-color: var(--color-primary-800);
+	}
+
+	.addButton__container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.addButton {

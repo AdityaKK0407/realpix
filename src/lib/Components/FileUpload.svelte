@@ -297,8 +297,8 @@
 	.click-button {
 		background-color: var(--color-primary);
 		color: var(--color-primary-text);
-		padding-inline: var(--primary-button-padding-inline);
-		padding-block: var(--primary-button-padding-inline);
+		padding-inline: var(--button-padding-inline);
+		padding-block: var(--button-padding-inline);
 		border-radius: 1.4rem;
 		filter: drop-shadow(0 0.125rem 0.55rem var(--color-primary-400));
 		transition:
