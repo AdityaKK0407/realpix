@@ -1,1 +1,1 @@
-export type FileUploadOptions = 'resetState' | 'draggingState' | 'errorState' | 'successState'
+export type FileUploadOptions = 'resetState' | 'draggingState' | 'errorState' | 'successState';

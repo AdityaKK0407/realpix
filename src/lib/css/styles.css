@@ -1,14 +1,16 @@
-*, *:before, *:after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+*,
+*:before,
+*:after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 body {
-    font-family: 'IBM Plex Sans', sans-serif;
+	font-family: 'IBM Plex Sans', sans-serif;
 }
 
 button {
-    cursor: pointer;
-    border: none;
+	cursor: pointer;
+	border: none;
 }

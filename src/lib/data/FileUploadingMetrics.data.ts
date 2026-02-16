@@ -15,4 +15,4 @@ export const fileUploadFooterData = [
 		text: 'Active',
 		color: 'green'
 	}
-] as const;
+];

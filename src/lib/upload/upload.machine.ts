@@ -1,6 +1,6 @@
 import type { UploadEvent, UploadState } from '$lib/upload/upload.types';
 
-export const uploadTransition : Record<UploadState, Partial<Record<UploadEvent, UploadState>>> = {
+export const uploadTransition: Record<UploadState, Partial<Record<UploadEvent, UploadState>>> = {
 	idle: {
 		SELECT_IMAGE: 'ready'
 	},
@@ -9,11 +9,11 @@ export const uploadTransition : Record<UploadState, Partial<Record<UploadEvent, 
 		RESET: 'idle'
 	},
 	uploading: {
-		UPLOAD_SUCCESS: "analyzing",
+		UPLOAD_SUCCESS: 'analyzing',
 		UPLOAD_FAILURE: 'error'
 	},
 	analyzing: {
-		 ANALYSIS_SUCCESS: 'result'
+		ANALYSIS_SUCCESS: 'result'
 	},
 	result: {
 		RESET: 'idle'
@@ -21,4 +21,4 @@ export const uploadTransition : Record<UploadState, Partial<Record<UploadEvent, 
 	error: {
 		RESET: 'idle'
 	}
-}
+};

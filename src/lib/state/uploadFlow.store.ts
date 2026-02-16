@@ -3,24 +3,24 @@ import { nanoid } from 'nanoid';
 import { browser } from '$app/environment';
 
 export interface FileUploader {
-	id: string
-	type: 'image' | 'video'
-	src: File
-	blob: string
-	name: string
+	id: string;
+	type: 'image' | 'video';
+	src: File;
+	blob: string;
+	name: string;
 }
 
-export type FileType = 'image' | 'video'
+export type FileType = 'image' | 'video';
 
 class UploadState {
-	uploadFilesWritable: Writable<FileUploader[]>
-	imageLength: number
-	videoLength: number
-	uploadedFiles: FileUploader[]
-	MAX_LENGTH: number = 5
+	uploadFilesWritable: Writable<FileUploader[]>;
+	imageLength: number;
+	videoLength: number;
+	uploadedFiles: FileUploader[];
+	MAX_LENGTH: number = 5;
 
 	constructor() {
-		this.uploadFilesWritable = writable<FileUploader[]>([])
+		this.uploadFilesWritable = writable<FileUploader[]>([]);
 		this.imageLength = 0;
 		this.videoLength = 0;
 		this.uploadedFiles = [];
@@ -29,9 +29,9 @@ class UploadState {
 	uploadFiles(newFiles: File[], fileType: FileType) {
 		if (browser) {
 			if (fileType === 'image') {
-				this.imageLength += newFiles.length
+				this.imageLength += newFiles.length;
 			} else if (fileType === 'video') {
-				this.videoLength += newFiles.length
+				this.videoLength += newFiles.length;
 			}
 
 			const newItems: FileUploader[] = newFiles.map((file: File) => {
@@ -49,11 +49,13 @@ class UploadState {
 	}
 
 	getFileType(fileType: FileType) {
-		return browser ? this.uploadedFiles.filter((file: FileUploader) => file.type === fileType) : undefined
+		return browser
+			? this.uploadedFiles.filter((file: FileUploader) => file.type === fileType)
+			: undefined;
 	}
 
 	getBlobs(fileType: FileType) {
-		const files = this.getFileType(fileType)
+		const files = this.getFileType(fileType);
 		return files && files.map((file: FileUploader) => file.blob);
 	}
 
@@ -63,25 +65,25 @@ class UploadState {
 	}
 
 	getName(id: string) {
-		return this.getFile(id)?.name
+		return this.getFile(id)?.name;
 	}
 
 	getFile(id: string) {
-		return this.uploadedFiles.find((file: FileUploader) => file.id === id)
+		return this.uploadedFiles.find((file: FileUploader) => file.id === id);
 	}
 
 	getFileBlob(id: string) {
-		const file = this.getFile(id)
+		const file = this.getFile(id);
 		if (file) {
 			return file.blob;
 		} else {
-			return this.uploadedFiles[0].blob
+			return this.uploadedFiles[0].blob;
 		}
 	}
 
 	getFileTypeFirstId(fileType: FileType) {
-		const files = this.getFileType(fileType)
-		return files && files[0].id
+		const files = this.getFileType(fileType);
+		return files && files[0].id;
 	}
 
 	getLength(fileType: FileType) {
@@ -93,13 +95,13 @@ class UploadState {
 	}
 
 	clearItems() {
-		this.uploadFilesWritable.set([])
+		this.uploadFilesWritable.set([]);
 		this.imageLength = 0;
 		this.videoLength = 0;
-		this.uploadedFiles = []
+		this.uploadedFiles = [];
 	}
 }
 
 const uploadData = new UploadState();
 
-export { uploadData }
+export { uploadData };

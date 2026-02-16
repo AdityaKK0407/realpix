@@ -13,7 +13,7 @@ function toTitleCase(stringVal: string) {
 }
 
 function addSBasedOnCondition(condition: boolean, value: string) {
-		return condition ? `${value}s` : value
+	return condition ? `${value}s` : value;
 }
 
 export { range, toTitleCase, addSBasedOnCondition };
