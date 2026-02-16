@@ -25,7 +25,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=400,
-        expected_body=None
+        expected_body=None,
     ),
     VerifyCaptchaCaseResults(
         name="invalid captcha token",
@@ -35,7 +35,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=403,
-        expected_body=None
+        expected_body=None,
     ),
     VerifyCaptchaCaseResults(
         name="rate limit token exists and activated",
@@ -45,7 +45,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token="old_token",
         redis_result=1,
         expected_status=200,
-        expected_body={"user_token": "old_token"}
+        expected_body={"user_token": "old_token"},
     ),
     VerifyCaptchaCaseResults(
         name="rate limit token exists but failed to activate, returns new token",
@@ -55,7 +55,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=0,
         expected_status=200,
-        expected_body={"user_token": "12345678-1234-5678-1234-567812345678"}
+        expected_body={"user_token": "12345678-1234-5678-1234-567812345678"},
     ),
     VerifyCaptchaCaseResults(
         name="missing rate limit token, returns new token",
@@ -65,16 +65,14 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=200,
-        expected_body={"user_token": "12345678-1234-5678-1234-567812345678"}
-    )
+        expected_body={"user_token": "12345678-1234-5678-1234-567812345678"},
+    ),
 ]
 
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    "test_case",
-    VERIFY_CAPTCHA_TEST_CASES,
-    ids=lambda test_case: test_case.name
+    "test_case", VERIFY_CAPTCHA_TEST_CASES, ids=lambda test_case: test_case.name
 )
 async def test_verify_captcha(client, mock_redis_client, test_case):
     key = f"rate_limiter:token:{test_case.saved_rate_limiter_token}"
@@ -88,9 +86,13 @@ async def test_verify_captcha(client, mock_redis_client, test_case):
 
     req_body = {"token": test_case.token_body} if test_case.token_body else {}
 
-    with patch("src.routers.verification.verify_turnstile",
-               new=AsyncMock(return_value=test_case.cloudflare_success)), patch("src.redis_client.rate_limiter.uuid.uuid4",
-                                                                                return_value=fixed_uuid):
+    with (
+        patch(
+            "src.routers.verification.verify_turnstile",
+            new=AsyncMock(return_value=test_case.cloudflare_success),
+        ),
+        patch("src.redis_client.rate_limiter.uuid.uuid4", return_value=fixed_uuid),
+    ):
         response = await client.post("/verify/captcha", json=req_body, headers=headers)
 
     assert response.status_code == test_case.expected_status

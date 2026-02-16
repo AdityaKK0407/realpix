@@ -134,9 +134,19 @@ Content-Type: image/extension
 ```json lines
     {"task_ids":  ["<task_id1>", "<task_id2>", ...]}
 ```
-- `400` - Missing rate limiter token
-```json
+- `400` - Missing rate limiter token or bad request error
+```json lines
     {"detail": "Missing rate limiter token"}
+    // Received more images than accepted
+    {"detail": "Max limit of <image_limit> images exceeded"}
+    // Unsupported image type
+    {"detail": "Unsupported image format"}
+    // Invalid file
+    {"detail": "Invalid image file"}
+    // Potential image bomb
+    {"detail": "Image too large or suspicious"}
+    // Corrupted file
+    {"detail": "Corrupted or unreadable image file"}
 ```
 - `401` - Rate limit token expired, CAPTCHA required
 ```json

@@ -6,7 +6,7 @@ import redis.asyncio as redis
 
 TOTAL_QUOTA = 100
 BUCKET_SIZE = 10
-RATE_PER_MIN = 2
+RATE_PER_MIN = 5
 RATE_PER_SECOND = RATE_PER_MIN / 60
 TTL_SECONDS = 30 * 24 * 60 * 60
 

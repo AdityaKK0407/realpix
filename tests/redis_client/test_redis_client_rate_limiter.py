@@ -2,8 +2,12 @@ from unittest.mock import AsyncMock, patch
 import uuid
 import pytest
 
-from src.redis_client.rate_limiter import create_rate_limiter_token, verify_rate_limiter_token, \
-    activate_rate_limiter_token, VerifyTokenResult
+from src.redis_client.rate_limiter import (
+    create_rate_limiter_token,
+    verify_rate_limiter_token,
+    activate_rate_limiter_token,
+    VerifyTokenResult,
+)
 
 
 @pytest.mark.anyio
@@ -15,13 +19,13 @@ async def test_create_rate_limiter_token():
         token = await create_rate_limiter_token(mock_redis, "fake_sha", 0, 0, 0)
 
     assert token == str(fixed_uuid)
-    mock_redis.evalsha.assert_awaited_once_with("fake_sha", 1, f"rate_limiter:token:{fixed_uuid}", 0, 0, 0)
+    mock_redis.evalsha.assert_awaited_once_with(
+        "fake_sha", 1, f"rate_limiter:token:{fixed_uuid}", 0, 0, 0
+    )
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize(
-    "test_case", [-1, 0, 1, 2, 3]
-)
+@pytest.mark.parametrize("test_case", [-1, 0, 1, 2, 3])
 async def test_verify_rate_limiter_token(test_case):
     mock_redis = AsyncMock()
     mock_redis.evalsha.return_value = test_case
@@ -39,7 +43,9 @@ async def test_verify_rate_limiter_token(test_case):
             assert result == VerifyTokenResult.INACTIVE_TOKEN
         case 3:
             assert result == VerifyTokenResult.UNREACHABLE
-    mock_redis.evalsha.assert_awaited_once_with("fake_sha", 1, f"rate_limiter:token:fake_uuid", 0, 0)
+    mock_redis.evalsha.assert_awaited_once_with(
+        "fake_sha", 1, f"rate_limiter:token:fake_uuid", 0, 0
+    )
 
 
 @pytest.mark.anyio
@@ -50,4 +56,6 @@ async def test_activate_rate_limiter_token():
     result = await activate_rate_limiter_token(mock_redis, "fake_sha", "fake_uuid")
 
     assert result == 1
-    mock_redis.evalsha.assert_awaited_once_with("fake_sha", 1, "rate_limiter:token:fake_uuid")
+    mock_redis.evalsha.assert_awaited_once_with(
+        "fake_sha", 1, "rate_limiter:token:fake_uuid"
+    )

@@ -31,7 +31,6 @@ token_count = math.min(
 )
 
 if token_count < 1 then
-    redis.call("HSET", key, "last_refill", time_now)
     redis.call("HSET", key, "active_token", 0)
     return 0
 end

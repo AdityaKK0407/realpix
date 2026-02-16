@@ -60,6 +60,7 @@ def env_setup(monkeypatch):
     monkeypatch.setenv("CLOUDFLARE_URL", "Cloudflare_URL")
     monkeypatch.setenv("CLOUDFLARE_SECRET_KEY", "Secret key")
 
+
 @pytest.fixture(autouse=True)
 def override_dependencies(
     mock_redis_client, mock_create_sha, mock_verify_sha, mock_activate_token_sha

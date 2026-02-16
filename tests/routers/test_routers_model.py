@@ -5,14 +5,13 @@ from fastapi import UploadFile
 from io import BytesIO
 
 from dataclasses import dataclass
-
-from src.routers.model import read_file_stream_data
+from src.routers.model import validate_image
 from tests.mocks.celery import MockCeleryAsyncResult
 
 
 @pytest.mark.anyio
-async def test_read_file_stream_data():
-    file_streams = [
+async def test_validate_image():
+    images = [
         UploadFile(
             filename="a.png",
             file=BytesIO(b"aaa"),
@@ -26,11 +25,10 @@ async def test_read_file_stream_data():
             file=BytesIO(b"ccc"),
         ),
     ]
-    file_bytes = await read_file_stream_data(file_streams)
-    assert isinstance(file_bytes, list)
-    assert len(file_bytes) == len(file_streams)
-    for file_byte in file_bytes:
-        assert isinstance(file_byte, bytes)
+
+    for image in images:
+        image_bytes = await validate_image(image, (".png",))
+        assert (image_bytes, bytes)
 
 
 @dataclass
@@ -254,8 +252,8 @@ async def test_check_task_status(client, mock_redis_client, test_case):
         headers["X-RateLimit-Token"] = test_case.token
 
     with patch(
-            "src.routers.model.task_queue.AsyncResult",
-            return_value=MockCeleryAsyncResult(test_case.state, test_case.result),
+        "src.routers.model.task_queue.AsyncResult",
+        return_value=MockCeleryAsyncResult(test_case.state, test_case.result),
     ):
         response = await client.get(
             "/model/status/fake_task_id",

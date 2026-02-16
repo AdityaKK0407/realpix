@@ -20,3 +20,8 @@ def get_verify_sha(request: Request) -> str:
 def get_activate_token_sha(request: Request) -> str:
     activate_sha: str = request.app.state.activate_token_sha
     return activate_sha
+
+
+def get_ip_rate_limiter_sha(request: Request) -> str:
+    ip_rate_limiter: str = request.app.state.ip_rate_limiter
+    return ip_rate_limiter

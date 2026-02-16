@@ -22,7 +22,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
     port = os.getenv("REDIS_PORT")
 
     if not host or not port:
-        print("Failed to get env vars")
+        print("Failed to get env variables")
         sys.exit(1)
     try:
         fastapi_app.state.redis_client = create_redis_client(host, int(port))
@@ -34,6 +34,9 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
         )
         fastapi_app.state.activate_token_sha = await load_lua_script(
             fastapi_app.state.redis_client, "src/redis_scripts/activate_token.lua"
+        )
+        fastapi_app.state.ip_rate_limiter_sha = await load_lua_script(
+            fastapi_app.state.redis_client, "src/redis_scripts/ip_rate_limiter.lua"
         )
     except Exception as e:
         print(f"Failed to start server: {e}")
