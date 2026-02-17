@@ -6,6 +6,7 @@
 	import ReadyPanel from '$lib/Panels/ReadyPanel.svelte';
 	import { Panel } from '$lib/types/Panel';
 	import UploadingPanel from '$lib/Panels/UploadingPanel.svelte';
+	import ProgressBar from '$lib/Components/ProgressBar.svelte';
 
 	function setFiles(newFiles: File[], fileType: FileType) {
 		uploadData.uploadFiles(newFiles, fileType);
@@ -25,10 +26,15 @@
 </svelte:head>
 
 <main class:reduce-grid={activePanel === Panel.Processing_Panel}>
-	<section class={setClassNames(Panel.Uploading_Panel)} class:items-center={true}>
+	<ProgressBar />
+	<section
+		class={setClassNames(Panel.Uploading_Panel)}
+		class:items-center={true}
+		class:panel__1={true}
+	>
 		<FileUpload onSelect={setFiles} extensions="PNG, JPG, JPEG" fileType="image" />
 	</section>
-	<section class={setClassNames(Panel.Processing_Panel)}>
+	<section class={setClassNames(Panel.Processing_Panel)} class:panel__2={true}>
 		{#if $uploadState === 'idle'}
 			<Reset
 				text={[
@@ -44,7 +50,7 @@
 		{:else if $uploadState === 'ready'}
 			<ReadyPanel fileType="image" />
 		{:else if $uploadState === 'uploading'}
-			<UploadingPanel />
+			<UploadingPanel fileType="image" />
 		{/if}
 	</section>
 </main>
@@ -53,6 +59,7 @@
 	main {
 		display: grid;
 		grid-template-columns: 0.3fr 0.7fr;
+		grid-template-rows: 0.085fr 1fr;
 		gap: var(--layout-panel-gap);
 		transition: grid-template-columns 500ms ease-in-out;
 	}
@@ -68,5 +75,15 @@
 		padding-block: var(--app-padding-block);
 		transition: filter 400ms ease-in-out;
 		display: flex;
+	}
+
+	.panel__1 {
+		grid-row-start: 2;
+		grid-column-start: 1;
+	}
+
+	.panel__2 {
+		grid-row-start: 2;
+		grid-column-start: 2;
 	}
 </style>

@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import { resolve } from '$app/paths';
 </script>
 
 <svelte:head>
@@ -6,4 +7,4 @@
 </svelte:head>
 
 <p>Hello</p>
-<a href="/imageUpload">Image</a>
+<a href={resolve('/imageUpload')}>Image</a>

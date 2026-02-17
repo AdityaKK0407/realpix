@@ -79,6 +79,10 @@
 	flex-direction: column;
 }
 
+.flex {
+	display: flex;
+}
+
 .iconField {
 	display: flex;
 	justify-content: center;

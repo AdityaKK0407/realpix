@@ -1,6 +1,7 @@
+import type { MetricType } from '$lib/types/fileupload.types';
 import { nanoid } from 'nanoid';
 
-export const fileUploadFooterData = [
+export const fileUploadFooterData: MetricType[] = [
 	{
 		id: nanoid(),
 		icon: 'Ai',
