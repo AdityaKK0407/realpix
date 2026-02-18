@@ -1,9 +1,13 @@
 from celery import Celery
+import os
+
+host = os.getenv("REDIS_HOST")
+port = os.getenv("REDIS_PORT")
 
 task_queue: Celery = Celery(
     main="src",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0",
+    broker=f"redis://{host}:{port}/0",
+    backend=f"redis://{host}:{port}/0",
     include=["src.tasks.model"],
 )
 
