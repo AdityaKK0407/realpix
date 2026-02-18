@@ -61,7 +61,7 @@ backend task processing.
 **Base URL**:  http://localhost:8000
 
 ## Render Prod
-**Base URL**: http://
+**Base URL**: https://realpix.onrender.com
 ---
 
 ## Default
