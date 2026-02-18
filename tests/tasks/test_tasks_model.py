@@ -16,7 +16,7 @@ def test_image_task():
 #
 # def test_video_task():
 #     filepath = "video.mp4"
-#     file_content = b"This is an video file"
+#     file_content = b"This is a video file"
 #     result = video_task(filepath, file_content)
 #
 #     assert isinstance(result, dict)

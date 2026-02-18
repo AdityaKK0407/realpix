@@ -4,6 +4,7 @@
 
 - [About](#about)
 - [How to Run](#how-to-run)
+- [Additional Commands](#additional-commands)
 - [API Endpoints](#api-endpoints)
 
 # About
@@ -28,10 +29,39 @@ backend task processing.
     honcho start -f ./Procfile.prod
 ```
 
+# Additional Commands
+
+## Tests
+
+```bash
+    # Run all tests
+    pytest ./tests
+    # Or specify filepath to run particular tests
+```
+
+## Static Type Checker
+
+```bash
+    # Performs typing checking on project
+    mypy ./src/main.py
+```
+
+## Format
+
+```bash
+    ruff format
+    
+    # Apply fixes
+    ruff format --fix
+```
+
 # API Endpoints
 
+## Local dev
 **Base URL**:  http://localhost:8000
 
+## Render Prod
+**Base URL**: http://
 ---
 
 ## Default
@@ -81,6 +111,10 @@ backend task processing.
 - `403` - Cloudflare Turnstile provided is invalid
 ```json
     {"detail":  "Invalid CAPTCHA token"}
+```
+- `429` - Rate limit exceeded. Rate limit computed based on IP address
+```json
+    {"detail":  "Rate limit exceeded"}
 ```
 - `500` - Client doesn't exist or unexpected server error
 ```json lines
@@ -171,6 +205,9 @@ Content-Type: image/extension
 ```json
     {"detail": "Service temporarily unavailable"}
 ```
+
+> [!WARNING]
+> This API endpoint is currently unavailable
 
 ### POST /model/videos
 

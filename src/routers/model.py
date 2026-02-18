@@ -80,9 +80,9 @@ async def start_task_image(
     result: list[str] = []
 
     try:
-        file_bytes: tuple[bytes] = await asyncio.gather(
+        file_bytes: tuple[bytes, ...] = tuple(await asyncio.gather(
             *[validate_image(image, allowed_extensions) for image in images]
-        )
+        ))
     except HTTPException as httpError:
         raise httpError
     except Exception:

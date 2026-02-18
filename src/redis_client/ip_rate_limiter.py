@@ -3,7 +3,7 @@ from typing import Awaitable
 import redis.asyncio as redis
 
 IP_BUCKET_SIZE = 10
-IP_RATE_PER_MIN = 5
+IP_RATE_PER_MIN = 2
 IP_RATE_PER_SECOND = IP_RATE_PER_MIN / 60
 IP_TTL = 1800
 GLOBAL_BUCKET_SIZE = 100

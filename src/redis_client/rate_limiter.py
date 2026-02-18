@@ -4,11 +4,11 @@ from typing import Awaitable
 
 import redis.asyncio as redis
 
-TOTAL_QUOTA = 100
+TOTAL_QUOTA = 50
 BUCKET_SIZE = 10
-RATE_PER_MIN = 5
+RATE_PER_MIN = 1
 RATE_PER_SECOND = RATE_PER_MIN / 60
-TTL_SECONDS = 30 * 24 * 60 * 60
+TTL_SECONDS = 60 * 60 * 24
 
 
 class VerifyTokenResult(Enum):
