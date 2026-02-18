@@ -14,5 +14,7 @@ class MockRedis:
                 if key not in self.store:
                     return 0
                 return 1
+            case "ip_rate_limiter":
+                return 1
             case _:
                 return 3

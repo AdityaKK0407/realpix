@@ -23,8 +23,8 @@ async def verify_ip_rate_limiter(
     global_rate: float = GLOBAL_RATE_PER_SECOND,
     global_ttl: int = GLOBAL_TTL,
 ) -> bool:
-    global_key = "global_rate_limiter"
     ip_key = f"ip_rate_limiter:{ip}"
+    global_key = "global_rate_limiter"
 
     result = client.evalsha(
         ip_rate_limiter_script_sha,
@@ -40,6 +40,6 @@ async def verify_ip_rate_limiter(
     )
 
     if isinstance(result, Awaitable):
-        await result
+        result = await result
 
     return int(result) == 1

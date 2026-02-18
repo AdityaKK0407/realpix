@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, File
 from pydantic import BaseModel
 
 from PIL import Image, UnidentifiedImageError
@@ -26,14 +26,16 @@ router = APIRouter(
 )
 
 
-async def validate_image(image: UploadFile, allowed_extensions: tuple[str]) -> bytes:
+async def validate_image(
+    image: UploadFile, allowed_extensions: tuple[str, ...]
+) -> bytes:
     try:
         contents = await image.read()
-        image = Image.open(io.BytesIO(contents))
-        image.verify()
+        img = Image.open(io.BytesIO(contents))
+        img.verify()
 
-        image = Image.open(io.BytesIO(contents))
-        if image.format not in allowed_extensions:
+        img = Image.open(io.BytesIO(contents))
+        if not img.format or img.format.lower() not in allowed_extensions:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Unsupported image format",
@@ -64,10 +66,11 @@ async def validate_image(image: UploadFile, allowed_extensions: tuple[str]) -> b
 
 @router.post("/images")
 async def start_task_image(
-    images: list[UploadFile],
-    max_images: int = MAX_IMAGES,
-    allowed_extensions: tuple[str] = ALLOWED_IMAGE_EXTENSIONS,
+    images: list[UploadFile] = File(...),
 ) -> dict[str, list[str]]:
+    max_images: int = MAX_IMAGES
+    allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
+
     if len(images) > max_images:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -110,7 +113,11 @@ async def start_task_image(
 #
 #
 # @router.post("/videos")
-# async def start_task_video(videos: list[UploadFile], max_videos: int = MAX_VIDEOS, allowed_extensions: tuple[str] = ALLOWED_VIDEO_EXTENSIONS) -> dict[str, list[str]]:
+# async def start_task_video(
+#     videos: list[UploadFile],
+#     max_videos: int = MAX_VIDEOS,
+#     allowed_extensions: tuple[str] = ALLOWED_VIDEO_EXTENSIONS,
+# ) -> dict[str, list[str]]:
 #     if len(videos) > max_videos:
 #         raise HTTPException(
 #             status_code=status.HTTP_400_BAD_REQUEST,

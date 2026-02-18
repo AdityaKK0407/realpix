@@ -58,8 +58,3 @@ app.add_middleware(
 )
 app.include_router(model_router)
 app.include_router(verification_router)
-
-
-@app.get("/")
-def home() -> dict[str, str]:
-    return {"status": "running"}

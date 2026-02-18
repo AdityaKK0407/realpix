@@ -10,6 +10,7 @@ from src.dependencies import (
     get_create_sha,
     get_verify_sha,
     get_activate_token_sha,
+    get_ip_rate_limiter_sha,
 )
 
 
@@ -29,15 +30,16 @@ def mock_redis_client():
 def mock_celery():
     with (
         patch("src.routers.model.image_task.delay") as mock_image_delay,
-        patch("src.routers.model.video_task.delay") as mock_video_delay,
+        # patch("src.routers.model.video_task.delay") as mock_video_delay,
     ):
         mock_image_delay.side_effect = lambda *args, **kwargs: MockCelery(
             str(uuid.uuid4())
         )
-        mock_video_delay.side_effect = lambda *args, **kwargs: MockCelery(
-            str(uuid.uuid4())
-        )
-        yield mock_image_delay, mock_video_delay
+        # mock_video_delay.side_effect = lambda *args, **kwargs: MockCelery(
+        #     str(uuid.uuid4())
+        # )
+        yield mock_image_delay
+        # yield mock_video_delay
 
 
 @pytest.fixture
@@ -55,6 +57,11 @@ def mock_activate_token_sha():
     return "activate_token"
 
 
+@pytest.fixture
+def mock_ip_rate_limiter_sha():
+    return "ip_rate_limiter"
+
+
 @pytest.fixture(autouse=True)
 def env_setup(monkeypatch):
     monkeypatch.setenv("CLOUDFLARE_URL", "Cloudflare_URL")
@@ -63,11 +70,16 @@ def env_setup(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def override_dependencies(
-    mock_redis_client, mock_create_sha, mock_verify_sha, mock_activate_token_sha
+    mock_redis_client,
+    mock_create_sha,
+    mock_verify_sha,
+    mock_activate_token_sha,
+    mock_ip_rate_limiter_sha,
 ):
     app.dependency_overrides[get_redis] = lambda: mock_redis_client
     app.dependency_overrides[get_create_sha] = lambda: mock_create_sha
     app.dependency_overrides[get_verify_sha] = lambda: mock_verify_sha
     app.dependency_overrides[get_activate_token_sha] = lambda: mock_activate_token_sha
+    app.dependency_overrides[get_ip_rate_limiter_sha] = lambda: mock_ip_rate_limiter_sha
     yield
     app.dependency_overrides.clear()
