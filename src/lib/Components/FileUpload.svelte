@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { CircleAlert, CircleCheckBigIcon, Info } from 'lucide-svelte';
+	import { CircleAlert, CircleCheckBigIcon } from 'lucide-svelte';
 	import { validateFiles } from '$lib/scripts/validatingFiles';
 	import type { FileUploadOptions } from '$lib/types/fileupload.types';
 	import UploadingMetrics from './UploadingMetrics.svelte';
-	import { addSBasedOnCondition, range, toTitleCase } from '$lib/scripts/utils';
+	import { addSBasedOnCondition, range } from '$lib/scripts/utils';
 
 	interface Props {
 		onSelect: (newFiles: File[], fileType: 'image' | 'video') => void;
@@ -150,13 +150,6 @@
 		{/if}
 	</div>
 	<UploadingMetrics />
-	<section class="footer-content">
-		<Info size="24" stroke="currentColor" />
-		<p class="sm-font-3">
-			<strong>Note: </strong>
-			{toTitleCase(props.fileType)}(s) are deleted after processing
-		</p>
-	</section>
 </section>
 
 <style>
@@ -309,13 +302,5 @@
 	.click-button:hover {
 		background-color: var(--color-primary-hover);
 		filter: drop-shadow(0px 0.25rem 0.6rem var(--color-primary-600));
-	}
-
-	.footer-content {
-		display: flex;
-		gap: var(--text-gap);
-		justify-content: center;
-		align-items: center;
-		color: var(--color-primary-900);
 	}
 </style>

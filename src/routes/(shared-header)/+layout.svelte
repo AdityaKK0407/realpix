@@ -26,7 +26,7 @@
 <style>
 	section {
 		display: grid;
-		grid-template-rows: 0.1fr 1fr;
+		grid-template-rows: 0.085fr 0.845fr 0.07fr;
 		height: 100dvh;
 		background-color: var(--color-bg-app);
 		padding-inline: var(--app-padding-inline);

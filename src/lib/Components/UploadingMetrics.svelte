@@ -60,9 +60,6 @@
 			{/each}
 		{/if}
 	</section>
-	<section class="flex displaySection__row2">
-		<Metric iconName="Server" heading="Status" text={serverStatus} color="orange" animate />
-	</section>
 </section>
 
 <style>
@@ -75,9 +72,5 @@
 
 	.displaySection__row1 {
 		gap: var(--spacing);
-	}
-
-	.displaySection__row2 {
-		justify-content: center;
 	}
 </style>

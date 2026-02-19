@@ -3,8 +3,6 @@
 
 	interface Props {
 		text: string[];
-		serverStatus: boolean;
-		inactiveText: string[];
 	}
 
 	let props: Props = $props();
@@ -16,15 +14,11 @@
 			<Image size="50" />
 		</div>
 
-		{#if props.serverStatus}
-			<section class="flex-column display-text">
-				{#each props.text as line (line)}
-					<p class="md-font-1 bold">{line}</p>
-				{/each}
-			</section>
-		{:else if !props.serverStatus}
-			<p>{props.inactiveText[0]}</p>
-		{/if}
+		<section class="flex-column display-text">
+			{#each props.text as line (line)}
+				<p class="md-font-1 bold">{line}</p>
+			{/each}
+		</section>
 	</section>
 </section>
 
