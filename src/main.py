@@ -2,14 +2,21 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
+import redis.asyncio as redis
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, Depends, HTTPException, status
 
 from src.redis_client.client import create_redis_client, load_lua_script
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
+from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
+from src.dependencies import (
+    get_redis,
+    get_ip_rate_limiter_sha,
+
+)
 
 
 @asynccontextmanager
@@ -58,3 +65,25 @@ app.add_middleware(
 )
 app.include_router(model_router)
 app.include_router(verification_router)
+
+
+@app.get("/")
+async def health_check(
+    request: Request,
+    redis_client: redis.Redis = Depends(get_redis),
+    ip_rate_limiter_sha: str = Depends(get_ip_rate_limiter_sha),
+):
+    user = request.client
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Client not available",
+        )
+    if not await verify_ip_rate_limiter(
+        redis_client, ip_rate_limiter_sha, user.host, "health_check"
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded",
+        )
+    return {"status": "ok"}

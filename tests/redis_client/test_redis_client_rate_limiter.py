@@ -45,7 +45,7 @@ async def test_verify_rate_limiter_token(test_case):
             assert result == VerifyTokenResult.UNREACHABLE
 
     mock_redis.evalsha.assert_awaited_once_with(
-        "fake_sha", 1, f"rate_limiter:token:fake_uuid", 0, 0
+        "fake_sha", 1, "rate_limiter:token:fake_uuid", 0, 0
     )
 
 
@@ -56,7 +56,7 @@ async def test_activate_rate_limiter_token():
 
     result = await activate_rate_limiter_token(mock_redis, "fake_sha", "fake_uuid")
 
-    assert result == True
+    assert result
     mock_redis.evalsha.assert_awaited_once_with(
         "fake_sha", 1, "rate_limiter:token:fake_uuid"
     )

@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient, ASGITransport
 from src.main import app
 from tests.mocks.redis import MockRedis
-from tests.mocks.celery import MockCelery, MockCeleryAsyncResult
+from tests.mocks.celery import MockCelery
 from src.dependencies import (
     get_redis,
     get_create_sha,

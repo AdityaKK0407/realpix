@@ -48,7 +48,9 @@ async def verify_captcha(
             detail="Client not available",
         )
 
-    if not await verify_ip_rate_limiter(redis_client, ip_rate_limiter_sha, user.host):
+    if not await verify_ip_rate_limiter(
+        redis_client, ip_rate_limiter_sha, user.host, "verification"
+    ):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Rate limit exceeded",

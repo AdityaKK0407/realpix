@@ -50,9 +50,16 @@ backend task processing.
 
 ```bash
     ruff format
-    
+```
+
+## Fix code
+
+```bash
+    ruff check
     # Apply fixes
-    ruff format --fix
+    ruff check --fix
+    # Apply unsafe fixes
+    ruff check --unsafe-fixes
 ```
 
 # API Endpoints
@@ -62,13 +69,14 @@ backend task processing.
 
 ## Render Prod
 **Base URL**: https://realpix.onrender.com
+
 ---
 
 ## Default
 
 ### GET /
 
-**Home path for checking server status**
+**Health check for server**
 
 ### Response
 
@@ -78,7 +86,17 @@ backend task processing.
   "status": "running"
 }
 ```
-
+- `429` - Rate limit exceeded. Rate limit computed based on IP address
+```json
+    {"detail":  "Rate limit exceeded"}
+```
+- `500` - Client doesn't exist or unexpected server error
+```json lines
+    // Client doesn't exist
+    {"detail": "Client not available"}
+    // Unexpected error
+    {"detail": "Unexpected server error"}
+```
 ---
 
 ## Verification
@@ -122,7 +140,6 @@ backend task processing.
     {"detail": "Client not available"}
     // Unexpected error
     {"detail": "Unexpected server error"}
-
 ```
 - `502` - Cloudflare server is down and turnstile token cannot be verified
 ```json

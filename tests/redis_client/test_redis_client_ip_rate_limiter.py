@@ -12,7 +12,7 @@ async def test_verify_ip_rate_limiter():
     result = await verify_ip_rate_limiter(
         mock_redis, "fake_sha", "fake_ip", 0, 0, 0, 0, 0, 0
     )
-    assert result == True
+    assert result
 
     mock_redis.evalsha.assert_awaited_once_with(
         "fake_sha",

@@ -16,6 +16,7 @@ async def verify_ip_rate_limiter(
     client: redis.Redis,
     ip_rate_limiter_script_sha: str,
     ip: str,
+    endpoint: str,
     ip_bucket_size: int = IP_BUCKET_SIZE,
     ip_rate: float = IP_RATE_PER_SECOND,
     ip_ttl: int = IP_TTL,
@@ -23,8 +24,8 @@ async def verify_ip_rate_limiter(
     global_rate: float = GLOBAL_RATE_PER_SECOND,
     global_ttl: int = GLOBAL_TTL,
 ) -> bool:
-    ip_key = f"ip_rate_limiter:{ip}"
-    global_key = "global_rate_limiter"
+    ip_key = f"ip_rate_limiter:{ip}:{endpoint}"
+    global_key = f"global_rate_limiter:{endpoint}"
 
     result = client.evalsha(
         ip_rate_limiter_script_sha,
