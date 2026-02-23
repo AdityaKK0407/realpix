@@ -11,12 +11,12 @@
 <section class="mainSection">
 	<section class="wrapper flex-column">
 		<div class="color-pri">
-			<Image size="50" />
+			<Image size="75" />
 		</div>
 
 		<section class="flex-column display-text">
 			{#each props.text as line (line)}
-				<p class="md-font-1 bold">{line}</p>
+				<p class="md-font-2 bold">{line}</p>
 			{/each}
 		</section>
 	</section>
@@ -25,12 +25,14 @@
 <style>
 	.mainSection {
 		flex-grow: 1;
-		display: flex;
+		display: grid;
+		grid-template-rows: 1fr 0.5fr;
+		grid-template-columns: 0.5fr 0.7fr 0.5fr;
 		align-items: center;
-		justify-content: center;
 	}
 
 	.wrapper {
+		grid-column-start: 2;
 		justify-content: center;
 		align-items: center;
 		gap: 1rem;

@@ -24,18 +24,13 @@
 	<title>Image Upload</title>
 </svelte:head>
 
-<main class:reduce-grid={activePanel === Panel.Processing_Panel}>
+<main>
 	<section class={setClassNames(Panel.Uploading_Panel)} class:items-center={true}>
 		<FileUpload onSelect={setFiles} extensions="PNG, JPG, JPEG" fileType="image" />
 	</section>
 	<section class={setClassNames(Panel.Processing_Panel)}>
 		{#if $uploadState === 'idle'}
-			<Reset
-				text={[
-					'AI Model is ready to complete your request.',
-					'Please select an image to get started'
-				]}
-			/>
+			<Reset text={['Upload images to begin analyzing', 'for authenticity']} />
 		{:else if $uploadState === 'ready'}
 			<ReadyPanel fileType="image" />
 		{:else if $uploadState === 'uploading'}
@@ -47,13 +42,9 @@
 <style>
 	main {
 		display: grid;
-		grid-template-columns: 0.3fr 0.7fr;
+		grid-template-columns: 0.32fr 0.68fr;
 		gap: var(--layout-panel-gap);
 		transition: grid-template-columns 500ms ease-in-out;
-	}
-
-	.reduce-grid {
-		grid-template-columns: 0.26fr 0.84fr;
 	}
 
 	section {

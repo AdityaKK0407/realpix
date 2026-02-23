@@ -2,7 +2,6 @@
 	import { CircleAlert, CircleCheckBigIcon } from 'lucide-svelte';
 	import { validateFiles } from '$lib/scripts/validatingFiles';
 	import type { FileUploadOptions } from '$lib/types/fileupload.types';
-	import UploadingMetrics from './UploadingMetrics.svelte';
 	import { addSBasedOnCondition, range } from '$lib/scripts/utils';
 
 	interface Props {
@@ -19,6 +18,7 @@
 	let screenReaderMessage: string = $state('');
 	let headerText: string = $state(`Upload ${props.fileType}`);
 	const numbers = range(1, 8);
+	const iconSize = 55;
 
 	function handleFiles(files: FileList) {
 		if (files.length > 0) {
@@ -73,12 +73,12 @@
 </script>
 
 <section class="flex-column uploadSection">
-	<h2 class="lg-font-1">
-		{headerText}
-	</h2>
+	<section>
+		<h2 class="uploadSection__headingcontent lg-font-1 align-center">
+			{headerText}
+		</h2>
+	</section>
 	<div
-		role="button"
-		tabindex={uploadState === 'successState' ? -1 : 0}
 		class="dropzone"
 		class:error={uploadState === 'errorState'}
 		class:dropping={uploadState === 'draggingState'}
@@ -107,8 +107,6 @@
 				</div>
 				<section class="dropzone-secondary-text flex-column">
 					<strong class="lg-font-2 primary-text">Drop {props.fileType}s here</strong>
-					<p class="sm-font-2 bodycolor">Max file limit: 5</p>
-					<small class="sm-font-1 muted">{props.extensions}</small>
 				</section>
 				<button
 					onclick={handleClick}
@@ -121,8 +119,8 @@
 		{:else if uploadState === 'successState'}
 			<section class="flex-column successText">
 				<p class="sr-only" aria-live="polite">{screenReaderMessage}</p>
-				<section class="successIcon" aria-hidden="true">
-					<CircleCheckBigIcon size="40" />
+				<section class="icon successIcon" aria-hidden="true">
+					<CircleCheckBigIcon size={iconSize} />
 				</section>
 				<p class="md-font-2 bold align-center" aria-hidden="true">{successText}</p>
 			</section>
@@ -134,22 +132,28 @@
 						<span style={`--i: ${number}`} class="animate-element"></span>
 					{/each}
 				</div>
-				<section class="flex-column dropzone-secondary-text">
+				<section class="dropzone-secondary-text">
 					<p class="md-font-2 bold">Drop the {props.fileType}</p>
-					<p class="sm-font-2 bold">Max file limit: 5</p>
 				</section>
 			</section>
 		{:else if uploadState === 'errorState'}
 			<section class="dropzone-text flex-column errorSection">
-				<CircleAlert size="48" />
+				<section class="icon errorIcon">
+					<CircleAlert size={iconSize} />
+				</section>
 				<section class="dropzone-secondary-text flex-column">
 					<strong class="lg-font-2">Upload failed</strong>
-					<p class="md-font-1">Please select a valid {props.fileType} file</p>
+					<p class="md-font-1">
+						Please select a valid {props.fileType} file
+					</p>
 				</section>
 			</section>
 		{/if}
 	</div>
-	<UploadingMetrics />
+	<section class="uploadSection__footer flex-column">
+		<p class="sm-font-2 muted bold">Up to 5 {props.fileType}s</p>
+		<p class="sm-font-2 muted bold">{props.extensions}</p>
+	</section>
 </section>
 
 <style>
@@ -163,6 +167,11 @@
 		justify-content: space-evenly;
 	}
 
+	.uploadSection__headingcontent {
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
 	.dropzone {
 		display: flex;
 		flex-direction: column;
@@ -174,7 +183,7 @@
 		border-radius: 0.6rem;
 		border-width: 0.25rem;
 		width: 100%;
-		height: 18rem;
+		height: 20rem;
 	}
 
 	.dropzone-text {
@@ -193,9 +202,9 @@
 	}
 
 	.dropping {
-		border-color: var(--color-border-dragover);
+		border-color: var(--color-primary);
 		border-style: solid;
-		color: var(--color-primary);
+		color: var(--color-primary-text);
 	}
 
 	.dropping > * {
@@ -210,9 +219,9 @@
 	}
 
 	.success {
-		border-color: var(--color-border-success);
+		border-color: var(--color-success-green);
 		background-color: var(--color-success-lowest);
-		color: var(--color-text-success);
+		color: var(--color-success-text);
 		pointer-events: none;
 		border-width: 0.19rem;
 		border-style: dotted;
@@ -224,27 +233,37 @@
 		justify-content: center;
 	}
 
-	.successIcon {
+	.icon {
 		width: max-content;
-		background-color: var(--color-success-100);
 		display: flex;
 		justify-content: center;
 		border-radius: 50vw;
 		padding: var(--small-padding);
 	}
 
+	.successIcon {
+		background-color: var(--color-success-100);
+		color: var(--color-success-green);
+	}
+
 	.error {
-		background-color: var(--color-bg-error);
-		border-color: var(--color-border-error);
+		background-color: var(--color-error-lowest);
+		border-color: var(--color-error);
 		border-style: dotted;
 	}
 
 	.errorSection {
-		color: var(--color-text-error);
+		color: var(--color-error);
+	}
+
+	.errorIcon {
+		background-color: var(--color-error-lowest);
+		color: var(--color-error);
 	}
 
 	.uploadIcon {
-		font-size: 3rem;
+		font-size: 4rem;
+		stroke-width: 1.5;
 	}
 
 	.pulse {
@@ -302,5 +321,10 @@
 	.click-button:hover {
 		background-color: var(--color-primary-hover);
 		filter: drop-shadow(0px 0.25rem 0.6rem var(--color-primary-600));
+	}
+
+	.uploadSection__footer {
+		align-items: center;
+		gap: var(--text-gap);
 	}
 </style>

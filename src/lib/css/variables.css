@@ -2,9 +2,10 @@
 	--color-bg-app: #f8f6f2;
 	--color-bg-surface: #fafafa;
 	--color-bg-subtle: #e8d8c3;
+	--color-warm-gray: #f5f3f0;
 
 	--app-padding-inline: 1.1rem;
-	--app-padding-block: 0.7rem;
+	--app-padding-block: 0.3rem;
 
 	--panel-padding-inline: 1.34rem;
 	--panel-padding-block: 0.4rem;
@@ -21,8 +22,6 @@
 
 	--button-radius: 1rem;
 	--button-gap: 0.75rem;
-
-	--color-border-default: #b8ada4;
 
 	--color-text-primary: #4a4a4a;
 	--color-text-body: #555;
@@ -46,17 +45,7 @@
 
 	--color-primary-shade: rgba(62 95 150 / 0.4);
 
-	--color-border-neutral: #a1a1a1;
-	--color-bg-neutral: #d9d5ce;
-	--color-border-dragover: var(--color-primary);
-
-	--color-border-success: #188038;
-	--color-bg-success: rgba(24 128 56 / 0.1);
-	--color-text-success: #188038;
-
-	--color-border-error: #c97070;
-	--color-bg-error: rgba(200 112 112 / 0.08);
-	--color-text-error: #a84848;
+	--color-border-neutral: #b8ada4;
 
 	/* Information Colors */
 	--color-info-blue: #6b88ab;
@@ -95,10 +84,15 @@
 	--color-warning-200: rgba(216 147 86 / 0.2);
 	--color-warning-100: rgba(216 147 86 / 0.1);
 
+	--color-error: #c96b6b;
+	--color-error-100: rgba(201 107 107 / 0.1);
+	--color-error-lowest: rgba(201 107 107 / 0.05);
+
 	--layout-panel-gap: 1rem;
 	--layout-panel-rounded: 1.5rem;
 
 	--text-gap: 0.5rem;
+	--text-gap-small: 0.2rem;
 	--text-gap-large: 1.5rem;
 
 	--panel-opacity-active: 1;
