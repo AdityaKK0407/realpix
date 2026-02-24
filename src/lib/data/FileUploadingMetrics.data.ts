@@ -14,6 +14,7 @@ export const fileUploadFooterData: MetricType[] = [
 		icon: 'Shield',
 		heading: 'Encryption',
 		text: 'Active',
-		color: 'green'
+		color: 'green',
+		turnstileSupport: true
 	}
 ];

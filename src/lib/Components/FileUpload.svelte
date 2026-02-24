@@ -90,7 +90,8 @@
 		ondrop={drop}
 		onkeydown={keyBoardEvent}
 		aria-label="Drag and drop images area"
-		role="region"
+		role="button"
+		tabindex={uploadState === 'resetState' ? 0 : -1}
 	>
 		<input
 			type="file"
@@ -111,7 +112,7 @@
 				</section>
 				<button
 					onclick={handleClick}
-					class="click-button bold sm-font-1"
+					class="click-button bold sm-font-2"
 					aria-label={`This button opens the file explorer to select the ${props.fileType}s`}
 				>
 					Select {props.fileType}s

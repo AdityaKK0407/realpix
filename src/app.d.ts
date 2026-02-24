@@ -17,10 +17,10 @@ declare global {
 					callback?: (token: string) => void;
 					theme?: 'light' | 'dark';
 					size?: 'normal' | 'compact';
+					'error-callback': (error: Error) => void;
 				}
 			) => string | undefined;
 			remove: (widgetId: string) => void;
-			"error-callback": (Error: Error) => void;
 		};
 	}
 }

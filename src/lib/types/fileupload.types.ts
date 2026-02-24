@@ -1,6 +1,5 @@
 export type FileUploadOptions = 'resetState' | 'draggingState' | 'errorState' | 'successState';
 
-export type ServerStatus = 'InActive' | 'Ping' | 'Active';
 export type IconNames = 'Ai' | 'Shield' | 'Server';
 export type Colors = 'blue' | 'green' | 'orange';
 
@@ -10,4 +9,5 @@ export interface MetricType {
 	heading: string;
 	text: string;
 	color: Colors;
+	turnstileSupport?: boolean;
 }

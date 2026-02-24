@@ -21,7 +21,7 @@
 		<section>
 			<a href={resolve('/')} class="pageContainer__header__link">RealPix</a>
 		</section>
-		<section>
+		<section class="pageContainer__header__col2">
 			<UploadingMetrics />
 		</section>
 	</header>
@@ -38,7 +38,7 @@
 <style>
 	.pageContainer {
 		display: grid;
-		grid-template-rows: 0.13fr 1fr 0.07fr;
+		grid-template-rows: 0.13fr 1fr 0.08fr;
 		height: 100dvh;
 		background-color: var(--color-bg-app);
 		padding-inline: var(--app-padding-inline);
@@ -53,6 +53,10 @@
 
 	.pageContainer__header__link {
 		text-decoration: none;
+	}
+
+	.pageContainer__header__col2 {
+		justify-self: center;
 	}
 
 	.pageContainer__footer {
