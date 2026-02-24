@@ -10,7 +10,6 @@
 
 .active-layout {
 	filter: drop-shadow(var(--shadow-panel-active));
-	opacity: var(--panel-opacity-active);
 }
 
 .items-center {
@@ -19,7 +18,6 @@
 
 .inactive-layout {
 	filter: drop-shadow(var(--shadow-panel-inactive));
-	opacity: var(--panel-opacity-inactive);
 }
 
 .lg-font-1 {

@@ -20,6 +20,7 @@ declare global {
 				}
 			) => string | undefined;
 			remove: (widgetId: string) => void;
+			"error-callback": (Error: Error) => void;
 		};
 	}
 }

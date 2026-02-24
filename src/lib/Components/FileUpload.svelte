@@ -90,6 +90,7 @@
 		ondrop={drop}
 		onkeydown={keyBoardEvent}
 		aria-label="Drag and drop images area"
+		role="region"
 	>
 		<input
 			type="file"
