@@ -18,9 +18,7 @@ declare global {
 					theme?: 'light' | 'dark';
 					size?: 'normal' | 'compact';
 					'error-callback': (error: Error) => void;
-					'render-callback': () => void
-					'before-interaction': () => void;
-					'tiemout-callback': () => void;
+					'before-interactive-callback': () => void;
 				}
 			) => string | undefined;
 			remove: (widgetId: string) => void;

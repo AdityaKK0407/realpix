@@ -13,7 +13,7 @@ export const fileUploadFooterData: MetricType[] = [
 		id: nanoid(),
 		icon: 'None',
 		heading: 'Encryption',
-		text: 'Active',
+		text: '',
 		iconType: 'security-animated'
 	}
 ];

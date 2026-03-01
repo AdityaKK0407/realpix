@@ -1,5 +1,5 @@
 import { turnstile } from '$lib/state/turnstile.svelte';
-import type { IconTypes } from '$lib/types/fileupload.types';
+import type { Colors, IconTypes } from '$lib/types/fileupload.types';
 
 function range(start: number, end: number) {
 	const array = [];
@@ -20,8 +20,8 @@ function addSBasedOnCondition(condition: boolean, value: string) {
 }
 
 const utils = {
-	returnColorForType: (type: IconTypes) => {
-		let color = '';
+	returnColorForType: (type: IconTypes): Colors => {
+		let color: Colors = null;
 		switch (type) {
 			case 'info':
 				color = 'blue';

@@ -23,10 +23,6 @@
 		errorText = error.message;
 	}
 
-	function renderingTurnstile() {
-		turnstile.changeTurnstileStatus('verifying');
-	}
-
 	function neededInteraction() {
 		turnstile.changeTurnstileStatus('manual-verification');
 	}
@@ -42,10 +38,9 @@
 						theme: 'light',
 						size: 'normal',
 						'error-callback': onTurnstileError,
-						'render-callback': renderingTurnstile,
-						'before-interaction': neededInteraction,
-						'tiemout-callback': () => {}
+						'before-interactive-callback': neededInteraction,
 					});
+					turnstile.changeTurnstileStatus('verifying');
 				}
 			}, 100);
 

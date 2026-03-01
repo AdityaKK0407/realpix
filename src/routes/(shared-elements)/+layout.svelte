@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { fileUploadFooterData } from '$lib/data/FileUploadingMetrics.data';
 	import Metric from '$lib/Components/Metric.svelte';
+	import { turnstile } from '$lib/state/turnstile.svelte';
 </script>
 
 <svelte:head>
@@ -11,10 +12,6 @@
 		async
 		defer
 	></script>
-	<link
-		rel="stylesheet"
-		href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=image_inset"
-	/>
 </svelte:head>
 
 <section class="pageContainer">
@@ -29,7 +26,7 @@
 						<Metric
 							iconName={metric.icon}
 							heading={metric.heading}
-							text={metric.text}
+							text={metric.iconType.includes('security') ? turnstile.getStatusInfo() : metric.text}
 							iconType={metric.iconType}
 						/>
 					{/each}

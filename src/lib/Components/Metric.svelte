@@ -15,10 +15,9 @@
 	const elementProps = {
 		size: '35'
 	};
-	const condition = utils.performAnimation(props.iconType);
 </script>
 
-<div class="fieldSection" class:fieldSection__pulse={props.animate}>
+<section class="fieldSection" class:fieldSection__pulse={props.animate}>
 	{#if props.animate}
 		{#each range(1, 5) as number (number)}
 			<span style={`--i:${number}`} class="fieldSection__animateElement"></span>
@@ -28,20 +27,13 @@
 		<div
 			class="iconField"
 			class:removePadding={props.iconType.includes('animated')}
-			class:animate={condition}
-			class:noAnimate={!condition}
-			class:yellow={utils.returnColorForType(props.iconType) === 'yellow'}
-			class:red={utils.returnColorForType(props.iconType) === 'red'}
-			class:periwinkle={utils.returnColorForType(props.iconType) === 'periwinkle'}
-			class:gray={utils.returnColorForType(props.iconType) === 'gray'}
 			class:blue={utils.returnColorForType(props.iconType) === 'blue'}
 			class:green={utils.returnColorForType(props.iconType) === 'green'}
-			class:security-green={utils.returnColorForType(props.iconType) === 'security-green'}
 		>
 			{#if props.iconName === 'Ai'}
 				<Bot {...elementProps} stroke="currentColor" strokeWidth={2} />
 			{:else if props.iconType === 'security-animated'}
-				<ShieldSvg />
+				<ShieldSvg color={utils.returnColorForType(props.iconType)} />
 			{:else if props.iconName === 'Shield'}
 				<Shield {...elementProps} stroke="currentColor" strokeWidth={2} />
 			{/if}
@@ -51,7 +43,7 @@
 			<p class="sm-font-2 bold">{props.text}</p>
 		</div>
 	</section>
-</div>
+</section>
 
 <style>
 	.fieldSection {
@@ -74,36 +66,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--text-gap-small);
-	}
-
-	.animate {
-		--layer-0-time: 7s;
-		--other-layers-time: 4s;
-	}
-
-	.noAnimate {
-		--layer-0-time: 0s;
-		--other-layers-time: 0s;
-	}
-
-	.yellow {
-		--shield-svg-color: var(--color-yellow);
-	}
-
-	.periwinkle {
-		--shield-svg-color: var(--color-primary);
-	}
-
-	.red {
-		--shield-svg-color: var(--color-error);
-	}
-
-	.gray {
-		--shield-svg-color: var(--color-text-muted);
-	}
-
-	.security-green {
-		--shield-svg-color: var(--color-success-green);
+		justify-content: center;
 	}
 
 	.blue {
