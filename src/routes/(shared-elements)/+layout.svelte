@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Info } from 'lucide-svelte';
 	import { resolve } from '$app/paths';
-	import UploadingMetrics from '$lib/Components/UploadingMetrics.svelte';
+	import { fileUploadFooterData } from '$lib/data/FileUploadingMetrics.data';
+	import Metric from '$lib/Components/Metric.svelte';
 </script>
 
 <svelte:head>
@@ -22,7 +23,18 @@
 			<a href={resolve('/')} class="pageContainer__header__link">RealPix</a>
 		</section>
 		<section class="pageContainer__header__col2">
-			<UploadingMetrics />
+			<section class="displaySection">
+				<section class="flex displaySection__row1">
+					{#each fileUploadFooterData as metric (metric.id)}
+						<Metric
+							iconName={metric.icon}
+							heading={metric.heading}
+							text={metric.text}
+							iconType={metric.iconType}
+						/>
+					{/each}
+				</section>
+			</section>
 		</section>
 	</header>
 	<slot />
@@ -57,6 +69,17 @@
 
 	.pageContainer__header__col2 {
 		justify-self: center;
+	}
+
+	.displaySection {
+		display: grid;
+		--spacing: 0.8rem;
+		--internal-spacing: 0.4rem;
+		gap: var(--spacing);
+	}
+
+	.displaySection__row1 {
+		gap: var(--spacing);
 	}
 
 	.pageContainer__footer {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BadgeAlert, Image } from 'lucide-svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount} from 'svelte';
 	import { browser } from '$app/environment';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 	import { turnstile } from '$lib/state/turnstile.svelte';
@@ -23,8 +23,16 @@
 		errorText = error.message;
 	}
 
+	function renderingTurnstile() {
+		turnstile.changeTurnstileStatus('verifying');
+	}
+
+	function neededInteraction() {
+		turnstile.changeTurnstileStatus('manual-verification');
+	}
+
 	onMount(() => {
-		if (browser && turnstile.getStatus() === 'not-verified') {
+		if (browser && turnstile.getStatus() === 'reset') {
 			const checkTurnstile = setInterval(() => {
 				if (window.turnstile && turnstileContainer) {
 					clearInterval(checkTurnstile);
@@ -33,7 +41,10 @@
 						callback: handleTurnstileSuccess,
 						theme: 'light',
 						size: 'normal',
-						'error-callback': onTurnstileError
+						'error-callback': onTurnstileError,
+						'render-callback': renderingTurnstile,
+						'before-interaction': neededInteraction,
+						'tiemout-callback': () => {}
 					});
 				}
 			}, 100);

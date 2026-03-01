@@ -1,11 +1,11 @@
-export type TurnStile = 'not-verified' | 'verifying' | 'verified' | 'error';
+export type TurnStile = 'verifying' | 'verified' | 'error' | 'reset' | 'manual-verification'
 
 class Turnstile {
 	turnstileSetup: TurnStile;
 	turnstileToken: string;
 
 	constructor() {
-		this.turnstileSetup = $state<TurnStile>('not-verified');
+		this.turnstileSetup = $state<TurnStile>('reset');
 		this.turnstileToken = '';
 	}
 

@@ -7,14 +7,13 @@ export const fileUploadFooterData: MetricType[] = [
 		icon: 'Ai',
 		heading: 'Model',
 		text: 'Real Pix V.1',
-		color: 'blue'
+		iconType: 'info'
 	},
 	{
 		id: nanoid(),
-		icon: 'Shield',
+		icon: 'None',
 		heading: 'Encryption',
 		text: 'Active',
-		color: 'green',
-		turnstileSupport: true
+		iconType: 'security-animated'
 	}
 ];

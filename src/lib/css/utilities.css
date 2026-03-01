@@ -88,6 +88,10 @@
 	padding: var(--small-padding);
 }
 
+.iconField.removePadding {
+	padding: 0;
+}
+
 .color-pri {
 	color: var(--color-primary);
 }
