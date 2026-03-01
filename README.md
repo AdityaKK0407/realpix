@@ -15,18 +15,29 @@ backend task processing.
 # How to Run
 
 - Install all the required packages using uv
+
 ```bash
-    uv sync 
+uv sync 
 ```
 - Start the redis server
 - Run the make script
 
 ```bash
-    # Development mode
-    honcho start -f ./Procfile.dev
+# Development mode
+honcho start -f ./Procfile.dev
     
-    # Production mode
-    honcho start -f ./Procfile.prod
+# Production mode
+honcho start -f ./Procfile.prod
+```
+
+## Environment Variables
+
+```dotenv
+CLOUDFLARE_URL=https://challenges.cloudflare.com/turnstile/v0/siteverify
+CLOUDFLARE_SECRET_KEY=<cloudflare-secret-key>
+
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
 
 # Additional Commands
@@ -34,40 +45,40 @@ backend task processing.
 ## Tests
 
 ```bash
-    # Run all tests
-    pytest ./tests
-    # Or specify filepath to run particular tests
+# Run all tests
+pytest ./tests
+# Or specify filepath to run particular tests
 ```
 
 ## Static Type Checker
 
 ```bash
-    # Performs typing checking on project
-    mypy ./src/main.py
+# Performs typing checking on project
+mypy ./src/main.py
 ```
 
 ## Format
 
 ```bash
-    ruff format
+ruff format
 ```
 
 ## Fix code
 
 ```bash
-    ruff check
-    # Apply fixes
-    ruff check --fix
-    # Apply unsafe fixes
-    ruff check --unsafe-fixes
+ruff check
+# Apply fixes
+ruff check --fix
+# Apply unsafe fixes
+ruff check --unsafe-fixes
 ```
 
 # API Endpoints
 
-## Local dev
+## Local Development
 **Base URL**:  http://localhost:8000
 
-## Render Prod
+## Render Production
 **Base URL**: https://realpix.onrender.com
 
 ---
