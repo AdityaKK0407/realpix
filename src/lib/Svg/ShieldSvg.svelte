@@ -73,8 +73,6 @@
 
 	.gray {
 		color: var(--color-text-muted);
-		--layer-1-time: 0;
-		--layers-time: 0;
 	}
 
 	.security-green {

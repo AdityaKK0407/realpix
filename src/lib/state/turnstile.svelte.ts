@@ -19,19 +19,22 @@ class Turnstile {
 	private turnstileSetup: TurnStile;
 	private turnstileToken: string;
 	private turnstileStatusText: string;
+	private autoCheckingStatus: boolean;
 
 	constructor() {
 		this.turnstileSetup = $state<TurnStile>('starting');
 		this.turnstileToken = '';
 		this.turnstileStatusText = $state('Saved-Checking');
+		this.autoCheckingStatus = true;
 		this.init();
 	}
 
-	private init() {
+	private async init() {
 		if (browser) {
-			const status = this.checkTurnstile();
+			const status = await this.checkTurnstile();
 			if (!status) {
 				this.turnstileSetup = 'reset';
+				this.autoCheckingStatus = false;
 			} else {
 				this.turnstileSetup = 'verified'
 			}
@@ -43,7 +46,7 @@ class Turnstile {
 		this.turnstileSetup = status;
 		this.getStatusText();
 
-		if(status === 'verified' && token !== undefined) {
+		if(status === 'verified' && token) {
 			this.turnstileToken = token;
 			this.nextSteps();
 		}
@@ -52,7 +55,7 @@ class Turnstile {
 	async checkTurnstile(): Promise<boolean> {
 		const ifExists = await axios('/api/checkCookie');
 
-		const result = statusType.safeParse(ifExists);
+		const result = statusType.safeParse(ifExists.data);
 		if (!result.success) {
 			return false;
 		}
@@ -63,6 +66,14 @@ class Turnstile {
 		return this.turnstileSetup;
 	}
 
+	shouldDisplay() {
+		if(this.turnstileSetup === 'reset' && !this.autoCheckingStatus) {
+			return true
+		} else {
+			return false
+		}
+	}
+
 	private async nextSteps() {
 		const response = await axios('/api/verify-turnstile', {
 			method: "POST",
@@ -70,6 +81,8 @@ class Turnstile {
 				turnstileToken: this.turnstileToken
 			})
 		})
+
+		console.log(response.data)
 	}
 
 	private getStatusText() {

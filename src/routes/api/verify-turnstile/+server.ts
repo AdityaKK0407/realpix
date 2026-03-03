@@ -10,10 +10,12 @@ const type = z.object({
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
 		const { turnstileToken } = await request.json();
+		console.log(turnstileToken)
 		const token = type.safeParse(turnstileToken);
 
 		if(!token.success) {
-			alert('Provided data is in incorrect format or is missing')
+			console.log('Provided data is in incorrect format or is missing')
+			throw error(400, 'Error')
 		}
 
 		if (!turnstileToken) {

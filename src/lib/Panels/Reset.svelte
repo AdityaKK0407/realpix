@@ -28,9 +28,9 @@
 	}
 
 	onMount(() => {
-		if (browser && turnstile.getStatus() === 'reset') {
+		if (browser) {
 			const checkTurnstile = setInterval(() => {
-				if (window.turnstile && turnstileContainer) {
+				if (window.turnstile && turnstileContainer && turnstile.shouldDisplay()) {
 					clearInterval(checkTurnstile);
 					turnstileWidgetId = window.turnstile.render(turnstileContainer, {
 						sitekey: PUBLIC_TURNSTILE_SITE_KEY,
