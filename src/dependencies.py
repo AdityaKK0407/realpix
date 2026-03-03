@@ -23,5 +23,5 @@ def get_activate_token_sha(request: Request) -> str:
 
 
 def get_ip_rate_limiter_sha(request: Request) -> str:
-    ip_rate_limiter: str = request.app.state.ip_rate_limiter
+    ip_rate_limiter: str = request.app.state.ip_rate_limiter_sha
     return ip_rate_limiter

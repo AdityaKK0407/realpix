@@ -5,7 +5,7 @@ from src.tasks.app import task_queue
 
 @task_queue.task
 def image_task(filepath: str, content: bytes) -> dict[str, str | int]:
-    time.sleep(10)
+    time.sleep(1)
     return {"filepath": filepath, "content_size": len(content)}
 
 

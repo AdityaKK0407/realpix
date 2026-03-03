@@ -2,21 +2,17 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
+
 import redis.asyncio as redis
-
 from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request, Depends, HTTPException, status
 
+from src.dependencies import get_ip_rate_limiter_sha, get_redis
 from src.redis_client.client import create_redis_client, load_lua_script
+from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
-from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
-from src.dependencies import (
-    get_redis,
-    get_ip_rate_limiter_sha,
-
-)
 
 
 @asynccontextmanager

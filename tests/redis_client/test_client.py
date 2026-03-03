@@ -1,7 +1,8 @@
 from unittest.mock import AsyncMock
 
-from src.redis_client.client import load_lua_script
 import pytest
+
+from src.redis_client.client import load_lua_script
 
 
 @pytest.mark.anyio

@@ -1,12 +1,13 @@
-from unittest.mock import AsyncMock, patch
 import uuid
+from unittest.mock import AsyncMock, patch
+
 import pytest
 
 from src.redis_client.rate_limiter import (
+    VerifyTokenResult,
+    activate_rate_limiter_token,
     create_rate_limiter_token,
     verify_rate_limiter_token,
-    activate_rate_limiter_token,
-    VerifyTokenResult,
 )
 
 

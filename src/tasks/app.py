@@ -1,5 +1,6 @@
-from celery import Celery
 import os
+
+from celery import Celery
 
 host = os.getenv("REDIS_HOST")
 port = os.getenv("REDIS_PORT")

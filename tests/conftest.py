@@ -1,17 +1,19 @@
-from unittest.mock import patch
 import uuid
+from unittest.mock import patch
+
 import pytest
-from httpx import AsyncClient, ASGITransport
-from src.main import app
-from tests.mocks.redis import MockRedis
-from tests.mocks.celery import MockCelery
+from httpx import ASGITransport, AsyncClient
+
 from src.dependencies import (
-    get_redis,
-    get_create_sha,
-    get_verify_sha,
     get_activate_token_sha,
+    get_create_sha,
     get_ip_rate_limiter_sha,
+    get_redis,
+    get_verify_sha,
 )
+from src.main import app
+from tests.mocks.celery import MockCelery
+from tests.mocks.redis import MockRedis
 
 
 @pytest.fixture

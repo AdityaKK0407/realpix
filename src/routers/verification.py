@@ -8,14 +8,14 @@ from pydantic import BaseModel
 from src.dependencies import (
     get_activate_token_sha,
     get_create_sha,
-    get_redis,
     get_ip_rate_limiter_sha,
+    get_redis,
 )
+from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.redis_client.rate_limiter import (
     activate_rate_limiter_token,
     create_rate_limiter_token,
 )
-from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 
 router = APIRouter(prefix="/verify", tags=["Verification"])
 

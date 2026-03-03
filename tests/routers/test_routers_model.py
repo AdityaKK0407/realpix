@@ -1,15 +1,15 @@
-from unittest.mock import patch
-from fastapi import HTTPException
-import pytest
-from fastapi import UploadFile
-from io import BytesIO
-from PIL import Image
-from typing import Callable
-
 from dataclasses import dataclass
+from io import BytesIO
+from typing import Callable
+from unittest.mock import patch
+
+import pytest
+from fastapi import HTTPException, UploadFile
+from PIL import Image
+
 from src.routers.model import validate_image
 from tests.mocks.celery import MockCeleryAsyncResult
-from tests.mocks.image import create_image_buffer, create_corrupt_image_buffer
+from tests.mocks.image import create_corrupt_image_buffer, create_image_buffer
 
 
 @dataclass
