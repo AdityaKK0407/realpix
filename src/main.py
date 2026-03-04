@@ -16,9 +16,7 @@ from src.routers.verification import router as verification_router
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
-    if not load_dotenv():
-        print("Failed to load .env")
-        sys.exit(1)
+    load_dotenv()
 
     host = os.getenv("REDIS_HOST")
     port = os.getenv("REDIS_PORT")
