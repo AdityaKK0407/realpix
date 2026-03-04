@@ -2,54 +2,50 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { PYTHON_BACKEND_SERVER } from '$env/static/private';
 import z from 'zod';
+import axios from 'axios';
 
-const type = z.object({
-	turnstileToken: z.string()
-})
+const turnstileTokenType = z.string().min(1)
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
 		const { turnstileToken } = await request.json();
-		console.log(turnstileToken)
-		const token = type.safeParse(turnstileToken);
+		const token = turnstileTokenType.safeParse(turnstileToken);
 
 		if(!token.success) {
 			console.log('Provided data is in incorrect format or is missing')
 			throw error(400, 'Error')
 		}
 
-		if (!turnstileToken) {
-			throw error(400, 'Missing turnstile token');
-		}
-
-		const turnstileResponse = await fetch(`${PYTHON_BACKEND_SERVER}/verify/captcha`, {
+		const turnstileResponse = await axios(`${PYTHON_BACKEND_SERVER}/verify/captcha`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({
-				token: token.data?.turnstileToken
-			})
+			data: {
+				token: token.data
+			}
 		});
 
-		const turnstileResult = await turnstileResponse.json();
+		const turnstileResponseType = z.object({
+			user_token: z.string()
+		})
 
-		if (!turnstileResult.success) {
-			throw error(401, 'Turnstile verification failed');
+		const parsedBackendToken = turnstileResponseType.safeParse(turnstileResponse.data);
+
+		if (!parsedBackendToken.success) {
+			throw error(500, 'Failed to parse backend response')
 		}
 
-		console.log('Turnstile verified');
-
-		cookies.set('session_turnstile_token', turnstileResult.token, {
+		cookies.set('session_turnstile_token', parsedBackendToken.data.user_token, {
 			httpOnly: true,
 			secure: true,
 			sameSite: 'strict',
 			path: '/',
-			maxAge: 86400000
+			maxAge: 86400
 		})
 
         return json({
-            token: turnstileResult.token
+            token: parsedBackendToken.data.user_token
         })
 		
 	} catch (err) {

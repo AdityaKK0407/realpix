@@ -5,8 +5,8 @@ interface Requirements {
 }
 
 export const GET: RequestHandler = ({ cookies }: Requirements) => {
-	const ifExists = cookies.get('turnstile-token');
+	const ifExists = cookies.get('session_turnstile_token');
 	return json({
-		status: ifExists ? true : false
+		status: !!ifExists
 	});
 };

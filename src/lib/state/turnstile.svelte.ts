@@ -75,14 +75,13 @@ class Turnstile {
 	}
 
 	private async nextSteps() {
-		const response = await axios('/api/verify-turnstile', {
+		await axios('/api/verify-turnstile', {
 			method: "POST",
-			data: JSON.stringify({
+			withCredentials: true,
+			data: {
 				turnstileToken: this.turnstileToken
-			})
+			}
 		})
-
-		console.log(response.data)
 	}
 
 	private getStatusText() {
