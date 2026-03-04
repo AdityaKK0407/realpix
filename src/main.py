@@ -6,7 +6,6 @@ from typing import Any, AsyncGenerator
 import redis.asyncio as redis
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, status
-from fastapi.middleware.cors import CORSMiddleware
 
 from src.dependencies import get_ip_rate_limiter_sha, get_redis
 from src.redis_client.client import create_redis_client, load_lua_script
@@ -52,13 +51,6 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
 
 
 app = FastAPI(lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 app.include_router(model_router)
 app.include_router(verification_router)
 
