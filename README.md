@@ -85,7 +85,7 @@ ruff check --unsafe-fixes
 
 ## Default
 
-### GET /
+### HEAD /
 
 **Health check for server**
 

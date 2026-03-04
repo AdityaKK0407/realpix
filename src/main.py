@@ -53,7 +53,7 @@ app.include_router(model_router)
 app.include_router(verification_router)
 
 
-@app.get("/")
+@app.head("/")
 async def health_check(
     request: Request,
     redis_client: redis.Redis = Depends(get_redis),
