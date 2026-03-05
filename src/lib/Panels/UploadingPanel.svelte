@@ -1,14 +1,14 @@
 <script lang="ts">
 	import axios from 'axios';
-	import { writable } from 'svelte/store';
 	import { type FileType, uploadData } from '$lib/state/uploadFlow.store';
+	import { addSBasedOnCondition } from '$lib/scripts/utils';
 
 	interface Props {
 		fileType: FileType;
 	}
 
 	const props: Props = $props();
-	const progress = writable(0);
+	let progress = $state(0);
 	const data = uploadData.getFileType(props.fileType);
 
 	async function upload() {
@@ -16,16 +16,15 @@
 			const formData = new FormData();
 			const fileType = props.fileType;
 			data.forEach((data) => {
-				formData.append(fileType, data.blob);
+				formData.append(addSBasedOnCondition(true, props.fileType), data.src);
 			});
 
 			try {
-				await axios.post('/api', formData, {
-					headers: { 'Content-Type': 'multipart/form-data' },
+				await axios.post('/api/uploadImage', formData, {
 					onUploadProgress: (event) => {
 						if (event && event.total) {
 							const percent = Math.round((event.loaded * 100) / event.total);
-							progress.set(percent);
+							progress = percent;
 						}
 					}
 				});
@@ -39,7 +38,7 @@
 </script>
 
 <section class="uploading__container">
-	<p>Uploaded: {$progress}</p>
+	<p>Uploaded: {progress}</p>
 </section>
 
 <style>

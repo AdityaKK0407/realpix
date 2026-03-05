@@ -58,7 +58,7 @@
 							}
 						},
 						retry: 'auto',
-						"retry-interval": 10000
+						"retry-interval": 15000
 					});
 					turnstile.changeTurnstileStatus({ status: 'verifying' });
 				}
@@ -159,7 +159,6 @@
 	
 	.row2__section__text {
 		gap: var(--text-gap);
-		align-items: center;
 	}
 
 	.section__text {
