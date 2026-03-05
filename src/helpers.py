@@ -2,7 +2,7 @@ import logging
 import sys
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     stream=sys.stdout
 )
 
