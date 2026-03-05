@@ -4,7 +4,6 @@ import io
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
-from src.helpers import logger
 from src.middleware.rate_limiter import rate_limiter_middleware
 from src.tasks.app import task_queue
 from src.tasks.model import image_task
