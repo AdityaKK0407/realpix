@@ -12,7 +12,7 @@ from src.redis_client.client import create_redis_client, load_lua_script
 from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
-
+from src.helpers import logger
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
@@ -61,6 +61,7 @@ async def health_check(
 ):
     user = request.client
     if not user:
+        logger.warning("Client IP missing in request")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Client not available",
@@ -68,6 +69,7 @@ async def health_check(
     if not await verify_ip_rate_limiter(
         redis_client, ip_rate_limiter_sha, user.host, "health_check"
     ):
+        logger.warning("Client IP token exceeded rate limit")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Rate limit exceeded",

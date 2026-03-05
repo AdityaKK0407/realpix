@@ -296,7 +296,7 @@ Content-Type: video/extension
     {"detail": "Service temporarily unavailable"}
 ```
 
-### GET /status/{task_id}
+### GET /model/status/{task_id}
 
 **Get the status of model inference given a task id**
 
