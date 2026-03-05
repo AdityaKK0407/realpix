@@ -4,33 +4,35 @@ import { PYTHON_BACKEND_SERVER } from '$env/static/private';
 import z from 'zod';
 import axios from 'axios';
 
-const turnstileTokenType = z.string().min(1)
+const turnstileTokenType = z.object({
+	turnstileToken: z.string().min(1)
+})
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	try {
-		const { turnstileToken } = await request.json();
-		const token = turnstileTokenType.safeParse(turnstileToken);
+		const turnstileResponse = await request.json();
+		const token = turnstileTokenType.safeParse(turnstileResponse);
 
 		if(!token.success) {
 			console.log('Provided data is in incorrect format or is missing')
 			throw error(400, 'Error')
 		}
 
-		const turnstileResponse = await axios(`${PYTHON_BACKEND_SERVER}/verify/captcha`, {
+		const serverTokenResponse = await axios(`${PYTHON_BACKEND_SERVER}/verify/captcha`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			data: {
-				token: token.data
+				token: token.data.turnstileToken
 			}
 		});
 
-		const turnstileResponseType = z.object({
+		const serverResponseType = z.object({
 			user_token: z.string()
 		})
 
-		const parsedBackendToken = turnstileResponseType.safeParse(turnstileResponse.data);
+		const parsedBackendToken = serverResponseType.safeParse(serverTokenResponse.data);
 
 		if (!parsedBackendToken.success) {
 			throw error(500, 'Failed to parse backend response')

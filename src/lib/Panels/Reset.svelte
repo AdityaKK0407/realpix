@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { BadgeAlert, Image } from 'lucide-svelte';
-	import { onDestroy, onMount} from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
-	import { turnstile } from '$lib/state/turnstile.svelte';
+	import { turnstile, type ErrorTurnstile } from '$lib/state/turnstile.svelte';
 
 	interface Props {
 		text: string[];
@@ -12,19 +12,23 @@
 	let props: Props = $props();
 	let turnstileContainer: HTMLDivElement | null = null;
 	let turnstileWidgetId: string | undefined = undefined;
-	let errorText: string | null = $state(null);
+	let errorTurnstile: ErrorTurnstile = $state({
+		errorText: null,
+		category: null,
+		errorStatus: false
+	});
 
 	function handleTurnstileSuccess(token: string) {
-		turnstile.changeTurnstileStatus('verified', token);
+		turnstile.changeTurnstileStatus({ status: 'verified', token });
 	}
 
-	function onTurnstileError(error: Error) {
-		turnstile.changeTurnstileStatus('error');
-		errorText = error.message;
+	function onTurnstileError(error: number) {
+		turnstile.changeTurnstileStatus({ status: 'error', errorCode: error });
+		errorTurnstile = turnstile.getErrorStatus();
 	}
 
 	function neededInteraction() {
-		turnstile.changeTurnstileStatus('manual-verification');
+		turnstile.changeTurnstileStatus({ status: 'manual-verification' });
 	}
 
 	onMount(() => {
@@ -39,8 +43,24 @@
 						size: 'normal',
 						'error-callback': onTurnstileError,
 						'before-interactive-callback': neededInteraction,
+						'timeout-callback': () => {
+							if(turnstileWidgetId) {
+								turnstile.changeTurnstileStatus({status: 'verification-timeout', errorCode: 700000})
+								errorTurnstile = turnstile.getErrorStatus();
+								window.turnstile.reset(turnstileWidgetId);
+							}
+						},
+						'expired-callback': () => {
+							if (turnstileWidgetId) {
+								turnstile.changeTurnstileStatus({ status: 'token-expired', errorCode: 710000})
+								errorTurnstile = turnstile.getErrorStatus();
+								window.turnstile.reset(turnstileWidgetId);
+							}
+						},
+						retry: 'auto',
+						"retry-interval": 10000
 					});
-					turnstile.changeTurnstileStatus('verifying');
+					turnstile.changeTurnstileStatus({ status: 'verifying' });
 				}
 			}, 100);
 
@@ -70,12 +90,16 @@
 	</section>
 	<section class="mainSection__row2 flex-column">
 		<div class="cf-turnstile" bind:this={turnstileContainer}></div>
-		{#if turnstile.getStatus() === 'error'}
+		{#if errorTurnstile.errorStatus}
 			<section class="row2__section">
-				<BadgeAlert size="35" stroke="currentColor" />
-				<section class="row2__section__text">
-					<p class="row2__strong sm-font-2">Error:</p>
-					<p class="sm-font-3">{errorText}</p>
+				<BadgeAlert size="45" stroke="currentColor" />
+				<section class="row2__section__text flex-column">
+					<p class="md-font-1 flex section__text">
+						<strong>Category: </strong> <span>{errorTurnstile.category}</span>
+					</p>
+					<p class="md-font-1 flex section__text">
+						<strong>Message: </strong> <span>{errorTurnstile.errorText}</span>
+					</p>
 				</section>
 			</section>
 		{/if}
@@ -86,9 +110,10 @@
 	.mainSection {
 		flex-grow: 1;
 		display: grid;
-		grid-template-rows: 0.7fr 0.3fr;
+		grid-template-rows: 1fr 0.3fr;
 		grid-template-columns: 0.5fr 0.7fr 0.5fr;
 		align-items: center;
+		padding: var(--small-padding);
 	}
 
 	.wrapper {
@@ -116,9 +141,10 @@
 
 	.mainSection__row2 {
 		grid-row-start: 2;
-		grid-column-start: 2;
 		align-items: center;
 		gap: var(--text-gap);
+		grid-column-start: 1;
+		grid-column-end: 4;
 	}
 
 	.row2__section {
@@ -130,16 +156,14 @@
 		padding: var(--medium-padding);
 		border-radius: 2rem;
 	}
-
-	.row2__strong {
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.02em;
-	}
-
+	
 	.row2__section__text {
-		display: flex;
-		gap: var(--text-gap-small);
+		gap: var(--text-gap);
 		align-items: center;
 	}
+
+	.section__text {
+		gap: var(--text-gap);
+	}
+
 </style>

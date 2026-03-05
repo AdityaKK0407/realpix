@@ -4,7 +4,7 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			turnstileSessionToken: string;
+			turnstileSessionToken: string | null;
 		}
 		// interface PageData {}
 		// interface PageState {}
@@ -19,11 +19,16 @@ declare global {
 					callback?: (token: string) => void;
 					theme?: 'light' | 'dark';
 					size?: 'normal' | 'compact';
-					'error-callback': (error: Error) => void;
+					'error-callback': (error: number) => void;
 					'before-interactive-callback': () => void;
+					'timeout-callback': () => void;
+					'expired-callback': () => void;
+					retry: 'auto' | 'never'
+					'retry-interval': number
 				}
 			) => string | undefined;
 			remove: (widgetId: string) => void;
+			reset: (widgetId: string) => void;
 		};
 	}
 }

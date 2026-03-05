@@ -158,7 +158,7 @@
 	.buttonImg {
 		display: block;
 		object-fit: cover;
-		height: clamp(1.4rem, 7vw, 8rem);
+		height: clamp(1.3rem, 5.5vw, 7rem);
 	}
 
 	img {
@@ -168,11 +168,11 @@
 	}
 
 	img.small {
-		height: 20rem;
+		height: 18rem;
 	}
 
 	img.max {
-		height: 23rem;
+		height: 20rem;
 	}
 
 	.btn-container {

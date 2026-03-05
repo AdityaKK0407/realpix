@@ -24,13 +24,13 @@
 		if (files.length > 0) {
 			if (props.fileType == 'image') {
 				const filesArray = Array.from(files);
-				const filteredFilesArray = validateFiles(filesArray);
-				if (filteredFilesArray.length > 0) {
+				const { filteredFiles } = validateFiles(filesArray);
+				if (filteredFiles.length > 0) {
 					uploadState = 'successState';
-					successText = `${addSBasedOnCondition(filteredFilesArray.length > 1, 'File')} uploaded successfully.`;
+					successText = `${addSBasedOnCondition(filteredFiles.length > 1, 'File')} uploaded successfully.`;
 					screenReaderMessage = `${files.length === 1 ? 'One' : files.length} files have been selected successfully.`;
-					props.onSelect(Array.from(filteredFilesArray), props.fileType);
-					headerText = `Uploaded ${addSBasedOnCondition(filteredFilesArray.length > 1, 'File')}`;
+					props.onSelect(Array.from(filteredFiles), props.fileType);
+					headerText = `Uploaded ${addSBasedOnCondition(filteredFiles.length > 1, 'File')}`;
 				} else {
 					uploadState = 'errorState';
 				}
