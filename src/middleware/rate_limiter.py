@@ -14,7 +14,8 @@ async def rate_limiter_middleware(
     verify_sha: str = Depends(get_verify_sha),
 ) -> None:
     if not x_ratelimit_token:
-        logger.warning("Rate limit token missing in header")
+        print("Rate limit token missing in header", flush=True)
+        # logger.warning("Rate limit token missing in header")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Missing rate limiter token"
         )

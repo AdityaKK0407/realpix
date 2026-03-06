@@ -2,26 +2,6 @@ import logging
 import sys
 import os
 
-for handler in logging.root.handlers[:]:
-    logging.root.removeHandler(handler)
-
-if __name__ != "__main__":
-    gunicorn_logger = logging.getLogger("gunicorn.error")
-    if gunicorn_logger.handlers:  # Gunicorn running
-        logging.root.handlers = gunicorn_logger.handlers
-        logging.root.setLevel(getattr(logging, os.getenv("LOG_LEVEL", "INFO")))
-    else:
-        handler = logging.StreamHandler(sys.stderr)
-        logging.root.addHandler(handler)
-        logging.root.setLevel(logging.INFO)
-else:
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[logging.StreamHandler(sys.stdout)]
-    )
-
-logger = logging.getLogger(__name__)
-
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
@@ -34,6 +14,16 @@ from src.redis_client.client import create_redis_client, load_lua_script
 from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
+
+formatter = logging.Formatter(fmt="%(asctime)s %(name)s %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+handler = logging.StreamHandler(stream=sys.stdout)
+handler.setFormatter(fmt=formatter)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+
+for name in logging.root.manager.loggerDict:
+    print(name)
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
