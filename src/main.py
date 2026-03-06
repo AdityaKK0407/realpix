@@ -1,4 +1,3 @@
-# import logging
 import sys
 import os
 
@@ -15,15 +14,12 @@ from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
 
-# formatter = logging.Formatter(fmt="%(asctime)s %(name)s %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-# handler = logging.StreamHandler(stream=sys.stdout)
-# handler.setFormatter(fmt=formatter)
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# logger.addHandler(handler)
-#
-# for name in logging.root.manager.loggerDict:
-#     print(name)
+from src.helpers import setup_logger
+import logging
+
+setup_logger()
+
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
@@ -72,8 +68,8 @@ async def health_check(
 ):
     user = request.client
     if not user:
-        print("Client IP missing in request", flush=True)
-        # logger.warning("Client IP missing in request")
+        # print("Client IP missing in request", flush=True)
+        logger.warning("Client IP missing in request")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Client not available",
@@ -81,8 +77,8 @@ async def health_check(
     if not await verify_ip_rate_limiter(
         redis_client, ip_rate_limiter_sha, user.host, "health_check"
     ):
-        print("Client IP token exceeded rate limit", flush=True)
-        # logger.warning("Client IP token exceeded rate limit")
+        # print("Client IP token exceeded rate limit", flush=True)
+        logger.warning("Client IP token exceeded rate limit")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Rate limit exceeded",
