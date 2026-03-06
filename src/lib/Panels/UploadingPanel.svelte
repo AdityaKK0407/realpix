@@ -28,7 +28,7 @@
 						}
 					}
 				});
-				alert(response)
+				alert(response);
 			} catch (err) {
 				alert(`Error occured: ${err}`);
 				console.log(err);

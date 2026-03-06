@@ -3,8 +3,8 @@
 
 	interface Props {
 		alertType: 'info' | 'warning' | 'critical';
-        heading: string;
-        body: string
+		heading: string;
+		body: string;
 	}
 	const props: Props = $props();
 </script>
@@ -19,11 +19,11 @@
 			<span class="material-symbols-outlined"> dangerous </span>
 		{/if}
 	</div>
-    <section>
-        <h3>{props.heading}</h3>
-        <p>{props.body}</p>
-    </section>
-    <div>
-        <CircleX />
-    </div>
+	<section>
+		<h3>{props.heading}</h3>
+		<p>{props.body}</p>
+	</section>
+	<div>
+		<CircleX />
+	</div>
 </section>

@@ -23,8 +23,8 @@ declare global {
 					'before-interactive-callback': () => void;
 					'timeout-callback': () => void;
 					'expired-callback': () => void;
-					retry: 'auto' | 'never'
-					'retry-interval': number
+					retry: 'auto' | 'never';
+					'retry-interval': number;
 				}
 			) => string | undefined;
 			remove: (widgetId: string) => void;

@@ -39,6 +39,7 @@
 			aria-hidden="true"
 			class:max={oneImage}
 			class:small={!oneImage}
+			loading="lazy"
 		/>
 	</section>
 	<section class:oneLayout={oneImage}>

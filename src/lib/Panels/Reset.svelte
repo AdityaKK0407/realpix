@@ -44,21 +44,24 @@
 						'error-callback': onTurnstileError,
 						'before-interactive-callback': neededInteraction,
 						'timeout-callback': () => {
-							if(turnstileWidgetId) {
-								turnstile.changeTurnstileStatus({status: 'verification-timeout', errorCode: 700000})
+							if (turnstileWidgetId) {
+								turnstile.changeTurnstileStatus({
+									status: 'verification-timeout',
+									errorCode: 700000
+								});
 								errorTurnstile = turnstile.getErrorStatus();
 								window.turnstile.reset(turnstileWidgetId);
 							}
 						},
 						'expired-callback': () => {
 							if (turnstileWidgetId) {
-								turnstile.changeTurnstileStatus({ status: 'token-expired', errorCode: 710000})
+								turnstile.changeTurnstileStatus({ status: 'token-expired', errorCode: 710000 });
 								errorTurnstile = turnstile.getErrorStatus();
 								window.turnstile.reset(turnstileWidgetId);
 							}
 						},
 						retry: 'auto',
-						"retry-interval": 15000
+						'retry-interval': 15000
 					});
 					turnstile.changeTurnstileStatus({ status: 'verifying' });
 				}
@@ -156,7 +159,7 @@
 		padding: var(--medium-padding);
 		border-radius: 2rem;
 	}
-	
+
 	.row2__section__text {
 		gap: var(--text-gap);
 	}
@@ -164,5 +167,4 @@
 	.section__text {
 		gap: var(--text-gap);
 	}
-
 </style>

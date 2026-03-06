@@ -8,19 +8,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const formData = await request.formData();
-	console.log(locals.turnstileSessionToken)
+	console.log(locals.turnstileSessionToken);
 
 	const response = await axios(`${PYTHON_BACKEND_SERVER}/model/images`, {
 		method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'X-RateLimit-Token': locals.turnstileSessionToken
-        },
-        data: formData
+		headers: {
+			'Content-Type': 'multipart/form-data',
+			'X-RateLimit-Token': locals.turnstileSessionToken
+		},
+		data: formData
 	});
 
-    console.log(response)
-    console.log(response.data.detail)
+	console.log(response);
+	console.log(response.data.detail);
 
 	return json({
 		data: response

@@ -7,7 +7,7 @@ interface ReturnType {
 
 export function validateFiles(files: File[]): ReturnType {
 	const MAX_LIMIT = 5;
-	
+
 	if (files.length > MAX_LIMIT) {
 		files = files.slice(0, MAX_LIMIT);
 	}
@@ -21,6 +21,6 @@ export function validateFiles(files: File[]): ReturnType {
 				return;
 			}
 			return allowedTypes.includes(file.type) && allowedExtensions.includes(ext.toLowerCase());
-		}),
+		})
 	};
 }
