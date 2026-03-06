@@ -5,16 +5,12 @@ from pathlib import Path
 import redis.asyncio as redis
 
 
-def setup_logger():
+def setup_logger() -> None:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
         handlers=[logging.StreamHandler(sys.stdout)],
     )
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-    return logger
 
 def create_redis_client(host: str, port: int) -> redis.Redis:
     client = redis.Redis(host=host, port=port, db=1)

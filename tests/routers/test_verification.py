@@ -10,6 +10,7 @@ class VerifyCaptchaCaseResults:
     name: str
     token_body: str | None
     cloudflare_success: bool
+    client_ip: str | None
     rate_limiter_token: str | None
     saved_rate_limiter_token: str | None
     redis_result: int
@@ -22,6 +23,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         name="missing captcha token",
         token_body=None,
         cloudflare_success=False,
+        client_ip=None,
         rate_limiter_token=None,
         saved_rate_limiter_token=None,
         redis_result=3,
@@ -32,6 +34,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         name="invalid captcha token",
         token_body="abc",
         cloudflare_success=False,
+        client_ip="fake_client_ip",
         rate_limiter_token=None,
         saved_rate_limiter_token=None,
         redis_result=3,
@@ -42,6 +45,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         name="rate limit token exists and activated",
         token_body="abc",
         cloudflare_success=True,
+        client_ip="fake_client_ip",
         rate_limiter_token="old_token",
         saved_rate_limiter_token="old_token",
         redis_result=1,
@@ -52,6 +56,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         name="rate limit token exists but failed to activate, returns new token",
         token_body="abc",
         cloudflare_success=True,
+        client_ip="fake_client_ip",
         rate_limiter_token="old_token",
         saved_rate_limiter_token=None,
         redis_result=0,
@@ -62,6 +67,7 @@ VERIFY_CAPTCHA_TEST_CASES = [
         name="missing rate limit token, returns new token",
         token_body="abc",
         cloudflare_success=True,
+        client_ip="fake_client_ip",
         rate_limiter_token=None,
         saved_rate_limiter_token=None,
         redis_result=3,
@@ -80,6 +86,8 @@ async def test_verify_captcha(client, mock_redis_client, test_case):
     mock_redis_client.store[key] = test_case.redis_result
 
     headers = {}
+    if test_case.client_ip:
+        headers["X-Client-Ip"] = test_case.client_ip
     if test_case.rate_limiter_token:
         headers["X-RateLimit-Token"] = test_case.rate_limiter_token
 
