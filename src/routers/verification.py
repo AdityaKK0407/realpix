@@ -16,7 +16,9 @@ from src.redis_client.rate_limiter import (
     activate_rate_limiter_token,
     create_rate_limiter_token,
 )
-from src.helpers import logger
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/verify", tags=["Verification"])
 

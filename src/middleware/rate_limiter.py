@@ -4,8 +4,9 @@ from redis.exceptions import RedisError
 
 from src.dependencies import get_redis, get_verify_sha
 from src.redis_client.rate_limiter import VerifyTokenResult, verify_rate_limiter_token
-from src.helpers import logger
+import logging
 
+logger = logging.getLogger(__name__)
 
 async def rate_limiter_middleware(
     x_ratelimit_token: str | None = Header(default=None),

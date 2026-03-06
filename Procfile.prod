@@ -1,2 +1,2 @@
 worker: celery -A src.tasks.app worker --concurrency=4 --prefetch-multiplier=1 --max-tasks-per-child=100
-api_prod: gunicorn src.main:app -k uvicorn.workers.UvicornWorker --workers=4 --timeout 60
+api_prod: gunicorn src.main:app -k uvicorn.workers.UvicornWorker --workers=4 --timeout 60 --capture-output --error-logfile - --access-logfile - --log-level info
