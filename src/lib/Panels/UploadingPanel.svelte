@@ -16,11 +16,11 @@
 			const formData = new FormData();
 			const fileType = props.fileType;
 			data.forEach((data) => {
-				formData.append(addSBasedOnCondition(true, props.fileType), data.src);
+				formData.append(addSBasedOnCondition(true, fileType), data.src);
 			});
 
 			try {
-				await axios.post('/api/uploadImage', formData, {
+				const response = await axios.post('/api/uploadImage', formData, {
 					onUploadProgress: (event) => {
 						if (event && event.total) {
 							const percent = Math.round((event.loaded * 100) / event.total);
@@ -28,8 +28,10 @@
 						}
 					}
 				});
+				alert(response)
 			} catch (err) {
 				alert(`Error occured: ${err}`);
+				console.log(err);
 			}
 		}
 	}
