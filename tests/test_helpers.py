@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from src.redis_client.client import load_lua_script
+from src.helpers import load_lua_script
 
 
 @pytest.mark.anyio

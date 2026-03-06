@@ -1,8 +1,9 @@
+import logging
 import os
 
 import httpx
 import redis.asyncio as redis
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel
 
 from src.dependencies import (
@@ -16,7 +17,6 @@ from src.redis_client.rate_limiter import (
     activate_rate_limiter_token,
     create_rate_limiter_token,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class TurnstileResult(BaseModel):
 @router.post("/captcha")
 async def verify_captcha(
     payload: dict[str, str],
-    request: Request,
+    x_client_ip: str | None = Header(None),
     x_ratelimit_token: str | None = Header(None),
     redis_client: redis.Redis = Depends(get_redis),
     create_sha: str = Depends(get_create_sha),
@@ -40,15 +40,12 @@ async def verify_captcha(
     cloudflare_token = payload.get("token", None)
 
     if not cloudflare_token:
-        # print("Missing cloudflare turnstile token in request body", flush=True)
         logger.warning("Missing cloudflare turnstile token in request body")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Missing CAPTCHA token"
         )
 
-    user = request.client
-    if not user:
-        # print("Client IP missing in request", flush=True)
+    if not x_client_ip:
         logger.error("Client IP missing in request")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -56,9 +53,8 @@ async def verify_captcha(
         )
 
     if not await verify_ip_rate_limiter(
-        redis_client, ip_rate_limiter_sha, user.host, "verification"
+        redis_client, ip_rate_limiter_sha, x_client_ip, "verification"
     ):
-        # print("Client IP token exceeded rate limit", flush=True)
         logger.warning("Client IP token exceeded rate limit")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -69,9 +65,6 @@ async def verify_captcha(
     secret_key = os.getenv("CLOUDFLARE_SECRET_KEY")
 
     if not url or not secret_key:
-        # print(
-        #     "Failed to read cloudflare url and cloudflare secret key env variables", flush=True
-        # )
         logger.error(
             "Failed to read cloudflare url and cloudflare secret key env variables"
         )
@@ -81,9 +74,8 @@ async def verify_captcha(
         )
 
     try:
-        success = await verify_turnstile(url, secret_key, cloudflare_token, user.host)
+        success = await verify_turnstile(url, secret_key, cloudflare_token, x_client_ip)
     except Exception:
-        # print("Failed to verify turnstile with cloudflare server", flush=True)
         logger.error("Failed to verify turnstile with cloudflare server")
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -91,7 +83,6 @@ async def verify_captcha(
         )
 
     if not success:
-        # print("Client provided invalid turnstile token in body", flush=True)
         logger.warning("Client provided invalid turnstile token in body")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CAPTCHA token"
@@ -107,7 +98,6 @@ async def verify_captcha(
         return {"user_token": uuid_token}
 
     except Exception:
-        # print("Redis service failed to add rate limiter token", flush=True)
         logger.error("Redis service failed to add rate limiter token")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

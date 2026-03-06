@@ -38,6 +38,9 @@ CLOUDFLARE_SECRET_KEY=<cloudflare-secret-key>
 
 REDIS_HOST=localhost
 REDIS_PORT=6379
+
+PYTHONUNBUFFERED=1
+LOG_LEVEL=INFO
 ```
 
 # Additional Commands
@@ -60,7 +63,10 @@ mypy ./src/main.py
 ## Format
 
 ```bash
+# Format code
 ruff format
+# Format imports
+ruff check --select I --fix .
 ```
 
 ## Fix code
@@ -89,12 +95,17 @@ ruff check --unsafe-fixes
 
 **Health check for server**
 
+### Request
+
+**Headers**
+- `X-Client-Ip: <client_ip>`
+
 ### Response
 
 - `200` - success
 ```json
 {
-  "status": "running"
+  "status": "ok"
 }
 ```
 - `429` - Rate limit exceeded. Rate limit computed based on IP address
@@ -120,6 +131,7 @@ ruff check --unsafe-fixes
 
 **Headers**
 - `Content-Type: application/json`
+- `X-Client-Ip: <client_ip>`
 - `X-RateLimit-Token: <rate-limiter-token>` (optional)
 
 **Body**

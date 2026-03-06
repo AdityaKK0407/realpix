@@ -1,13 +1,14 @@
 import asyncio
 import io
+import logging
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
+
 from src.middleware.rate_limiter import rate_limiter_middleware
 from src.tasks.app import task_queue
 from src.tasks.model import image_task
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,6 @@ async def validate_image(
 
         img = Image.open(io.BytesIO(contents))
         if not img.format or img.format.lower() not in allowed_extensions:
-            # print("Invalid image extension format provided", flush=True)
             logger.warning("Invalid image extension format provided")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -46,7 +46,6 @@ async def validate_image(
         return contents
 
     except UnidentifiedImageError:
-        # print("Invalid image file provided", flush=True)
         logger.warning("Invalid image file provided")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -54,7 +53,6 @@ async def validate_image(
         )
 
     except Image.DecompressionBombError:
-        # print("Dangerous image file provided", flush=True)
         logger.warning("Dangerous image file provided")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -62,7 +60,6 @@ async def validate_image(
         )
 
     except OSError:
-        # print("Corrupted or unreadable image file", flush=True)
         logger.warning("Corrupted or unreadable image file")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -81,7 +78,6 @@ async def start_task_image(
     allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
 
     if len(images) > max_images:
-        # print("Too many images provided", flush=True)
         logger.warning("Too many images provided")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -99,7 +95,6 @@ async def start_task_image(
     except HTTPException as httpError:
         raise httpError
     except Exception:
-        # print("Server failed to process the images", flush=True)
         logger.error("Server failed to process the images")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -110,7 +105,6 @@ async def start_task_image(
         try:
             task_data = image_task.delay(image.filename, file_byte)
         except Exception:
-            # print("Celery task failed to add images to task queue", flush=True)
             logger.error("Celery task failed to add images to task queue")
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -180,7 +174,6 @@ async def check_task_status(task_id: str) -> dict[str, str | TaskResult]:
         try:
             result = TaskResult.model_validate(task_result.result)
         except Exception:
-            # print("Celery task failed to validate result", flush=True)
             logger.error("Celery task failed to validate result")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
