@@ -12,6 +12,7 @@ from src.redis_client.client import create_redis_client, load_lua_script
 from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
+import logging as logger
 
 
 @asynccontextmanager
