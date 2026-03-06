@@ -5,18 +5,15 @@
 </script>
 
 <svelte:head>
-	<meta name="title" content="RealPix - AI Deepfake Detection Tool" />
 	<meta
 		name="description"
-		content="Detect deepfakes and verify authenticity of images. Upload upto 5 images and get instant AI-powered analysis to identify manipulated images."
+		content="Detect deepfakes and verify image authenticity with RealPix's AI powered tool. Upload upto 5 images and get fast analysis. Secure, encrypted and easy to use."
 	/>
 
 	<meta
 		name="keywords"
-		content="deepfake detection, image verification, AI detection, fake image detector, photo authenticity, manipulated image detection"
+		content="deepfake detection, AI detection tool, fake image detector, image verification, photo authenticity checker, AI image analysis, free deepfake detector"
 	/>
-
-	<link rel="canonical" href="https://fab-realpix.netlify.app" />
 
 	<meta property="org:type" content="website" />
 	<meta property="og:url" content="https://fab-realpix.netlify.app" />
@@ -34,8 +31,19 @@
 		content="Detect deepfakes and verify the authenticity of images instantly with AI powered analysis to identify manipulated images."
 	/>
 
-	<meta name="robots" content="index, follow" />
-	<meta name="googlebot" content="index, follow" />
+	{@html `<script type='application/ld+json'>
+		"@context": "https://schema.org/",
+		"@type": "SoftwareApplication",
+		"name": "RealPix",
+		"applicationCategory": "SecurityApplication",
+		"operatingSystem": "Web Browser",
+		"offers": {
+			"@type": "Offer,",
+			"price": "0",
+			"priceCurrency": "USD"
+		},
+		"description": "AI-powered deepfake detection and image authenticity verification tool",
+	<\/script>`}
 </svelte:head>
 
 <slot />
