@@ -8,8 +8,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const formData = await request.formData();
-    console.log(typeof formData)
-    console.log(formData)
+	console.log(locals.turnstileSessionToken)
 
 	const response = await axios(`${PYTHON_BACKEND_SERVER}/model/images`, {
 		method: 'POST',
