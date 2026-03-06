@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from src.middleware.rate_limiter import rate_limiter_middleware
 from src.tasks.app import task_queue
 from src.tasks.model import image_task
-import logging as logger
+from src.helpers import logger
 
 MAX_IMAGES = 5
 MAX_VIDEOS = 2
