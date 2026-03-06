@@ -21,6 +21,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	});
 
     console.log(response)
+    console.log(response.data.detail)
 
 	return json({
 		success: true
