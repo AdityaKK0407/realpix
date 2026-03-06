@@ -46,10 +46,10 @@ async def verify_captcha(
         )
 
     if not x_client_ip:
-        logger.error("Client IP missing in request")
+        logger.error("Missing Client IP in header")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Client not available",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing Client IP",
         )
 
     if not await verify_ip_rate_limiter(

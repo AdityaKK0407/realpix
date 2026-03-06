@@ -1,34 +1,28 @@
-import logging
 import os
 import sys
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
-import redis.asyncio as redis
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import FastAPI, Response, status
 
-from src.dependencies import get_ip_rate_limiter_sha, get_redis
 from src.helpers import create_redis_client, load_lua_script, setup_logger
-from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
 
+load_dotenv()
+PRODUCTION = os.getenv("SERVER") == "production"
+
 setup_logger()
-
-logger = logging.getLogger(__name__)
-
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
-    load_dotenv()
 
     host = os.getenv("REDIS_HOST")
     port = os.getenv("REDIS_PORT")
 
     if not host or not port:
-        print("Failed to get env variables")
-        sys.exit(1)
+        raise RuntimeError("Failed to get env variables")
     try:
         fastapi_app.state.redis_client = create_redis_client(host, int(port))
         fastapi_app.state.create_sha = await load_lua_script(
@@ -44,38 +38,23 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
             fastapi_app.state.redis_client, "src/redis_scripts/ip_rate_limiter.lua"
         )
     except Exception as e:
-        print(f"Failed to start server: {e}")
-        sys.exit(1)
-
+        raise RuntimeError(f"Failed to start server: {e}")
     try:
         yield
     finally:
         await fastapi_app.state.redis_client.close()
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url=None if PRODUCTION else "/docs",
+    redoc_url=None if PRODUCTION else "/redoc",
+    openapi_url=None if PRODUCTION else "/openapi.json",
+)
 app.include_router(model_router)
 app.include_router(verification_router)
 
 
 @app.head("/")
-async def health_check(
-    x_client_ip: str | None = Header(None),
-    redis_client: redis.Redis = Depends(get_redis),
-    ip_rate_limiter_sha: str = Depends(get_ip_rate_limiter_sha),
-):
-    if not x_client_ip:
-        logger.warning("Client IP missing in request")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Client not available",
-        )
-    if not await verify_ip_rate_limiter(
-        redis_client, ip_rate_limiter_sha, x_client_ip, "health_check"
-    ):
-        logger.warning("Client IP token exceeded rate limit")
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Rate limit exceeded",
-        )
-    return {"status": "ok"}
+async def health_check():
+    return Response(status_code=status.HTTP_200_OK)

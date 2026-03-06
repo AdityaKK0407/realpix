@@ -41,6 +41,9 @@ REDIS_PORT=6379
 
 PYTHONUNBUFFERED=1
 LOG_LEVEL=INFO
+
+SERVER=development
+#SERVER=production
 ```
 
 # Additional Commands
@@ -95,30 +98,6 @@ ruff check --unsafe-fixes
 
 **Health check for server**
 
-### Request
-
-**Headers**
-- `X-Client-Ip: <client_ip>`
-
-### Response
-
-- `200` - success
-```json
-{
-  "status": "ok"
-}
-```
-- `429` - Rate limit exceeded. Rate limit computed based on IP address
-```json
-    {"detail":  "Rate limit exceeded"}
-```
-- `500` - Client doesn't exist or unexpected server error
-```json lines
-    // Client doesn't exist
-    {"detail": "Client not available"}
-    // Unexpected error
-    {"detail": "Unexpected server error"}
-```
 ---
 
 ## Verification
@@ -145,9 +124,12 @@ ruff check --unsafe-fixes
 ```json
     {"user_token": "<rate-limiter-token>"}
 ```
-- `400` - Missing Cloudflare Turnstile token from body
-```json
+- `400` - Missing Cloudflare Turnstile token from body or Client IP from header
+```json lines
+    // Missing Cloudflare Turnstile token
     {"detail":  "Missing CAPTCHA token"}
+    // Missing Client IP
+    {"detail":  "Missing Client IP"}
 ```
 - `403` - Cloudflare Turnstile provided is invalid
 ```json
@@ -157,11 +139,8 @@ ruff check --unsafe-fixes
 ```json
     {"detail":  "Rate limit exceeded"}
 ```
-- `500` - Client doesn't exist or unexpected server error
-```json lines
-    // Client doesn't exist
-    {"detail": "Client not available"}
-    // Unexpected error
+- `500` - Unexpected server error
+```json
     {"detail": "Unexpected server error"}
 ```
 - `502` - Cloudflare server is down and turnstile token cannot be verified
