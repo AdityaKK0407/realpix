@@ -44,6 +44,8 @@
 		},
 		"description": "AI-powered deepfake detection and image authenticity verification tool",
 	<\/script>`}
+
+	<link rel="canonical" href="https://fab-realpix.netlify.app" />
 </svelte:head>
 
 <slot />
