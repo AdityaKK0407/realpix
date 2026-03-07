@@ -34,7 +34,10 @@
 
 	<meta property="org:type" content="website" />
 	<meta property="og:url" content="https://fab-realpix.netlify.app/imageUpload" />
-	<meta property="og:title" content="Upload images to instantly detect deepfakes with AI analysis. Secure and encrypted." />
+	<meta
+		property="og:title"
+		content="Upload images to instantly detect deepfakes with AI analysis. Secure and encrypted."
+	/>
 	<meta
 		property="og:description"
 		content="Detect deepfakes and verify the authenticity of images instantly with AI powered analysis to identify manipulated images."
@@ -42,26 +45,31 @@
 
 	<meta property="twitter:card" content="summary_large_image" />
 	<meta property="twitter:url" content="https://fab-realpix.netlify.app/imageUpload" />
-	<meta property="twitter:title" content="Upload images to instantly detect deepfakes with AI analysis. Secure and encrypted." />
+	<meta
+		property="twitter:title"
+		content="Upload images to instantly detect deepfakes with AI analysis. Secure and encrypted."
+	/>
 	<meta
 		property="twitter:description"
 		content="Detect deepfakes and verify the authenticity of images instantly with AI powered analysis to identify manipulated images."
 	/>
 
-	{@html `<script type='application/ld+json'>
-		"@context": "https://schema.org/",
-		"@type": "WebPage",
-		"name": "Upload Images for Deepfake Detection",
-		"url": "https://fab-realpix.netlify.app/imageUpload"
-		"description": "Upload and analyze images to detect deepfakes and verify authenticity",
-	<\/script>`}
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org/",
+			"@type": "WebPage",
+			"name": "Upload Images for Deepfake Detection",
+			"url": "https://fab-realpix.netlify.app/imageUpload",
+			"description": "Upload and analyze images to detect deepfakes and verify authenticity"
+		}
+	</script>
 </svelte:head>
 
 <main>
 	<section class={setClassNames(Panel.Uploading_Panel)} class:items-center={true}>
 		<FileUpload onSelect={setFiles} extensions="PNG, JPG, JPEG" fileType="image" />
 	</section>
-	<section class={setClassNames(Panel.Processing_Panel)}>
+	<section class={setClassNames(Panel.Processing_Panel)} class:relative={true}>
 		{#if $uploadState === 'idle'}
 			<Reset text={['Upload images to begin analyzing', 'for authenticity']} />
 		{:else if $uploadState === 'ready'}

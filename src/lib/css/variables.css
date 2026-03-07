@@ -23,8 +23,8 @@
 	--button-radius: 1rem;
 	--button-gap: 0.75rem;
 
-	--color-text-primary: #4a4a4a;
-	--color-text-body: #555;
+	--color-text-primary: #2a2a2a;
+	--color-text-body: #4a4a4a;
 	--color-text-muted: #8c827a;
 
 	--color-primary: #4f5dc2;
@@ -83,8 +83,10 @@
 	--color-warning-300: rgba(216 147 86 / 0.3);
 	--color-warning-200: rgba(216 147 86 / 0.2);
 	--color-warning-100: rgba(216 147 86 / 0.1);
+	--color-warning-lowest: rgba(216 147 86 / 0.05);
 
 	--color-error: #c96b6b;
+	--color-error-200: rgba(201 107 107 / 0.2);
 	--color-error-100: rgba(201 107 107 / 0.1);
 	--color-error-lowest: rgba(201 107 107 / 0.05);
 
@@ -109,6 +111,7 @@
 	--font-md-1: 1.25rem;
 	--font-md-2: 1.27rem;
 	--font-sm-4: 0.75rem;
+	--font-sm-5: 1.16rem;
 	--font-sm-3: 0.98rem;
 	--font-sm-2: 1.1rem;
 	--font-sm-1: 0.85rem;

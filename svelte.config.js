@@ -10,10 +10,7 @@ const config = {
 			edge: true
 		}),
 		prerender: {
-			entries: [
-				'/',
-				'/imageUpload'
-			]
+			entries: ['/', '/imageUpload']
 		}
 	}
 };

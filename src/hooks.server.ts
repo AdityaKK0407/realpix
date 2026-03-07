@@ -1,4 +1,4 @@
-import type { Cookies, Handle } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { url, cookies } = event;

@@ -31,19 +31,21 @@
 		content="Detect deepfakes and verify the authenticity of images instantly with AI powered analysis to identify manipulated images."
 	/>
 
-	{@html `<script type='application/ld+json'>
-		"@context": "https://schema.org/",
-		"@type": "SoftwareApplication",
-		"name": "RealPix",
-		"applicationCategory": "SecurityApplication",
-		"operatingSystem": "Web Browser",
-		"offers": {
-			"@type": "Offer,",
-			"price": "0",
-			"priceCurrency": "USD"
-		},
-		"description": "AI-powered deepfake detection and image authenticity verification tool",
-	<\/script>`}
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org/",
+			"@type": "SoftwareApplication",
+			"name": "RealPix",
+			"applicationCategory": "SecurityApplication",
+			"operatingSystem": "Web Browser",
+			"offers": {
+				"@type": "Offer,",
+				"price": "0",
+				"priceCurrency": "USD"
+			},
+			"description": "AI-powered deepfake detection and image authenticity verification tool"
+		}
+	</script>
 
 	<link rel="canonical" href="https://fab-realpix.netlify.app" />
 </svelte:head>

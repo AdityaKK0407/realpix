@@ -36,6 +36,10 @@
 	font-size: var(--font-md-2);
 }
 
+.sm-font-5 {
+	font-size: var(--font-sm-5);
+}
+
 .sm-font-4 {
 	font-size: var(--font-sm-4);
 }
@@ -50,6 +54,10 @@
 
 .sm-font-1 {
 	font-size: var(--font-sm-1);
+}
+
+.bolder {
+	font-weight: bolder;
 }
 
 .bold {
@@ -195,4 +203,8 @@
 .primary-btn {
 	background-color: var(--color-primary);
 	color: var(--color-primary-text);
+}
+
+.relative {
+	position: relative;
 }

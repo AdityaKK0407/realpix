@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const uploadImageSuccessResponseType = z.object({
-		task_ids: z.array(z.string()).max(5).min(1),
+		task_ids: z.array(z.string()).max(5).min(1)
 	});
 
 	const formData = await request.formData();
@@ -45,12 +45,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const responseResult = await response.json();
 
 	const uploadState = uploadImageSuccessResponseType.safeParse(responseResult);
-		if (!uploadState.success) {
-			throw error(500, 'Incompatible result type.');
-		}
+	if (!uploadState.success) {
+		throw error(500, 'Incompatible result type.');
+	}
 
-		return json({
-			task_ids: uploadState.data.task_ids,
-			status: response.status
-		});
+	return json({
+		task_ids: uploadState.data.task_ids,
+		status: response.status
+	});
 };

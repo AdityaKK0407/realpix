@@ -139,8 +139,10 @@ class Turnstile {
 			case 710:
 				message = 'Token Expired. Resetting the widget.';
 				category = 'Time-Out';
+				break;
 			default:
 				message = 'An unexpected error occurred. Please try again.';
+				break;
 		}
 
 		this.turnstileErrorText = message;
@@ -206,6 +208,7 @@ class Turnstile {
 
 			case 'save-check':
 				text = 'Saved-Checking';
+				break;
 		}
 		this.turnstileStatusText = text;
 	}

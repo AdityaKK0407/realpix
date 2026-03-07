@@ -74,7 +74,7 @@
 
 <section class="flex-column uploadSection">
 	<section>
-		<h2 class="uploadSection__headingcontent lg-font-1 align-center">
+		<h2 class="uploadSection__headingcontent primary-text lg-font-1 align-center">
 			{headerText}
 		</h2>
 	</section>
@@ -153,8 +153,8 @@
 		{/if}
 	</div>
 	<section class="uploadSection__footer flex-column">
-		<p class="sm-font-2 muted bold">Up to 5 {props.fileType}s</p>
-		<p class="sm-font-2 muted bold">{props.extensions}</p>
+		<p class="sm-font-2 bodycolor bold">Up to 5 {props.fileType}s</p>
+		<p class="sm-font-2 bodycolor bold">{props.extensions}</p>
 	</section>
 </section>
 
@@ -327,6 +327,6 @@
 
 	.uploadSection__footer {
 		align-items: center;
-		gap: var(--text-gap);
+		gap: var(--text-gap-small);
 	}
 </style>
