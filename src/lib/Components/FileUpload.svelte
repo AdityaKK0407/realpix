@@ -3,6 +3,7 @@
 	import { validateFiles } from '$lib/scripts/validatingFiles';
 	import type { FileUploadOptions } from '$lib/types/fileupload.types';
 	import { addSBasedOnCondition, range } from '$lib/scripts/utils';
+	import ImageInset from '$lib/assets/ImageInset.svelte';
 
 	interface Props {
 		onSelect: (newFiles: File[], fileType: 'image' | 'video') => void;
@@ -16,7 +17,7 @@
 	let uploadState: FileUploadOptions = $state('resetState');
 	let successText: string = $state('');
 	let screenReaderMessage: string = $state('');
-	let headerText: string = $state(`Upload ${props.fileType}`);
+	let headerText: string = $derived(`Upload ${props.fileType}`);
 	const numbers = range(1, 8);
 	const iconSize = 55;
 
@@ -105,7 +106,7 @@
 		{#if uploadState === 'resetState'}
 			<section class="dropzone-text flex-column">
 				<div class="iconField background-color-pri-100 color-pri">
-					<span class="material-symbols-outlined uploadIcon"> image_inset </span>
+					<ImageInset />
 				</div>
 				<section class="dropzone-secondary-text flex-column">
 					<strong class="lg-font-2 primary-text">Drop {props.fileType}s here</strong>
@@ -129,7 +130,7 @@
 		{:else if uploadState === 'draggingState'}
 			<section class="drop-field flex-column">
 				<div class="iconField background-color-pri-900 color-text-pri pulse">
-					<span class="material-symbols-outlined uploadIcon"> image_inset </span>
+					<ImageInset />
 					{#each numbers as number (number)}
 						<span style={`--i: ${number}`} class="animate-element"></span>
 					{/each}
@@ -261,11 +262,6 @@
 	.errorIcon {
 		background-color: var(--color-error-lowest);
 		color: var(--color-error);
-	}
-
-	.uploadIcon {
-		font-size: 4rem;
-		stroke-width: 1.5;
 	}
 
 	.pulse {

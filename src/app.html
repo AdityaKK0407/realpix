@@ -7,12 +7,21 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
-			rel="stylesheet"
+			rel="preload"
+			as="style"
+			onload="
+				this.onload = null;
+				this.rel = 'stylesheet';
+			"
 		/>
-		<link
-			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-			rel="stylesheet"
-		/>
+
+		<noscript>
+			<link
+				rel="stylesheet"
+				href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+			/>
+		</noscript>
+
 		<meta name="google-site-verification" content="googlee7fedf8976060075.html" />
 		<meta name="theme-color" content="#4F5DC2" />
 
