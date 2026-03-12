@@ -9,11 +9,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	const uploadImageSuccessResponseType = z.object({
-		detail: z.undefined(),
+		status: z.literal("success"),
 		task_ids: z.array(z.string()).max(5).min(1)
 	});
 
 	const uploadImageErrorResponseType = z.object({
+		status: z.literal("error"),
 		detail: z.string()
 	});
 
@@ -56,7 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return serverUtils.errorResponse(500, 'Incompatible result type');
 	}
 
-	if (uploadState.data.detail === undefined) {
+	if (uploadState.data.status === "success") {
 		console.log('hi')
 		return serverUtils.successResponse(
 			{
