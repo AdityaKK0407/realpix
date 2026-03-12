@@ -1,21 +1,40 @@
 import asyncio
 import io
 import logging
+import os
+import subprocess
+import tempfile
+from typing import Any
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    UploadFile,
+    status,
+)
+from fastapi.responses import JSONResponse
 from PIL import Image, UnidentifiedImageError
 from pydantic import BaseModel
 
 from src.middleware.rate_limiter import rate_limiter_middleware
 from src.tasks.app import task_queue
-from src.tasks.model import image_task
+from src.tasks.model import image_task, video_task
 
 logger = logging.getLogger(__name__)
 
 MAX_IMAGES = 5
-MAX_VIDEOS = 2
 ALLOWED_IMAGE_EXTENSIONS = ("png", "jpg", "jpeg")
-ALLOWED_VIDEO_EXTENSIONS = ()
+MAX_IMAGE_FILE_SIZE = 5 * 1024 * 1024
+IMAGE_CHUNK_SIZE = 512 * 1024
+
+MAX_VIDEOS = 1
+# ALLOWED_VIDEO_EXTENSIONS = ("mp4", "mov", "avi", "mkv")
+ALLOWED_VIDEO_EXTENSIONS = ("mp4",)
+MAX_VIDEO_FILE_SIZE = 50 * 1024 * 1024
+VIDEO_CHUNK_SIZE = 1024 * 1024
+ALLOWED_CODECS = ("h264", "hevc", "vp9")
 
 
 class TaskResult(BaseModel):
@@ -29,10 +48,23 @@ router = APIRouter(
 
 
 async def validate_image(
-    image: UploadFile, allowed_extensions: tuple[str, ...]
+    image: UploadFile,
+    allowed_extensions: tuple[str, ...],
+    max_image_file_size: int,
+    image_chunk_size: int,
 ) -> bytes:
     try:
-        contents = await image.read()
+        contents = bytearray()
+        while True:
+            chunk = await image.read(image_chunk_size)
+            if not chunk:
+                break
+            contents.extend(chunk)
+            if len(contents) > max_image_file_size:
+                logger.warning("Image file provided is too large")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Image too large"
+                )
         img = Image.open(io.BytesIO(contents))
         img.verify()
 
@@ -43,7 +75,7 @@ async def validate_image(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Unsupported image format",
             )
-        return contents
+        return bytes(contents)
 
     except UnidentifiedImageError:
         logger.warning("Invalid image file provided")
@@ -53,10 +85,10 @@ async def validate_image(
         )
 
     except Image.DecompressionBombError:
-        logger.warning("Dangerous image file provided")
+        logger.warning("Provided image is potentially a decompression bomb")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Image too large or suspicious",
+            detail="Dangerous image file",
         )
 
     except OSError:
@@ -73,15 +105,30 @@ async def validate_image(
 @router.post("/images")
 async def start_task_image(
     images: list[UploadFile] = File(...),
-) -> dict[str, list[str]]:
-    max_images: int = MAX_IMAGES
+) -> dict[str, list[str]] | JSONResponse:
+    max_images = MAX_IMAGES
     allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
+    max_image_file_size = MAX_IMAGE_FILE_SIZE
+    image_chunk_size = IMAGE_CHUNK_SIZE
+
+    if len(images) < 1:
+        logger.warning("Client didn't provide any images")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": "error",
+                "detail": "At least one image must be provided",
+            },
+        )
 
     if len(images) > max_images:
-        logger.warning("Too many images provided")
-        raise HTTPException(
+        logger.warning("Client provided too many images")
+        return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Max limit of {max_images} images exceeded",
+            content={
+                "status": "error",
+                "detail": f"Max limit of {max_images} images exceeded",
+            },
         )
 
     result: list[str] = []
@@ -89,16 +136,27 @@ async def start_task_image(
     try:
         file_bytes: tuple[bytes, ...] = tuple(
             await asyncio.gather(
-                *[validate_image(image, allowed_extensions) for image in images]
+                *[
+                    validate_image(
+                        image, allowed_extensions, max_image_file_size, image_chunk_size
+                    )
+                    for image in images
+                ]
             )
         )
     except HTTPException as httpError:
-        raise httpError
+        return JSONResponse(
+            status_code=httpError.status_code,
+            content={
+                "status": "error",
+                "detail": httpError.detail,
+            },
+        )
     except Exception:
         logger.error("Server failed to process the images")
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process image",
+            content={"status": "error", "detail": "Failed to process image"},
         )
 
     for image, file_byte in zip(images, file_bytes):
@@ -106,81 +164,229 @@ async def start_task_image(
             task_data = image_task.delay(image.filename, file_byte)
         except Exception:
             logger.error("Celery task failed to add images to task queue")
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Service temporarily unavailable",
+                content={
+                    "status": "error",
+                    "detail": "Service temporarily unavailable",
+                },
             )
 
         result.append(task_data.id)
 
     return {
+        "status": "success",
         "task_ids": result,
     }
 
 
-#
-# async def validate_video(video: UploadFile, allowed_extensions: tuple[str]) -> bytes:
-#     return await video.read()
-#
-#
-# @router.post("/videos")
-# async def start_task_video(
-#     videos: list[UploadFile],
-#     max_videos: int = MAX_VIDEOS,
-#     allowed_extensions: tuple[str] = ALLOWED_VIDEO_EXTENSIONS,
-# ) -> dict[str, list[str]]:
-#     if len(videos) > max_videos:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=f"Max limit of {max_videos} videos exceeded",
-#         )
-#
-#     result: list[str] = []
-#
-#     try:
-#         file_bytes: tuple[bytes] = await asyncio.gather(
-#             *[validate_video(video, allowed_extensions) for video in videos]
-#         )
-#     except HTTPException as httpError:
-#         raise httpError
-#     except Exception:
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail="Failed to process video",
-#         )
-#
-#     for video, file_byte in zip(videos, file_bytes):
-#         try:
-#             task_data = video_task.delay(video.filename, file_byte)
-#         except HTTPException as httpError:
-#             raise httpError
-#         except Exception:
-#             raise HTTPException(
-#                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-#                 detail="Service temporarily unavailable",
-#             )
-#
-#         result.append(task_data.id)
-#
-#     return {
-#         "task_ids": result,
-#     }
+async def validate_video(
+    video: UploadFile,
+    allowed_extensions: tuple[str, ...],
+    max_video_file_size: int,
+    video_chunk_size: int,
+    allowed_codecs: tuple[str, ...],
+) -> bytes:
+    contents = bytearray()
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        while True:
+            chunk = await video.read(video_chunk_size)
+            if not chunk:
+                break
+            contents.extend(chunk)
+            if len(contents) > max_video_file_size:
+                tmp.close()
+                os.remove(tmp.name)
+                logger.warning("Video file provided is too large")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="Video too large"
+                )
+        tmp.write(contents)
+        tmp_path = tmp.name
+
+    try:
+        if not video.filename:
+            logger.critical("UploadFile must have filename attribute")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unexpected server error",
+            )
+        ext = video.filename.split(".")[-1].lower()
+        if ext not in allowed_extensions:
+            logger.warning("Invalid video extension format provided")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Unsupported video format",
+            )
+
+        cmd = [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=codec_name,width,height,r_frame_rate:format=duration,format_name",
+            "-of",
+            "json",
+            tmp_path,
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+
+        if result.returncode != 0:
+            logger.warning("Video file provided was invalid or corrupted")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or corrupted video",
+            )
+
+        import json
+
+        data: dict[str, Any] = json.loads(result.stdout)
+
+        if "streams" not in data or len(data["streams"]) == 0:
+            logger.warning("Provided file does not contain a valid video stream")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="No video stream found"
+            )
+
+        format_name: str = data["format"]["format_name"]
+        if format_name.lower() not in allowed_extensions:
+            logger.warning("Provided video file format is not supported")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Unsupported video format",
+            )
+
+        stream: dict[str, Any] = data["streams"][0]
+        codec: str = stream["codec_name"]
+        width: int = stream["width"]
+        height: int = stream["height"]
+        duration = float(data["format"]["duration"])
+
+        if codec not in allowed_codecs:
+            logger.warning(f"Client provided codec {codec} which is not allowed")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Unsupported codec {codec}",
+            )
+
+        if width > 1920 or height > 1080:
+            logger.warning("Client provided video with too large resolution")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Resolution too high"
+            )
+
+        if duration > 30:
+            logger.warning(
+                f"Video duration of {duration} exceeds max limit of 30 seconds"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Video too long"
+            )
+        return bytes(contents)
+    finally:
+        os.remove(tmp_path)
+
+
+@router.post("/videos")
+async def start_task_video(
+    videos: list[UploadFile] = File(...),
+) -> dict[str, list[str]] | JSONResponse:
+    max_videos = MAX_VIDEOS
+    allowed_extensions = ALLOWED_VIDEO_EXTENSIONS
+    max_video_file_size = MAX_VIDEO_FILE_SIZE
+    video_chunk_size = VIDEO_CHUNK_SIZE
+    allowed_codecs = ALLOWED_CODECS
+
+    if len(videos) < 1:
+        logger.warning("Client didn't provide any videos")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": "error",
+                "detail": "At least one video must be provided",
+            },
+        )
+
+    if len(videos) > max_videos:
+        logger.warning("Client provided too many videos")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": "error",
+                "detail": f"Max limit of {max_videos} videos exceeded",
+            },
+        )
+
+    result: list[str] = []
+
+    try:
+        file_bytes: tuple[bytes, ...] = tuple(
+            await asyncio.gather(
+                *[
+                    validate_video(
+                        video,
+                        allowed_extensions,
+                        max_video_file_size,
+                        video_chunk_size,
+                        allowed_codecs,
+                    )
+                    for video in videos
+                ]
+            )
+        )
+    except HTTPException as httpError:
+        return JSONResponse(
+            status_code=httpError.status_code,
+            content={
+                "status": "error",
+                "detail": httpError.detail,
+            },
+        )
+    except Exception:
+        logger.error("Server failed to process the videos")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"status": "error", "detail": "Failed to process video"},
+        )
+
+    for video, file_byte in zip(videos, file_bytes):
+        try:
+            task_data = video_task.delay(video.filename, file_byte)
+        except Exception:
+            logger.error("Celery task failed to add videos to task queue")
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={
+                    "status": "error",
+                    "detail": "Service temporarily unavailable",
+                },
+            )
+
+        result.append(task_data.id)
+
+    return {
+        "status": "success",
+        "task_ids": result,
+    }
 
 
 @router.get("/status/{task_id}")
-async def check_task_status(task_id: str) -> dict[str, str | TaskResult]:
+async def check_task_status(task_id: str) -> dict[str, str | TaskResult] | JSONResponse:
     task_result = task_queue.AsyncResult(task_id)
     if task_result.state == "SUCCESS":
         try:
             result = TaskResult.model_validate(task_result.result)
         except Exception:
             logger.error("Celery task failed to validate result")
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Unexpected server error",
+                content={"status": "error", "detail": "Unexpected server error"},
             )
-        return {"status": "completed", "result": result}
+        return {"status": "success", "result": "completed", "data": result}
     elif task_result.state == "FAILURE":
-        return {"status": "failed"}
+        return {"status": "success", "result": "failed"}
     else:
-        return {"status": "pending"}
+        return {"status": "success", "result": "pending"}

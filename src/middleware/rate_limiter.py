@@ -1,7 +1,8 @@
 import logging
 
 import redis.asyncio as redis
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, status
+from fastapi.responses import JSONResponse
 from redis.exceptions import RedisError
 
 from src.dependencies import get_redis, get_verify_sha
@@ -14,11 +15,12 @@ async def rate_limiter_middleware(
     x_ratelimit_token: str | None = Header(default=None),
     redis_client: redis.Redis = Depends(get_redis),
     verify_sha: str = Depends(get_verify_sha),
-) -> None:
+) -> JSONResponse | None:
     if not x_ratelimit_token:
         logger.warning("Rate limit token missing in header")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing rate limiter token"
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"status": "error", "detail": "Missing rate limiter token"},
         )
 
     try:
@@ -27,33 +29,41 @@ async def rate_limiter_middleware(
         ):
             case VerifyTokenResult.TOKEN_LIMIT_EXCEEDED:
                 logger.warning("Rate limit token expired or invalid")
-                raise HTTPException(
+                return JSONResponse(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid rate limiter token",
+                    content={"status": "error", "detail": "Invalid rate limiter token"},
                 )
             case VerifyTokenResult.RATE_LIMITED:
                 logger.warning("Rate limiter token exceeded rate limit")
-                raise HTTPException(
+                return JSONResponse(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail="Rate limit exceeded",
+                    content={"status": "error", "detail": "Rate limit exceeded"},
                 )
             case VerifyTokenResult.SUCCESS:
                 ...
             case VerifyTokenResult.INACTIVE_TOKEN:
                 logger.warning("Rate limit token inactive")
-                raise HTTPException(
+                return JSONResponse(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Rate limiter token inactive",
+                    content={
+                        "status": "error",
+                        "detail": "Rate limiter token inactive",
+                    },
                 )
             case VerifyTokenResult.UNREACHABLE:
-                logger.critical("Unreachable Code. Something is really wrong")
-                raise HTTPException(
+                logger.critical("Redis script executed unreachable code")
+                return JSONResponse(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Unexpected server error",
+                    content={"status": "error", "detail": "Unexpected server error"},
                 )
     except RedisError:
         logger.error("Redis failed to verify rate limiter token")
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Service temporarily unavailable",
+            content={
+                "status": "error",
+                "detail": "Service temporarily unavailable",
+            },
         )
+
+    return None

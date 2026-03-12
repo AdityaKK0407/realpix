@@ -14,6 +14,7 @@ PRODUCTION = os.getenv("SERVER") == "production"
 
 setup_logger()
 
+
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
 

@@ -3,7 +3,8 @@ import os
 
 import httpx
 import redis.asyncio as redis
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from src.dependencies import (
@@ -36,29 +37,36 @@ async def verify_captcha(
     create_sha: str = Depends(get_create_sha),
     ip_rate_limiter_sha: str = Depends(get_ip_rate_limiter_sha),
     activate_token_sha: str = Depends(get_activate_token_sha),
-) -> dict[str, str]:
+) -> dict[str, str] | JSONResponse:
     cloudflare_token = payload.get("token", None)
 
     if not cloudflare_token:
         logger.warning("Missing cloudflare turnstile token in request body")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing CAPTCHA token"
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"status": "error", "detail": "Missing CAPTCHA token"},
         )
 
     if not x_client_ip:
         logger.error("Missing Client IP in header")
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Missing Client IP",
+            content={
+                "status": "error",
+                "detail": "Missing Client IP",
+            },
         )
 
     if not await verify_ip_rate_limiter(
         redis_client, ip_rate_limiter_sha, x_client_ip, "verification"
     ):
         logger.warning("Client IP token exceeded rate limit")
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Rate limit exceeded",
+            content={
+                "status": "error",
+                "detail": "Rate limit exceeded",
+            },
         )
 
     url = os.getenv("CLOUDFLARE_URL")
@@ -68,40 +76,47 @@ async def verify_captcha(
         logger.error(
             "Failed to read cloudflare url and cloudflare secret key env variables"
         )
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unexpected server error",
+            content={"status": "error", "detail": "Unexpected server error"},
         )
 
     try:
         success = await verify_turnstile(url, secret_key, cloudflare_token, x_client_ip)
     except Exception:
         logger.error("Failed to verify turnstile with cloudflare server")
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Unable to verify request at this time. Please try again later",
+            content={
+                "status": "error",
+                "detail": "Unable to verify request at this time. Please try again later",
+            },
         )
 
     if not success:
         logger.warning("Client provided invalid turnstile token in body")
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CAPTCHA token"
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={"status": "error", "detail": "Invalid CAPTCHA token"},
         )
 
     try:
         if x_ratelimit_token and await activate_rate_limiter_token(
             redis_client, activate_token_sha, x_ratelimit_token
         ):
-            return {"user_token": x_ratelimit_token}
+            return {"status": "success", "user_token": x_ratelimit_token}
 
         uuid_token = await create_rate_limiter_token(redis_client, create_sha)
-        return {"user_token": uuid_token}
+        return {"status": "success", "user_token": uuid_token}
 
     except Exception:
         logger.error("Redis service failed to add rate limiter token")
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Service temporarily unavailable",
+            content={
+                "status": "error",
+                "detail": "Service temporarily unavailable",
+            },
         )
 
 

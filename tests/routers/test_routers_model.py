@@ -9,7 +9,12 @@ from PIL import Image
 
 from src.routers.model import validate_image
 from tests.mocks.celery import MockCeleryAsyncResult
-from tests.mocks.image import create_corrupt_image_buffer, create_image_buffer
+from tests.mocks.image import (
+    create_corrupt_image_buffer,
+    create_image_buffer,
+    create_image_buffer_bomb,
+    create_large_image_buffer,
+)
 
 
 @dataclass
@@ -30,6 +35,13 @@ VALIDATE_IMAGE_TEST_CASES = [
         exception=None,
     ),
     ValidateImageCaseResult(
+        name="image too large",
+        save_format="PNG",
+        buffer_factory=create_large_image_buffer,
+        allowed_extensions=("png",),
+        exception=(400, "Image too large"),
+    ),
+    ValidateImageCaseResult(
         name="unsupported image file extension",
         save_format="JPEG",
         buffer_factory=create_image_buffer,
@@ -42,6 +54,13 @@ VALIDATE_IMAGE_TEST_CASES = [
         buffer_factory=lambda _: BytesIO(b"image file"),
         allowed_extensions=("png",),
         exception=(400, "Invalid image file"),
+    ),
+    ValidateImageCaseResult(
+        name="image decompression bomb",
+        save_format="PNG",
+        buffer_factory=create_image_buffer_bomb,
+        allowed_extensions=("png",),
+        exception=(400, "Dangerous image file"),
     ),
     ValidateImageCaseResult(
         name="corrupt image",
@@ -62,20 +81,30 @@ async def test_validate_image(test_case):
         filename="image.png", file=test_case.buffer_factory(test_case.save_format)
     )
 
+    max_image_file_size = 5 * 1024 * 1024
+    image_chunk_size = 512 * 1024
+
     if test_case.exception:
         with pytest.raises(HTTPException) as e:
-            await validate_image(image, test_case.allowed_extensions)
+            await validate_image(
+                image,
+                test_case.allowed_extensions,
+                max_image_file_size,
+                image_chunk_size,
+            )
 
         assert e.value.status_code == test_case.exception[0]
         assert e.value.detail == test_case.exception[1]
 
     else:
-        image_bytes = await validate_image(image, test_case.allowed_extensions)
+        image_bytes = await validate_image(
+            image, test_case.allowed_extensions, max_image_file_size, image_chunk_size
+        )
         assert isinstance(image_bytes, bytes)
 
 
 @dataclass
-class StartTaskCaseResults:
+class StartImageTaskCaseResults:
     name: str
     token: str | None
     redis_result: int | None
@@ -83,52 +112,59 @@ class StartTaskCaseResults:
     expected_status: int
 
 
-START_TASK_TEST_CASES = [
-    StartTaskCaseResults(
+START_IMAGE_TASK_TEST_CASES = [
+    StartImageTaskCaseResults(
         name="missing rate limiter token",
         token=None,
         redis_result=None,
         no_of_files=0,
         expected_status=400,
     ),
-    StartTaskCaseResults(
+    StartImageTaskCaseResults(
         name="token limit exceeded, key doesn't exist",
-        token="abc",
+        token="fake_token",
         redis_result=-1,
         no_of_files=0,
         expected_status=401,
     ),
-    StartTaskCaseResults(
+    StartImageTaskCaseResults(
         name="token limit exceeded, global token count depleted",
-        token="abc",
+        token="fake_token",
         redis_result=-1,
         no_of_files=0,
         expected_status=401,
     ),
-    StartTaskCaseResults(
+    StartImageTaskCaseResults(
         name="rate limit exceeded",
-        token="abc",
+        token="fake_token",
         redis_result=0,
         no_of_files=0,
         expected_status=429,
     ),
-    StartTaskCaseResults(
+    StartImageTaskCaseResults(
         name="inactive token",
-        token="abc",
+        token="fake_token",
         redis_result=2,
         no_of_files=0,
         expected_status=403,
     ),
-    StartTaskCaseResults(
+    StartImageTaskCaseResults(
+        name="no images provided",
+        token="fake_token",
+        redis_result=1,
+        no_of_files=0,
+        expected_status=422,
+    ),
+    StartImageTaskCaseResults(
         name="exceeded number of files limit",
-        token="abc",
+        token="fake_token",
         redis_result=1,
         no_of_files=6,
         expected_status=400,
     ),
-    StartTaskCaseResults(
+    StartImageTaskCaseResults(
         name="success case",
-        token="abc",
+        token="fake_token",
         redis_result=1,
         no_of_files=3,
         expected_status=200,
@@ -138,7 +174,7 @@ START_TASK_TEST_CASES = [
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    "test_case", START_TASK_TEST_CASES, ids=lambda test_case: test_case.name
+    "test_case", START_IMAGE_TASK_TEST_CASES, ids=lambda test_case: test_case.name
 )
 async def test_start_task_image(client, mock_redis_client, test_case):
     key = f"rate_limiter:token:{test_case.token}"
@@ -175,7 +211,59 @@ async def test_start_task_image(client, mock_redis_client, test_case):
         assert len(data["task_ids"]) == len(files)
 
 
-#
+@dataclass
+class ValidateVideoCaseResult:
+    name: str
+    save_format: str | None
+    buffer_factory: Callable[[str | None], BytesIO]
+    allowed_extensions: tuple[str, ...]
+    allowed_codecs: tuple[str, ...]
+    exception: tuple[int, str] | None
+
+
+VALIDATE_VIDEO_TEST_CASES = []
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "test_case", VALIDATE_VIDEO_TEST_CASES, ids=lambda test_case: test_case.name
+)
+async def test_validate_video(test_case):
+    image = UploadFile(
+        filename="video.mp4", file=test_case.buffer_factory(test_case.save_format)
+    )
+
+    max_image_file_size = 5 * 1024 * 1024
+    image_chunk_size = 512 * 1024
+
+    if test_case.exception:
+        with pytest.raises(HTTPException) as e:
+            await validate_image(
+                image,
+                test_case.allowed_extensions,
+                max_image_file_size,
+                image_chunk_size,
+            )
+
+        assert e.value.status_code == test_case.exception[0]
+        assert e.value.detail == test_case.exception[1]
+
+    else:
+        image_bytes = await validate_image(
+            image, test_case.allowed_extensions, max_image_file_size, image_chunk_size
+        )
+        assert isinstance(image_bytes, bytes)
+
+
+@dataclass
+class StartVideoTaskCaseResults:
+    name: str
+    token: str | None
+    redis_result: int | None
+    no_of_files: int
+    expected_status: int
+
+
 # @pytest.mark.anyio
 # @pytest.mark.parametrize(
 #     "test_case", START_TASK_TEST_CASES, ids=lambda test_case: test_case.name
@@ -234,7 +322,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="token limit exceeded, key doesn't exist",
-        token="abc",
+        token="fake_token",
         redis_result=-1,
         expected_status=401,
         state=None,
@@ -243,7 +331,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="token limit exceeded, global token count depleted",
-        token="abc",
+        token="fake_token",
         redis_result=-1,
         expected_status=401,
         state=None,
@@ -252,7 +340,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="rate limit exceeded",
-        token="abc",
+        token="fake_token",
         redis_result=0,
         expected_status=429,
         state=None,
@@ -261,7 +349,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="inactive token",
-        token="abc",
+        token="fake_token",
         redis_result=2,
         expected_status=403,
         state=None,
@@ -270,7 +358,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="success case, status complete",
-        token="abc",
+        token="fake_token",
         redis_result=1,
         expected_status=200,
         state="SUCCESS",
@@ -282,7 +370,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="success case, status failed",
-        token="abc",
+        token="fake_token",
         redis_result=1,
         expected_status=200,
         state="FAILURE",
@@ -291,7 +379,7 @@ CHECK_TASK_TEST_CASES = [
     ),
     CheckTaskCaseResults(
         name="success case, status pending",
-        token="abc",
+        token="fake_token",
         redis_result=1,
         expected_status=200,
         state="PENDING",

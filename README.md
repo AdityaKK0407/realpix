@@ -60,7 +60,7 @@ pytest ./tests
 
 ```bash
 # Performs typing checking on project
-mypy ./src/main.py
+mypy ./src
 ```
 
 ## Format
@@ -190,6 +190,8 @@ Content-Type: image/extension
 - `400` - Missing rate limiter token or bad request error
 ```json lines
     {"detail": "Missing rate limiter token"}
+    // Received no images
+    {"detail":  "At least one image must be provided"}
     // Received more images than accepted
     {"detail": "Max limit of <image_limit> images exceeded"}
     // Unsupported image type
@@ -197,7 +199,7 @@ Content-Type: image/extension
     // Invalid file
     {"detail": "Invalid image file"}
     // Potential image bomb
-    {"detail": "Image too large or suspicious"}
+    {"detail": "Dangerous image file"}
     // Corrupted file
     {"detail": "Corrupted or unreadable image file"}
 ```
@@ -216,7 +218,7 @@ Content-Type: image/extension
 - `500` - Failed to read image. Or server error, something unexpected happened
 ```json lines
     // Video stream failed to convert to bytes
-    {"detail":  "Failed to read image"}
+    {"detail":  "Failed to process image"}
     // Unreachable error
     {"detail": "Unexpected server error"}
 ```

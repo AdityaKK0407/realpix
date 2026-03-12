@@ -66,8 +66,13 @@ def mock_ip_rate_limiter_sha():
 
 @pytest.fixture(autouse=True)
 def env_setup(monkeypatch):
-    monkeypatch.setenv("CLOUDFLARE_URL", "Cloudflare_URL")
-    monkeypatch.setenv("CLOUDFLARE_SECRET_KEY", "Secret key")
+    monkeypatch.setenv("CLOUDFLARE_URL", "cloudflare_url")
+    monkeypatch.setenv("CLOUDFLARE_SECRET_KEY", "secret_key")
+    monkeypatch.setenv("REDIS_HOST", "redis_host")
+    monkeypatch.setenv("REDIS_PORT", "redis_port")
+    monkeypatch.setenv("PYTHON_UNBUFFERED", "true")
+    monkeypatch.setenv("LOG_LEVEL", "log_level")
+    monkeypatch.setenv("SERVER", "development")
 
 
 @pytest.fixture(autouse=True)
