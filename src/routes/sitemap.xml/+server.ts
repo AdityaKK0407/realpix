@@ -12,7 +12,7 @@ export const GET = async () => {
 								(page) => `
                 <url>
                     <loc>${baseUrl}/${page.url}</loc>
-                    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+                    <lastmod>12/03/2026</lastmod>
                     <changefreq>${page.changefreq}</changefreq>
                     <priority>${page.priority}</priority>
                 </url>

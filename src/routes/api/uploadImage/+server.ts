@@ -1,15 +1,26 @@
 import { PYTHON_BACKEND_SERVER } from '$env/static/private';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { type RequestHandler } from '@sveltejs/kit';
 import z from 'zod';
+import { serverUtils } from '$lib/server/response.server';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.turnstileSessionToken) {
-		throw error(401, 'Not authenticated');
+		return serverUtils.errorResponse(401, 'Not authenticated. Please authenticated to continue.');
 	}
 
 	const uploadImageSuccessResponseType = z.object({
+		detail: z.undefined(),
 		task_ids: z.array(z.string()).max(5).min(1)
 	});
+
+	const uploadImageErrorResponseType = z.object({
+		detail: z.string()
+	});
+
+	const uploadImageResponseType = z.discriminatedUnion('detail', [
+		uploadImageSuccessResponseType,
+		uploadImageErrorResponseType
+	]);
 
 	const formData = await request.formData();
 
@@ -38,19 +49,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		body: formData
 	});
 
-	if (!response.ok) {
-		throw error(response.status, response.statusText);
-	}
-
 	const responseResult = await response.json();
 
-	const uploadState = uploadImageSuccessResponseType.safeParse(responseResult);
+	const uploadState = uploadImageResponseType.safeParse(responseResult);
 	if (!uploadState.success) {
-		throw error(500, 'Incompatible result type.');
+		return serverUtils.errorResponse(500, 'Incompatible result type');
 	}
 
-	return json({
-		task_ids: uploadState.data.task_ids,
-		status: response.status
-	});
+	if (uploadState.data.detail === undefined) {
+		console.log('hi')
+		return serverUtils.successResponse(
+			{
+				task_ids: uploadState.data.task_ids
+			},
+			response.status
+		);
+	} else {
+		return serverUtils.errorResponse(response.status, uploadState.data.detail);
+	}
 };

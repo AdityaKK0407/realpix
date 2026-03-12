@@ -27,11 +27,6 @@
 		content="Upload up to 5 images to detect deepfakes and verify authentication. Instant AI-powered analysis with detailed results. Your images are encrypted and deleted after processing"
 	/>
 
-	<meta
-		name="keywords"
-		content="upload image for verification, check photo authenticity, upload picture to detect fake, analyze image for deepfake, verify photo online, image upload deepfake detection"
-	/>
-
 	<meta property="org:type" content="website" />
 	<meta property="og:url" content="https://fab-realpix.netlify.app/imageUpload" />
 	<meta
@@ -53,6 +48,8 @@
 		property="twitter:description"
 		content="Detect deepfakes and verify the authenticity of images instantly with AI powered analysis to identify manipulated images."
 	/>
+
+	<link rel="canonical" href="https://fab-realpix.netlify.app/imageUpload" />
 
 	<script type="application/ld+json">
 		{

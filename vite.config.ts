@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [sveltekit()],
 	test: {
 		expect: { requireAssertions: true },
@@ -31,5 +31,22 @@ export default defineConfig({
 				}
 			}
 		]
+	},
+	build: {
+		minify: 'terser',
+		cssMinify: true,
+		reportCompressedSize: false,
+		terserOptions:
+			mode === 'production'
+				? {
+						compress: {
+							drop_console: true,
+							drop_debugger: true,
+							dead_code: true,
+							unused: true,
+							passes: 2
+						}
+					}
+				: {}
 	}
-});
+}));
