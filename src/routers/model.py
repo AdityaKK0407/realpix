@@ -4,6 +4,7 @@ import logging
 import os
 import subprocess
 import tempfile
+import json
 from typing import Any
 
 from fastapi import (
@@ -105,7 +106,7 @@ async def validate_image(
 @router.post("/images")
 async def start_task_image(
     images: list[UploadFile] = File(...),
-) -> dict[str, list[str]] | JSONResponse:
+) -> dict[str, str | list[str]] | JSONResponse:
     max_images = MAX_IMAGES
     allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
     max_image_file_size = MAX_IMAGE_FILE_SIZE
@@ -241,8 +242,6 @@ async def validate_video(
                 detail="Invalid or corrupted video",
             )
 
-        import json
-
         data: dict[str, Any] = json.loads(result.stdout)
 
         if "streams" not in data or len(data["streams"]) == 0:
@@ -293,7 +292,7 @@ async def validate_video(
 @router.post("/videos")
 async def start_task_video(
     videos: list[UploadFile] = File(...),
-) -> dict[str, list[str]] | JSONResponse:
+) -> dict[str, str | list[str]] | JSONResponse:
     max_videos = MAX_VIDEOS
     allowed_extensions = ALLOWED_VIDEO_EXTENSIONS
     max_video_file_size = MAX_VIDEO_FILE_SIZE
