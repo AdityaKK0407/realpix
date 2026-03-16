@@ -44,7 +44,6 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
-		"axios": "^1.13.6",
 		"lucide-svelte": "^0.563.0",
 		"nanoid": "^5.1.6",
 		"zod": "^4.3.6"

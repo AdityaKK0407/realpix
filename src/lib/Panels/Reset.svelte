@@ -4,7 +4,6 @@
 	import { browser } from '$app/environment';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 	import { turnstile, type ErrorTurnstile } from '$lib/state/turnstile.svelte';
-	import Alert from '$lib/Components/Alert.svelte';
 
 	interface Props {
 		text: string[];

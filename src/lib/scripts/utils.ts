@@ -27,13 +27,15 @@ const utils = {
 				color = 'blue';
 				break;
 
-			case 'security-animated':
-				if (turnstile.getStatus() === 'verified') color = 'security-green';
-				else if (turnstile.getStatus() === 'error') color = 'red';
-				else if (turnstile.getStatus() === 'verifying') color = 'yellow';
-				else if (turnstile.getStatus() === 'manual-verification') color = 'periwinkle';
-				else if (turnstile.getStatus() === 'reset') color = 'gray';
+			case 'security-animated': {
+				const turnstileStatus = turnstile.getStatus();
+				if (turnstileStatus === 'verified') color = 'security-green';
+				else if (turnstileStatus === 'error') color = 'red';
+				else if (turnstileStatus === 'verifying') color = 'yellow';
+				else if (turnstileStatus === 'manual-verification') color = 'periwinkle';
+				else if (turnstileStatus === 'reset' || turnstileStatus === 'save-check') color = 'gray';
 				break;
+			}
 
 			case 'security':
 				color = 'green';

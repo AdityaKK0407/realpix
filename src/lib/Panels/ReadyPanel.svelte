@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { uploadData, type FileType } from '$lib/state/uploadFlow.store';
-	import { transition } from '$lib/upload/upload.store';
+	import { uploadData, type FileType } from '$lib/state/uploadFlow.svelte';
+	import { mainState } from '$lib/upload/upload.svelte';
 	import { CircleX, ImagePlus, ScanSearch } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 
@@ -15,11 +15,11 @@
 		index = uploadData.getFileTypeFirstId(props.fileType)!;
 	});
 
-	const fileType = uploadData.getFileType(props.fileType);
+	const fileType = $derived(uploadData.getFileType(props.fileType));
 	let selectedImage = $derived(uploadData.getFileBlob(index));
 	const selectedName = $derived(uploadData.getName(index));
-	const length = uploadData.getLength(props.fileType);
-	const oneImage = length === 1;
+	const length = $derived(uploadData.getLength(props.fileType));
+	const oneImage = $derived(length === 1);
 	const remainingLength = uploadData.getMaxLength();
 
 	function changeIndex(num: string) {
@@ -27,7 +27,7 @@
 	}
 
 	function handleAnaylzeClick(): void {
-		transition('START_UPLOAD');
+		mainState.transitionState('START_UPLOAD');
 	}
 </script>
 

@@ -1,15 +1,15 @@
 <script lang="ts">
 	import FileUpload from '$lib/Components/FileUpload.svelte';
-	import { type FileType, uploadData } from '$lib/state/uploadFlow.store';
-	import { transition, uploadState } from '$lib/upload/upload.store';
+	import { type FileType, uploadData } from '$lib/state/uploadFlow.svelte';
+	import { mainState } from '$lib/upload/upload.svelte';
 	import Reset from '$lib/Panels/Reset.svelte';
 	import ReadyPanel from '$lib/Panels/ReadyPanel.svelte';
 	import { Panel } from '$lib/types/Panel';
-	import UploadingPanel from '$lib/Panels/UploadingPanel.svelte';
+	import Processing from '$lib/Panels/Processing.svelte';
 
 	function setFiles(newFiles: File[], fileType: FileType) {
 		uploadData.uploadFiles(newFiles, fileType);
-		transition('SELECT_IMAGE');
+		mainState.transitionState('SELECT_IMAGE');
 		activePanel = Panel.Processing_Panel;
 	}
 
@@ -18,6 +18,7 @@
 	}
 
 	let activePanel: Panel = $state(Panel.Uploading_Panel);
+	const uploadFlow = $derived(mainState.getUploadState());
 </script>
 
 <svelte:head>
@@ -67,12 +68,12 @@
 		<FileUpload onSelect={setFiles} extensions="PNG, JPG, JPEG" fileType="image" />
 	</section>
 	<section class={setClassNames(Panel.Processing_Panel)} class:relative={true}>
-		{#if $uploadState === 'idle'}
+		{#if uploadFlow === 'idle'}
 			<Reset text={['Upload images to begin analyzing', 'for authenticity']} />
-		{:else if $uploadState === 'ready'}
+		{:else if uploadFlow === 'ready'}
 			<ReadyPanel fileType="image" />
-		{:else if $uploadState === 'uploading'}
-			<UploadingPanel fileType="image" />
+		{:else if uploadFlow === 'processing'}
+			<Processing fileType="image" />
 		{/if}
 	</section>
 </main>

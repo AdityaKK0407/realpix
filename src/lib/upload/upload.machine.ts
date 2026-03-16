@@ -5,14 +5,10 @@ export const uploadTransition: Record<UploadState, Partial<Record<UploadEvent, U
 		SELECT_IMAGE: 'ready'
 	},
 	ready: {
-		START_UPLOAD: 'uploading',
+		START_UPLOAD: 'processing',
 		RESET: 'idle'
 	},
-	uploading: {
-		UPLOAD_SUCCESS: 'analyzing',
-		UPLOAD_FAILURE: 'error'
-	},
-	analyzing: {
+	processing: {
 		ANALYSIS_SUCCESS: 'result'
 	},
 	result: {

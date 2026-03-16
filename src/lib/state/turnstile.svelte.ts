@@ -22,7 +22,6 @@ export interface ErrorTurnstile {
 }
 
 import { browser } from '$app/environment';
-import axios from 'axios';
 import z from 'zod';
 
 const statusType = z.object({
@@ -150,9 +149,10 @@ class Turnstile {
 	}
 
 	async checkTurnstile(): Promise<boolean> {
-		const ifExists = await axios('/api/checkCookie');
+		const ifExists = await fetch('/api/checkCookie');
+		const ifExistsData = await ifExists.json();
 
-		const result = statusType.safeParse(ifExists.data);
+		const result = statusType.safeParse(ifExistsData);
 		if (!result.success) {
 			return false;
 		}
@@ -172,15 +172,24 @@ class Turnstile {
 	}
 
 	private async verifyTurnstile() {
-		await axios('/api/verify-turnstile', {
+		const verifyResponse = await fetch('/api/verify-turnstile', {
+			headers: {
+				'Content-Type': 'application/json'
+			},
 			method: 'POST',
-			withCredentials: true,
-			data: {
+			credentials: 'include',
+			body: JSON.stringify({
 				turnstileToken: this.turnstileToken
-			}
+			})
 		});
-		this.turnstileSetup = 'verified';
-		this.changeStatusText();
+
+		if (verifyResponse.ok) {
+			this.turnstileSetup = 'verified';
+			this.changeStatusText();
+		} else {
+			this.turnstileSetup = 'error';
+			this.changeStatusText();
+		}
 	}
 
 	private changeStatusText() {
@@ -207,7 +216,7 @@ class Turnstile {
 				break;
 
 			case 'save-check':
-				text = 'Saved-Checking';
+				text = 'Checking';
 				break;
 		}
 		this.turnstileStatusText = text;

@@ -1,6 +1,6 @@
-import { get, writable, type Writable } from 'svelte/store';
 import { nanoid } from 'nanoid';
 import { browser } from '$app/environment';
+import { PUBLIC_MAX_BATCH_SIZE } from '$env/static/public';
 
 export interface FileUploader {
 	id: string;
@@ -8,22 +8,24 @@ export interface FileUploader {
 	src: File;
 	blob: string;
 	name: string;
+	size: number;
 }
 
 export type FileType = 'image' | 'video';
 
 class UploadState {
-	uploadFilesWritable: Writable<FileUploader[]>;
+	uploadedFiles: FileUploader[];
 	imageLength: number;
 	videoLength: number;
-	uploadedFiles: FileUploader[];
 	MAX_LENGTH: number = 5;
+	MAX_BATCH_SIZE: number = parseInt(PUBLIC_MAX_BATCH_SIZE) * 1024 * 1024;
+	batchedFiles: string[];
 
 	constructor() {
-		this.uploadFilesWritable = writable<FileUploader[]>([]);
+		this.uploadedFiles = $state<FileUploader[]>([]);
 		this.imageLength = 0;
 		this.videoLength = 0;
-		this.uploadedFiles = [];
+		this.batchedFiles = [];
 	}
 
 	uploadFiles(newFiles: File[], fileType: FileType) {
@@ -40,11 +42,12 @@ class UploadState {
 					type: fileType,
 					src: file,
 					blob: URL.createObjectURL(file),
-					name: file.name
+					name: file.name,
+					size: file.size
 				};
 			});
-			this.uploadFilesWritable.update((file) => [...file, ...newItems]);
-			this.uploadedFiles = get(this.uploadFilesWritable);
+			const newUploadedFiles = [...this.uploadedFiles, ...newItems];
+			this.uploadedFiles = newUploadedFiles;
 		}
 	}
 
@@ -95,11 +98,67 @@ class UploadState {
 	}
 
 	clearItems() {
-		this.uploadFilesWritable.set([]);
+		this.uploadedFiles = [];
 		this.imageLength = 0;
 		this.videoLength = 0;
-		this.uploadedFiles = [];
 	}
+
+	private generateBatch() {
+		const batchToSend: File[] = [];
+		let notBatched = 0;
+		let sizeOfBatch = 0;
+
+		for (const file of this.uploadedFiles) {
+			if (file.size + sizeOfBatch > this.MAX_BATCH_SIZE) {
+				notBatched++;
+				break;
+			} else {
+				if (!this.batchedFiles.includes(file.id)) {
+					batchToSend.push(file.src);
+					sizeOfBatch += file.size;
+					this.batchedFiles.push(file.id);
+				}
+			}
+		}
+
+		return {
+			batchFiles: batchToSend,
+			noOfNotBatched: notBatched
+		};
+	}
+
+	private generateFormData(fileType: FileType) {
+		const { batchFiles, noOfNotBatched } = this.generateBatch();
+		const formData = new FormData();
+		batchFiles.forEach((data) => {
+			formData.append(`${fileType}s`, data);
+		});
+
+		return {
+			noOfNotBatched,
+			formData
+		};
+	}
+
+	createPackages(fileType: FileType) {
+		const package1 = this.generateFormData(fileType);
+		let package2;
+		let moreBatchAvailable: boolean;
+		if (package1.noOfNotBatched > 0) {
+			package2 = this.generateFormData(fileType);
+			moreBatchAvailable = package2.noOfNotBatched > 0;
+		} else {
+			moreBatchAvailable = false;
+		}
+
+		return {
+			package1: package1.formData,
+			package2: package2?.formData,
+			moreBatchAvailable
+		};
+	}
+
+	createCustomPackages() {}
 }
 
 const uploadData = new UploadState();
