@@ -5,7 +5,6 @@ export type TurnStile =
 	| 'reset'
 	| 'manual-verification'
 	| 'save-check'
-	| 'starting'
 	| 'verification-timeout'
 	| 'token-expired';
 
@@ -37,9 +36,9 @@ class Turnstile {
 	private turnstileErrorCategory: string | null;
 
 	constructor() {
-		this.turnstileSetup = $state<TurnStile>('starting');
+		this.turnstileSetup = $state<TurnStile>('save-check');
 		this.turnstileToken = '';
-		this.turnstileStatusText = $state('Saved-Checking');
+		this.turnstileStatusText = $state('Checking');
 		this.autoCheckingStatus = true;
 		this.turnstileErrorText = $state(null);
 		this.turnstileErrorCategory = $state(null);
@@ -213,10 +212,6 @@ class Turnstile {
 
 			case 'manual-verification':
 				text = 'Attention';
-				break;
-
-			case 'save-check':
-				text = 'Checking';
 				break;
 		}
 		this.turnstileStatusText = text;

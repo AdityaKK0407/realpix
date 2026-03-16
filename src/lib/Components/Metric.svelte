@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { range, utils } from '$lib/scripts/utils';
-	import ShieldSvg from '$lib/Svg/ShieldSvg.svelte';
+	import { ShieldSvg } from '$lib/assets';
 	import type { IconNames, IconTypes } from '$lib/types/fileupload.types';
 	import { Bot, Shield } from 'lucide-svelte';
 	interface Props {

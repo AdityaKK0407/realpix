@@ -1,7 +1,11 @@
 import { PYTHON_BACKEND_SERVER } from '$env/static/private';
 import { type RequestHandler } from '@sveltejs/kit';
 import z from 'zod';
-import { serverUtils, type EachFileLimit, type TotalPackageLimit } from '$lib/server/serverUtils.server';
+import {
+	serverUtils,
+	type EachFileLimit,
+	type TotalPackageLimit
+} from '$lib/server/serverUtils.server';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.turnstileSessionToken) {
@@ -23,11 +27,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const formData = await request.formData();
 	const imageFiles = formData.getAll('images') as File[];
-	
-	const packageCheck: TotalPackageLimit = serverUtils.checkPackageSizeSendStatus(imageFiles);
-	const eachFileCheck: EachFileLimit = serverUtils.checkEachFileSizeStatus(imageFiles)
 
-	if(packageCheck === 'plm' || eachFileCheck === 'flm') {
+	const packageCheck: TotalPackageLimit = serverUtils.checkPackageSizeSendStatus(imageFiles);
+	const eachFileCheck: EachFileLimit = serverUtils.checkEachFileSizeStatus(imageFiles);
+
+	if (packageCheck === 'plm' || eachFileCheck === 'flm') {
 		return serverUtils.errorResponse(413, 'PayLoad Too large');
 	}
 

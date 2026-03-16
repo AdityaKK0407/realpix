@@ -3,7 +3,7 @@
 	import { validateFiles } from '$lib/scripts/validatingFiles';
 	import type { FileUploadOptions } from '$lib/types/fileupload.types';
 	import { addSBasedOnCondition, range } from '$lib/scripts/utils';
-	import ImageInset from '$lib/assets/ImageInset.svelte';
+	import { ImageInset } from '$lib/assets';
 
 	interface Props {
 		onSelect: (newFiles: File[], fileType: 'image' | 'video') => void;
@@ -106,7 +106,7 @@
 		{#if uploadState === 'resetState'}
 			<section class="dropzone-text flex-column">
 				<div class="iconField background-color-pri-100 color-pri">
-					<ImageInset />
+					<ImageInset size={70} fill="currentColor" />
 				</div>
 				<section class="dropzone-secondary-text flex-column">
 					<strong class="lg-font-2 primary-text">Drop {props.fileType}s here</strong>
@@ -130,14 +130,12 @@
 		{:else if uploadState === 'draggingState'}
 			<section class="drop-field flex-column">
 				<div class="iconField background-color-pri-900 color-text-pri pulse">
-					<ImageInset />
+					<ImageInset size={70} fill="currentColor" ariaHidden={true} />
 					{#each numbers as number (number)}
 						<span style={`--i: ${number}`} class="animate-element"></span>
 					{/each}
 				</div>
-				<section class="dropzone-secondary-text">
-					<p class="md-font-2 bold">Drop the {props.fileType}</p>
-				</section>
+				<p class="md-font-2 bold">Drop the {props.fileType}</p>
 			</section>
 		{:else if uploadState === 'errorState'}
 			<section class="dropzone-text flex-column errorSection">
@@ -207,7 +205,7 @@
 	.dropping {
 		border-color: var(--color-primary);
 		border-style: solid;
-		color: var(--color-primary-text);
+		color: var(--color-primary);
 	}
 
 	.dropping > * {
@@ -224,7 +222,7 @@
 	.success {
 		border-color: var(--color-success-green);
 		background-color: var(--color-success-lowest);
-		color: var(--color-success-text);
+		color: var(--color-success-green);
 		pointer-events: none;
 		border-width: 0.19rem;
 		border-style: dotted;
@@ -272,7 +270,7 @@
 			0 0 3.125rem var(--color-primary-500);
 	}
 
-	.pulse > * {
+	:global(.pulse > *) {
 		grid-row-start: 1;
 		grid-column-start: 1;
 	}
@@ -284,7 +282,7 @@
 		border: 1px solid var(--color-primary-400);
 		border-radius: 50vw;
 		animation: animate 6s linear infinite;
-		animation-delay: calc(var(--i) * -1.2s);
+		animation-delay: calc(var(--i) * -1.5s);
 	}
 
 	@keyframes animate {
@@ -299,7 +297,7 @@
 			opacity: 0.2;
 		}
 		100% {
-			scale: 3;
+			scale: 2.3;
 			opacity: 0;
 		}
 	}

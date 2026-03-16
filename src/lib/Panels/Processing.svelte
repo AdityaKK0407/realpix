@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { processingStatus } from '$lib/state/processingResult.svelte';
 	import { type FileType, uploadData } from '$lib/state/uploadFlow.svelte';
 
 	interface Props {
@@ -6,37 +7,43 @@
 	}
 
 	const props: Props = $props();
-	const data = $derived(uploadData.getFileType(props.fileType));
 
 	async function upload() {
-		if (data) {
-			const packages = uploadData.createPackages(props.fileType);
+		const packages = uploadData.createPackages(props.fileType);
 
-			try {
-				const package1Response = await fetch('/api/uploadImage', {
-					method: 'POST',
-					body: packages.package1
-				});
+		try {
+			const package1Response = await fetch('/api/uploadImage', {
+				method: 'POST',
+				body: packages.package1
+			});
+			let package2Response = null;
 
-				if (package1Response.ok) {
-					if (packages.package2) {
-						const package2Response = await fetch('/api/uploadImage', {
-							method: 'POST',
-							body: packages.package2
-						});
-						if (!package2Response.ok) {
-							alert('error');
-						} else if (packages.moreBatchAvailable) {
-							alert('More packages available');
-						}
+			if (package1Response.ok) {
+				const package1Data = await package1Response.json();
+				processingStatus.addTasks(package1Data.data.task_ids);
+				if (packages.package2) {
+					package2Response = await fetch('/api/uploadImage', {
+						method: 'POST',
+						body: packages.package2
+					});
+					if (!package2Response.ok) {
+						alert('error');
+						return;
+					} else if (packages.moreBatchAvailable) {
+						alert('More packages available');
 					}
-				} else {
-					alert('error');
+
+					const package2Data = await package2Response.json();
+					processingStatus.addTasks(package2Data.data.task_ids);
+
+					processingStatus.startPinging();
 				}
-			} catch (err) {
-				alert(`Error occured: ${err}`);
-				console.log(err);
+			} else {
+				alert('error');
+				return;
 			}
+		} catch (err) {
+			alert(`Error occured: ${err}`);
 		}
 	}
 

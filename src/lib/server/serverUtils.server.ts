@@ -5,8 +5,8 @@ interface Data {
 	task_ids: string[];
 }
 
-export type TotalPackageLimit = 's' | 'plm'
-export type EachFileLimit = 's' | 'flm'
+export type TotalPackageLimit = 's' | 'plm';
+export type EachFileLimit = 's' | 'flm';
 
 export const serverUtils = {
 	max_package_size: parseInt(MAX_BATCH_SIZE) * 1024 * 1024,
@@ -37,12 +37,12 @@ export const serverUtils = {
 		return totalSize > this.max_package_size ? 'plm' : 's';
 	},
 
-	checkEachFileSizeStatus: function(image: File[]): EachFileLimit {
-		let status: EachFileLimit = 's'
-		for(const file of image) {
-			if(file.size > this.file_size_limit) {
-				status = 'flm'
-				break
+	checkEachFileSizeStatus: function (image: File[]): EachFileLimit {
+		let status: EachFileLimit = 's';
+		for (const file of image) {
+			if (file.size > this.file_size_limit) {
+				status = 'flm';
+				break;
 			}
 		}
 
