@@ -33,6 +33,7 @@
 		"playwright": "^1.58.2",
 		"prettier": "^3.8.1",
 		"prettier-plugin-svelte": "^3.5.1",
+		"svead": "^0.0.15",
 		"svelte": "^5.53.10",
 		"svelte-check": "^4.4.5",
 		"terser": "^5.46.0",

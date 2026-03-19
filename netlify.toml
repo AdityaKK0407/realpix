@@ -1,3 +1,27 @@
 [build]
     command = "pnpm run build"
     publish = "build"
+
+[build.environment]
+    NODE_VERSION = "22"
+
+[build.processing]
+    skip_processing = false
+
+[build.processing.css]
+    bundle = false
+    minify = true
+
+[[headers]]
+    for = "/*"
+    [headers.values]
+        X-Frame-Options = "DENY"
+        X-Content-Type-Options = "nosniff"
+        Referrer-Policy = "strict-origin-when-cross-origin"
+        Cross-Origin-Opener-Policy = "same-origin"
+
+[[redirects]]
+    from = "http://fab-realpix.com/*"
+    to = "https://fab-realpix.com/:splat"
+    status = 301
+    force = true

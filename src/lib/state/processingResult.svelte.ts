@@ -8,7 +8,7 @@ class TaskPinging {
 	private increase_time_value: number;
 	private base_request_time = parseInt(PUBLIC_BASE_TIME_REQUEST);
 	private request_bias = parseInt(PUBLIC_REQUEST_BIAS);
-    private threshold_reached: boolean
+	private threshold_reached: boolean;
 
 	constructor() {
 		this.task_ids = $state([]);
@@ -16,7 +16,7 @@ class TaskPinging {
 		this.threshold_pings = 0;
 		this.increase_time_value = 0;
 		this.pingCount = 0;
-        this.threshold_reached = false;
+		this.threshold_reached = false;
 	}
 
 	addTasks(tasks: string[]): void {
@@ -30,43 +30,40 @@ class TaskPinging {
 		switch (length) {
 			case 1:
 			case 2:
-                this.threshold_pings = length;
-                this.increase_time_value = this.base_request_time / length;
+				this.threshold_pings = length;
+				this.increase_time_value = this.base_request_time / length;
 				break;
 
 			case 3:
 			case 4:
-                case 5:
+			case 5:
 				this.threshold_pings = length - 1;
-                this.increase_time_value = Math.floor(this.base_request_time / length * 1.2)
-                break;
+				this.increase_time_value = Math.floor((this.base_request_time / length) * 1.2);
+				break;
 
-                default:
-                    alert('Some error occurred.')
+			default:
+				alert('Some error occurred.');
 		}
-
 	}
 
 	startPinging() {
 		this.determineTimeLimit();
-        console.log('hi started pining')
+		console.log('hi started pining');
 
-        const request1 = setInterval(() => {
-            if(this.pingCount > this.threshold_pings) {
-                clearInterval(request1);
-                this.threshold_reached = true;
-            } else {
-                this.task_ids.forEach(async (task) => {
-                    const response = await fetch('/api/modelStatus',
-                        {
-                            method: 'POST',
-                            body: JSON.stringify({task_id: task})
-                        }
-                    )
-                })
-                this.pingCount++;
-            }
-        }, this.base_time)
+		const request1 = setInterval(() => {
+			if (this.pingCount > this.threshold_pings) {
+				clearInterval(request1);
+				this.threshold_reached = true;
+			} else {
+				this.task_ids.forEach(async (task) => {
+					const response = await fetch('/api/modelStatus', {
+						method: 'POST',
+						body: JSON.stringify({ task_id: task })
+					});
+				});
+				this.pingCount++;
+			}
+		}, this.base_time);
 	}
 }
 

@@ -12,7 +12,6 @@
 		async
 		defer
 	></script>
-	<link rel="canonical" href="https://fab-realpix.netlify.app" />
 </svelte:head>
 
 <section class="pageContainer">

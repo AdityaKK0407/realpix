@@ -52,6 +52,10 @@ const utils = {
 				break;
 		}
 		return status;
+	},
+
+	getMainDescription: () => {
+		return 'In an age where AI can make the fake look real, staying informed matters. RealPix helps anyone detect AI-generated images instantly while building a community dedicated to spreading awareness about digital misinformation.';
 	}
 };
 
