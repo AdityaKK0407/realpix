@@ -83,7 +83,7 @@
 <section class="mainSection">
 	<section class="wrapper flex-column">
 		<div class="color-pri">
-			<ImageSearch size={75} fill='currentColor'/>
+			<ImageSearch size={84} stroke="#fafafa" />
 		</div>
 
 		<section class="flex-column display-text">

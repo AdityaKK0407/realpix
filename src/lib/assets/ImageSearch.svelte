@@ -1,14 +1,15 @@
-<script lang='ts'>
-    interface Props {
-        class?: string;
+<script lang="ts">
+	interface Props {
+		class?: string;
 		size: number;
 		ariaHidden?: boolean;
 		ariaLabel?: string;
 		strokeWidth?: number;
 		fill?: string;
-    }
-    const props: Props = $props();
-    const accessbilityLabels = $derived(
+		stroke?: string;
+	}
+	const props: Props = $props();
+	const accessbilityLabels = $derived(
 		props.ariaHidden
 			? {
 					'aria-hidden': true
@@ -22,49 +23,31 @@
 </script>
 
 <svg
-    class={props.class}
+	class={props.class}
 	width={props.size}
 	xmlns="http://www.w3.org/2000/svg"
 	height={props.size}
-	id="image-search"
-	viewBox="-1087 2350 661 703"
-	style="-webkit-print-color-adjust::exact"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
+	viewBox="0 0 661 703"
 	fill={props.fill}
-    stroke='currentColor'
-    stroke-width={props.strokeWidth}
+	stroke={props.stroke}
+	stroke-width={props.strokeWidth}
 	version="1.1"
-    {...accessbilityLabels}
+	{...accessbilityLabels}
 >
 	<g id="shape-35802bb9-e4b3-80d6-8007-c0549d1baa39" rx="0" ry="0">
-		<g
-			id="shape-35802bb9-e4b3-80d6-8007-c0509c81af91"
-			fill='none'
-			class="ionicon"
-			rx="0"
-			ry="0"
-		>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c84d777">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c84d777">
+		<g rx="0" ry="0">
+			<g>
+				<g>
 					<path
-						d="M-1039,2478C-1039,2451.508056640625,-1017.491943359375,2430,-991,2430L-671,2430C-644.508056640625,2430,-623,2452.508056640625,-623,2479L-623,2734C-623,2760.491943359375,-644.508056640625,2782,-671,2782L-991,2782C-1017.491943359375,2782,-1039,2760.491943359375,-1039,2734L-1039,2478"
-						fill={props.fill}
+						d="M48,128C48,101.508057,69.508057,80,96,80L416,80C442.491943,80,464,102.508057,464,129L464,384C464,410.491943,442.491943,432,416,432L96,432C69.508057,432,48,410.491943,48,384L48,128"
 						stroke-linejoin="round"
-						
 					>
 					</path>
 				</g>
-				<g
-					fill={props.fill}
-					stroke-linejoin="round"
-					id="strokes-35802bb9-e4b3-80d6-8007-c05522f28764-35802bb9-e4b3-80d6-8007-c0509c84d777"
-					class="strokes"
-				>
+				<g stroke-linejoin="round">
 					<g class="stroke-shape">
 						<path
-							d="M-1039,2478C-1039,2451.508056640625,-1017.491943359375,2430,-991,2430L-671,2430C-644.508056640625,2430,-623,2452.508056640625,-623,2479L-623,2734C-623,2760.491943359375,-644.508056640625,2782,-671,2782L-991,2782C-1017.491943359375,2782,-1039,2760.491943359375,-1039,2734L-1039,2478"
-							fill={props.fill}   
-                            stroke-width={props.strokeWidth}
+							d="M48,128C48,101.508057,69.508057,80,96,80L416,80C442.491943,80,464,102.508057,464,129L464,384C464,410.491943,442.491943,432,416,432L96,432C69.508057,432,48,410.491943,48,384L48,128"
 						>
 						</path>
 					</g>
@@ -73,26 +56,17 @@
 			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c861e87">
 				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c861e87">
 					<path
-						d="M-783,2685.7900390625L-873.6599731445312,2595.300048828125C-885.6357421875,2583.326904296875,-904.8662719726562,2582.757080078125,-917.5299682617188,2594L-1039,2702M-863,2782L-739.6599731445312,2658.659912109375C-727.96923828125,2646.94580078125,-709.2750854492188,2646.07861328125,-696.5499877929688,2656.659912109375L-623,2718"
-						fill={props.fill}
+						d="M304,335.790039L213.340027,245.300049C201.364258,233.326904,182.133728,232.75708,169.470032,244L48,352M224,432L347.340027,308.659912C359.030762,296.945801,377.724915,296.078613,390.450012,306.659912L464,368"
 						stroke-linecap="round"
 						stroke-linejoin="round"
-						
 					>
 					</path>
 				</g>
-				<g
-					fill={props.fill}
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					id="strokes-35802bb9-e4b3-80d6-8007-c05522f5d544-35802bb9-e4b3-80d6-8007-c0509c861e87"
-					class="strokes"
-				>
+				<g stroke-linecap="round" stroke-linejoin="round">
 					<g class="stroke-shape">
 						<path
-							d="M-783,2685.7900390625L-873.6599731445312,2595.300048828125C-885.6357421875,2583.326904296875,-904.8662719726562,2582.757080078125,-917.5299682617188,2594L-1039,2702M-863,2782L-739.6599731445312,2658.659912109375C-727.96923828125,2646.94580078125,-709.2750854492188,2646.07861328125,-696.5499877929688,2656.659912109375L-623,2718"
-							fill={props.fill}   
-                            stroke-width={props.strokeWidth}
+							d="M304,335.790039L213.340027,245.300049C201.364258,233.326904,182.133728,232.75708,169.470032,244L48,352M224,432L347.340027,308.659912C359.030762,296.945801,377.724915,296.078613,390.450012,306.659912L464,368"
+							stroke-width={props.strokeWidth}
 						>
 						</path>
 					</g>
@@ -101,92 +75,61 @@
 			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c8592b8">
 				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c8592b8">
 					<ellipse
-						cx="-876"
-						cy="2498"
+						cx="211"
+						cy="148"
 						rx="32"
 						ry="32"
 						transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-						fill={props.fill}
 						stroke-miterlimit="10"
+						stroke="#fafafa"
 					>
 					</ellipse>
 				</g>
-				<g
-					fill={props.fill}
-					stroke-miterlimit="10"
-					id="strokes-35802bb9-e4b3-80d6-8007-c05522f89501-35802bb9-e4b3-80d6-8007-c0509c8592b8"
-					class="strokes"
-				>
+				<g stroke-miterlimit="10">
 					<g class="stroke-shape">
 						<ellipse
-							cx="-876"
-							cy="2498"
+							cx="211"
+							cy="148"
 							rx="32"
 							ry="32"
 							transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-                            fill={props.fill}   
-                            stroke-width={props.strokeWidth}
+							stroke="#fafafa"
 						>
 						</ellipse>
 					</g>
 				</g>
 			</g>
 			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c835c33" style="display:none">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c835c33">
+				<g>
 					<rect
 						rx="0"
 						ry="0"
-						x="-1087"
-						y="2350"
+						x="0"
+						y="0"
 						transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
 						width="512.0000000000002"
 						height="512"
-						fill={props.fill}
-						
 					>
 					</rect>
 				</g>
 			</g>
 		</g>
-		<g id="shape-35802bb9-e4b3-80d6-8007-c052b66a194d">
-			<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c052b66a194d">
+		<g>
+			<g>
 				<ellipse
-					cx="-725.5"
-					cy="2756"
+					cx="361.5"
+					cy="406"
 					rx="196.5"
 					ry="198.00000000000023"
 					transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
 				>
 				</ellipse>
 			</g>
-			<g
-				id="strokes-35802bb9-e4b3-80d6-8007-c05522fb9494-35802bb9-e4b3-80d6-8007-c052b66a194d"
-				class="strokes"
-			>
-				<g
-					class="inner-stroke-shape"
-					transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-				>
+			<g>
+				<g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
 					<defs>
-						<clipPath id="inner-stroke-render-317-35802bb9-e4b3-80d6-8007-c052b66a194d-0">
-							<use href="#stroke-shape-render-317-35802bb9-e4b3-80d6-8007-c052b66a194d-0"> </use>
-						</clipPath>
-						<ellipse
-							cx="-725.5"
-							cy="2756"
-							rx="196.5"
-							ry="198.00000000000023"
-                            fill={props.fill}
-                            stroke-width={props.strokeWidth}
-							id="stroke-shape-render-317-35802bb9-e4b3-80d6-8007-c052b66a194d-0"
-						>
-						</ellipse>
+						<ellipse cx="361.5" cy="406" rx="196.5" ry="198.00000000000023"> </ellipse>
 					</defs>
-					<use
-						href="#stroke-shape-render-317-35802bb9-e4b3-80d6-8007-c052b66a194d-0"
-						clip-path="url(&#x27;#inner-stroke-render-317-35802bb9-e4b3-80d6-8007-c052b66a194d-0&#x27;)"
-					>
-					</use>
 				</g>
 			</g>
 		</g>
@@ -202,73 +145,51 @@
 					<rect
 						rx="0"
 						ry="0"
-						x="-952.9999999999986"
-						y="2530"
+						x="134"
+						y="180"
 						transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
 						width="527.0000000000001"
 						height="523.0000000000014"
 						fill={props.fill}
-						
 					>
 					</rect>
 				</g>
 			</g>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c3fe592">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c3fe592">
+			<g>
+				<g>
 					<path
-						d="M-725.432861328125,2595.375C-814.7327880859375,2595.37548828125,-887.1250610351562,2667.217529296875,-887.1250610351562,2755.83984375C-887.125,2844.46240234375,-814.7329711914062,2916.3046875,-725.4328002929688,2916.304931640625C-636.1327514648438,2916.305419921875,-563.740478515625,2844.46240234375,-563.7405395507812,2755.840087890625C-563.7461547851562,2667.22021484375,-636.1349487304688,2595.380859375,-725.432861328125,2595.375Z"
-						fill={props.fill}
+						d="M361.567139,245.375C272.267212,245.375488,199.874939,317.217529,199.874939,405.839844C199.875,494.462402,272.267029,566.304688,361.5672,566.304932C450.867249,566.30542,523.259521,494.462402,523.25946,405.840088C523.253845,317.220215,450.865051,245.380859,361.567139,245.375Z"
 						stroke-miterlimit="10"
 					>
 					</path>
 				</g>
-				<g
-					fill={props.fill}
-					stroke-miterlimit="10"
-					id="strokes-35802bb9-e4b3-80d6-8007-c05522ff2e9d-35802bb9-e4b3-80d6-8007-c0509c3fe592"
-					class="strokes"
-				>
+				<g stroke-miterlimit="10">
 					<g class="stroke-shape">
 						<path
-							d="M-725.432861328125,2595.375C-814.7327880859375,2595.37548828125,-887.1250610351562,2667.217529296875,-887.1250610351562,2755.83984375C-887.125,2844.46240234375,-814.7329711914062,2916.3046875,-725.4328002929688,2916.304931640625C-636.1327514648438,2916.305419921875,-563.740478515625,2844.46240234375,-563.7405395507812,2755.840087890625C-563.7461547851562,2667.22021484375,-636.1349487304688,2595.380859375,-725.432861328125,2595.375Z"
-                            fill={props.fill}
-                            stroke-width={props.strokeWidth}
+							d="M361.567139,245.375C272.267212,245.375488,199.874939,317.217529,199.874939,405.839844C199.875,494.462402,272.267029,566.304688,361.5672,566.304932C450.867249,566.30542,523.259521,494.462402,523.25946,405.840088C523.253845,317.220215,450.865051,245.380859,361.567139,245.375Z"
 						>
 						</path>
 					</g>
 				</g>
 			</g>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c4175f5">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c4175f5">
+			<g>
+				<g>
 					<path
-						d="M-604.7991943359375,2875.55859375L-491.875,2987.624755859375"
-						fill={props.fill}
+						d="M482.200806,525.558594L595.125,637.624756"
 						stroke-linecap="round"
 						stroke-miterlimit="10"
-						
 					>
 					</path>
 				</g>
-				<g
-					fill={props.fill}
-					stroke-linecap="round"
-					stroke-miterlimit="10"
-					id="strokes-35802bb9-e4b3-80d6-8007-c05523016a18-35802bb9-e4b3-80d6-8007-c0509c4175f5"
-					class="strokes"
-				>
+				<g stroke-linecap="round" stroke-miterlimit="10">
 					<g class="stroke-shape">
-						<path
-							d="M-604.7991943359375,2875.55859375L-491.875,2987.624755859375"
-                            fill={props.fill}
-                            stroke-width={props.strokeWidth}
-						>
-						</path>
+						<path d="M482.200806,525.558594L595.125,637.624756"> </path>
 					</g>
 				</g>
 			</g>
 		</g>
-		<g id="shape-35802bb9-e4b3-80d6-8007-c05411c35d2f">
-			<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c05411c35d2f">
+		<g>
+			<g>
 				<ellipse
 					cx="-725.5"
 					cy="2755"
@@ -278,34 +199,20 @@
 				>
 				</ellipse>
 			</g>
-			<g
-				id="strokes-35802bb9-e4b3-80d6-8007-c0552301ce19-35802bb9-e4b3-80d6-8007-c05411c35d2f"
-				class="strokes"
-			>
-				<g
-					class="inner-stroke-shape"
-					transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-				>
+			<g>
+				<g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
 					<defs>
-						<clipPath id="inner-stroke-render-322-35802bb9-e4b3-80d6-8007-c05411c35d2f-0">
-							<use href="#stroke-shape-render-322-35802bb9-e4b3-80d6-8007-c05411c35d2f-0"> </use>
-						</clipPath>
 						<ellipse
 							cx="-725.5"
 							cy="2755"
 							rx="150.5"
 							ry="143.99999999999977"
-							fill={props.fill}   
-                            stroke-width={props.strokeWidth}
+							fill={props.fill}
+							stroke-width={props.strokeWidth}
 							id="stroke-shape-render-322-35802bb9-e4b3-80d6-8007-c05411c35d2f-0"
 						>
 						</ellipse>
 					</defs>
-					<use
-						href="#stroke-shape-render-322-35802bb9-e4b3-80d6-8007-c05411c35d2f-0"
-						clip-path="url(&#x27;#inner-stroke-render-322-35802bb9-e4b3-80d6-8007-c05411c35d2f-0&#x27;)"
-					>
-					</use>
 				</g>
 			</g>
 		</g>
