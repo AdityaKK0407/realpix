@@ -7,6 +7,7 @@
 		strokeWidth?: number;
 		fill?: string;
 		stroke?: string;
+		backgroundStroke?: string;
 	}
 	const props: Props = $props();
 	const accessbilityLabels = $derived(
@@ -23,198 +24,76 @@
 </script>
 
 <svg
-	class={props.class}
 	width={props.size}
-	xmlns="http://www.w3.org/2000/svg"
 	height={props.size}
 	viewBox="0 0 661 703"
-	fill={props.fill}
-	stroke={props.stroke}
-	stroke-width={props.strokeWidth}
+	xmlns="http://www.w3.org/2000/svg"
+	fill="none"
+	stroke-linecap="round"
+	stroke-linejoin="round"
 	version="1.1"
-	{...accessbilityLabels}
+	stroke-opacity="1"
 >
-	<g id="shape-35802bb9-e4b3-80d6-8007-c0549d1baa39" rx="0" ry="0">
-		<g rx="0" ry="0">
-			<g>
-				<g>
-					<path
-						d="M48,128C48,101.508057,69.508057,80,96,80L416,80C442.491943,80,464,102.508057,464,129L464,384C464,410.491943,442.491943,432,416,432L96,432C69.508057,432,48,410.491943,48,384L48,128"
-						stroke-linejoin="round"
-					>
-					</path>
-				</g>
-				<g stroke-linejoin="round">
-					<g class="stroke-shape">
-						<path
-							d="M48,128C48,101.508057,69.508057,80,96,80L416,80C442.491943,80,464,102.508057,464,129L464,384C464,410.491943,442.491943,432,416,432L96,432C69.508057,432,48,410.491943,48,384L48,128"
-						>
-						</path>
-					</g>
-				</g>
-			</g>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c861e87">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c861e87">
-					<path
-						d="M304,335.790039L213.340027,245.300049C201.364258,233.326904,182.133728,232.75708,169.470032,244L48,352M224,432L347.340027,308.659912C359.030762,296.945801,377.724915,296.078613,390.450012,306.659912L464,368"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-					</path>
-				</g>
-				<g stroke-linecap="round" stroke-linejoin="round">
-					<g class="stroke-shape">
-						<path
-							d="M304,335.790039L213.340027,245.300049C201.364258,233.326904,182.133728,232.75708,169.470032,244L48,352M224,432L347.340027,308.659912C359.030762,296.945801,377.724915,296.078613,390.450012,306.659912L464,368"
-							stroke-width={props.strokeWidth}
-						>
-						</path>
-					</g>
-				</g>
-			</g>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c8592b8">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c8592b8">
-					<ellipse
-						cx="211"
-						cy="148"
-						rx="32"
-						ry="32"
-						transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-						stroke-miterlimit="10"
-						stroke="#fafafa"
-					>
-					</ellipse>
-				</g>
-				<g stroke-miterlimit="10">
-					<g class="stroke-shape">
-						<ellipse
-							cx="211"
-							cy="148"
-							rx="32"
-							ry="32"
-							transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-							stroke="#fafafa"
-						>
-						</ellipse>
-					</g>
-				</g>
-			</g>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c835c33" style="display:none">
-				<g>
-					<rect
-						rx="0"
-						ry="0"
-						x="0"
-						y="0"
-						transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-						width="512.0000000000002"
-						height="512"
-					>
-					</rect>
-				</g>
-			</g>
-		</g>
-		<g>
-			<g>
-				<ellipse
-					cx="361.5"
-					cy="406"
-					rx="196.5"
-					ry="198.00000000000023"
-					transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-				>
-				</ellipse>
-			</g>
-			<g>
-				<g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
-					<defs>
-						<ellipse cx="361.5" cy="406" rx="196.5" ry="198.00000000000023"> </ellipse>
-					</defs>
-				</g>
-			</g>
-		</g>
-		<g
-			id="shape-35802bb9-e4b3-80d6-8007-c0509c3789b6"
-			style="fill:#000000"
-			class="ionicon"
-			rx="0"
-			ry="0"
-		>
-			<g id="shape-35802bb9-e4b3-80d6-8007-c0509c3d3f8e" style="display:none">
-				<g class="fills" id="fills-35802bb9-e4b3-80d6-8007-c0509c3d3f8e">
-					<rect
-						rx="0"
-						ry="0"
-						x="134"
-						y="180"
-						transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-						width="527.0000000000001"
-						height="523.0000000000014"
-						fill={props.fill}
-					>
-					</rect>
-				</g>
-			</g>
-			<g>
-				<g>
-					<path
-						d="M361.567139,245.375C272.267212,245.375488,199.874939,317.217529,199.874939,405.839844C199.875,494.462402,272.267029,566.304688,361.5672,566.304932C450.867249,566.30542,523.259521,494.462402,523.25946,405.840088C523.253845,317.220215,450.865051,245.380859,361.567139,245.375Z"
-						stroke-miterlimit="10"
-					>
-					</path>
-				</g>
-				<g stroke-miterlimit="10">
-					<g class="stroke-shape">
-						<path
-							d="M361.567139,245.375C272.267212,245.375488,199.874939,317.217529,199.874939,405.839844C199.875,494.462402,272.267029,566.304688,361.5672,566.304932C450.867249,566.30542,523.259521,494.462402,523.25946,405.840088C523.253845,317.220215,450.865051,245.380859,361.567139,245.375Z"
-						>
-						</path>
-					</g>
-				</g>
-			</g>
-			<g>
-				<g>
-					<path
-						d="M482.200806,525.558594L595.125,637.624756"
-						stroke-linecap="round"
-						stroke-miterlimit="10"
-					>
-					</path>
-				</g>
-				<g stroke-linecap="round" stroke-miterlimit="10">
-					<g class="stroke-shape">
-						<path d="M482.200806,525.558594L595.125,637.624756"> </path>
-					</g>
-				</g>
-			</g>
-		</g>
-		<g>
-			<g>
-				<ellipse
-					cx="-725.5"
-					cy="2755"
-					rx="150.5"
-					ry="143.99999999999977"
-					transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)"
-				>
-				</ellipse>
-			</g>
-			<g>
-				<g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
-					<defs>
-						<ellipse
-							cx="-725.5"
-							cy="2755"
-							rx="150.5"
-							ry="143.99999999999977"
-							fill={props.fill}
-							stroke-width={props.strokeWidth}
-							id="stroke-shape-render-322-35802bb9-e4b3-80d6-8007-c05411c35d2f-0"
-						>
-						</ellipse>
-					</defs>
-				</g>
-			</g>
-		</g>
-	</g>
+	<!-- Image frame -->
+	<path
+		d="M48,128C48,101.508056640625,69.508056640625,80,96,80L416,80C442.491943359375,80,464,102.508056640625,464,129L464,384C464,410.491943359375,442.491943359375,432,416,432L96,432C69.508056640625,432,48,410.491943359375,48,384L48,128"
+		stroke-linejoin="round"
+		stroke-width="32"
+		stroke={props.stroke}
+	/>
+
+	<!-- Mountain / image preview lines -->
+	<path
+		d="M48,352L48,384C48,410.491943359375,69.508056640625,432,96,432L416,432C442.491943359375,432,464,410.491943359375,464,384L464,368L390.45001220703125,306.659912109375C377.72491455078125,296.07861328125,359.03076171383,296.94580078125,347.34002685546875,308.659912109375L304,335.7900390625L213.34002685546875,245.300048828125C201.3642578125,233.326904296875,182.13372802734375,232.757080078125,169.47003173828125,244L48,352Z"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		fill={props.fill}
+	/>
+
+	<!-- Sun dot -->
+	<ellipse
+		cx="211"
+		cy="148"
+		rx="32"
+		ry="32"
+		stroke-miterlimit="10"
+		fill={props.fill}
+	/>
+
+	<!-- Outer search circle -->
+	<ellipse
+		cx="363"
+		cy="406.0000000000002"
+		rx="194"
+		ry="198.00000000000023"
+		stroke={props.backgroundStroke}
+		stroke-width="25"
+	/>
+
+	<!-- Search circle outline -->
+	<path
+		d="M361.567138671875,245.375C272.2672119140625,245.37548828125,199.87493896484375,317.217529296875,199.87493896484375,405.83984375C199.875,494.46240234375,272.26702880859375,566.3046875,361.56719970703125,566.304931640625C450.86724853515625,566.305419921875,523.259521484375,494.46240234375,523.2594604492188,405.840087890625C523.2538452148438,317.22021484375,450.86505126953125,245.380859375,361.567138671875,245.375Z"
+		stroke-miterlimit="5"
+		stroke={props.stroke}
+		stroke-width="40"
+	/>
+
+	<!-- Search handle line -->
+	<path
+		d="M482.2008056640625,525.55859375L595.125,637.624755859375"
+		stroke-linecap="round"
+		stroke-miterlimit="10"
+		stroke={props.stroke}
+		stroke-width="30"
+	/>
+
+	<!-- Inner search circle (on top) -->
+	<ellipse
+		cx="361.5"
+		cy="404.9999999999998"
+		rx="150.5"
+		ry="143.99999999999977"
+		stroke-width="27"
+		stroke={props.backgroundStroke}
+	/>
 </svg>

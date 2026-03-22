@@ -34,12 +34,6 @@ class UploadState {
 
 	uploadFiles(newFiles: File[], fileType: FileType) {
 		if (browser) {
-			if (fileType === 'image') {
-				this.imageLength += newFiles.length;
-			} else if (fileType === 'video') {
-				this.videoLength += newFiles.length;
-			}
-
 			const newItems: FileUploader[] = newFiles.map((file: File) => {
 				return {
 					id: nanoid(),
@@ -50,6 +44,14 @@ class UploadState {
 					size: file.size
 				};
 			});
+
+			if (fileType === 'image') {
+				this.imageLength += newItems.length;
+				const newFiles = [...this.imageFiles, ...newItems]
+			} else if (fileType === 'video') {
+				this.videoLength += newFiles.length;
+			}
+
 			const newUploadedFiles = [...this.uploadedFiles, ...newItems];
 			this.uploadedFiles = newUploadedFiles;
 		}

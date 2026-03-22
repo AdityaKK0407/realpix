@@ -83,12 +83,12 @@
 <section class="mainSection">
 	<section class="wrapper flex-column">
 		<div class="color-pri">
-			<ImageSearch size={84} stroke="#fafafa" />
+			<ImageSearch size={185} stroke="currentColor" backgroundStroke="#fafafa" fill="currentColor" />
 		</div>
 
 		<section class="flex-column display-text">
 			{#each props.text as line (line)}
-				<p class="md-font-2 bold">{line}</p>
+				<p class="md-font-3 bold">{line}</p>
 			{/each}
 		</section>
 	</section>

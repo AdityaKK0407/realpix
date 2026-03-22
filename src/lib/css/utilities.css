@@ -36,6 +36,10 @@
 	font-size: var(--font-md-2);
 }
 
+.md-font-3 {
+	font-size: var(--font-md-3)
+}
+
 .sm-font-5 {
 	font-size: var(--font-sm-5);
 }
