@@ -15,6 +15,8 @@
 	const elementProps = {
 		size: '35'
 	};
+	const colorOfType = $derived(utils.returnColorForType(props.iconType));
+	const isAnimated = $derived(props.iconType.includes('animated'));
 </script>
 
 <section class="fieldSection" class:fieldSection__pulse={props.animate}>
@@ -26,9 +28,9 @@
 	<section class="flex fieldSection__content">
 		<div
 			class="iconField"
-			class:removePadding={props.iconType.includes('animated')}
-			class:blue={utils.returnColorForType(props.iconType) === 'blue'}
-			class:green={utils.returnColorForType(props.iconType) === 'green'}
+			class:removePadding={isAnimated}
+			class:blue={colorOfType === 'blue' && !isAnimated}
+			class:green={colorOfType === 'green' && !isAnimated}
 		>
 			{#if props.iconName === 'Ai'}
 				<Bot {...elementProps} stroke="currentColor" strokeWidth={2} />
@@ -40,7 +42,16 @@
 		</div>
 		<div class="fieldSection__text">
 			<p class="sm-font-1">{props.heading}</p>
-			<p class="sm-font-2 bold">{props.text}</p>
+			<p
+				class="sm-font-2 bold fieldSection__text__sub2"
+				class:green__text={colorOfType === 'security-green' && isAnimated}
+				class:red__text={colorOfType === 'red' && isAnimated}
+				class:yellow__text={colorOfType === 'yellow' && isAnimated}
+				class:color-text-pri={colorOfType === 'periwinkle' && isAnimated}
+				class:muted={colorOfType === 'gray' && isAnimated}
+			>
+				{props.text}
+			</p>
 		</div>
 	</section>
 </section>
@@ -115,5 +126,21 @@
 			scale: 1.5 1.85;
 			opacity: 0;
 		}
+	}
+
+	.fieldSection__text__sub2 {
+		letter-spacing: 0.02em;
+	}
+
+	.green__text {
+		color: var(--color-success-green);
+	}
+
+	.red__text {
+		color: var(--color-error);
+	}
+
+	.yellow__text {
+		color: var(--color-warning);
 	}
 </style>

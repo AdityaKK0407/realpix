@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { BadgeAlert, Image } from 'lucide-svelte';
+	import { BadgeAlert } from 'lucide-svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 	import { turnstile, type ErrorTurnstile } from '$lib/state/turnstile.svelte';
+	import ImageSearch from '$lib/assets/ImageSearch.svelte';
 
 	interface Props {
 		text: string[];
@@ -82,7 +83,7 @@
 <section class="mainSection">
 	<section class="wrapper flex-column">
 		<div class="color-pri">
-			<Image size="75" />
+			<ImageSearch size={75} fill='currentColor'/>
 		</div>
 
 		<section class="flex-column display-text">
@@ -125,7 +126,6 @@
 		align-items: center;
 		gap: 1rem;
 		color: var(--color-text-body);
-		background-color: var(--color-primary-lowest);
 		padding: var(--medium-padding);
 		border-radius: 1.2rem;
 	}

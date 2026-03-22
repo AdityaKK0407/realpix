@@ -17,7 +17,6 @@
 	let uploadState: FileUploadOptions = $state('resetState');
 	let successText: string = $state('');
 	let screenReaderMessage: string = $state('');
-	let headerText: string = $derived(`Upload ${props.fileType}`);
 	const numbers = range(1, 8);
 	const iconSize = 55;
 
@@ -31,7 +30,6 @@
 					successText = `${addSBasedOnCondition(filteredFiles.length > 1, 'File')} uploaded successfully.`;
 					screenReaderMessage = `${files.length === 1 ? 'One' : files.length} files have been selected successfully.`;
 					props.onSelect(Array.from(filteredFiles), props.fileType);
-					headerText = `Uploaded ${addSBasedOnCondition(filteredFiles.length > 1, 'File')}`;
 				} else {
 					uploadState = 'errorState';
 				}
@@ -75,9 +73,9 @@
 
 <section class="flex-column uploadSection">
 	<section>
-		<h2 class="uploadSection__headingcontent primary-text lg-font-1 align-center">
-			{headerText}
-		</h2>
+		<h1 class="uploadSection__headingcontent primary-text lg-font-1 align-center">
+			Is this {props.fileType} AI Generated?
+		</h1>
 	</section>
 	<div
 		class="dropzone"
@@ -91,8 +89,10 @@
 		ondrop={drop}
 		onkeydown={keyBoardEvent}
 		aria-label="Drag and drop images area"
+		aria-live="polite"
 		role="button"
 		tabindex={uploadState === 'resetState' ? 0 : -1}
+		aria-describedby="constraints-section"
 	>
 		<input
 			type="file"
@@ -105,8 +105,8 @@
 
 		{#if uploadState === 'resetState'}
 			<section class="dropzone-text flex-column">
-				<div class="iconField background-color-pri-100 color-pri">
-					<ImageInset size={70} fill="currentColor" />
+				<div class="iconField background-color-pri-100 color-pri dropzone__icon">
+					<ImageInset size={70} fill="currentColor" ariaHidden />
 				</div>
 				<section class="dropzone-secondary-text flex-column">
 					<strong class="lg-font-2 primary-text">Drop {props.fileType}s here</strong>
@@ -130,7 +130,7 @@
 		{:else if uploadState === 'draggingState'}
 			<section class="drop-field flex-column">
 				<div class="iconField background-color-pri-900 color-text-pri pulse">
-					<ImageInset size={70} fill="currentColor" ariaHidden={true} />
+					<ImageInset size={70} fill="currentColor" ariaHidden />
 					{#each numbers as number (number)}
 						<span style={`--i: ${number}`} class="animate-element"></span>
 					{/each}
@@ -151,7 +151,7 @@
 			</section>
 		{/if}
 	</div>
-	<section class="uploadSection__footer flex-column">
+	<section class="uploadSection__footer flex-column" id="constraints-section">
 		<p class="sm-font-2 bodycolor bold">Up to 5 {props.fileType}s</p>
 		<p class="sm-font-2 bodycolor bold">{props.extensions}</p>
 	</section>
@@ -169,7 +169,6 @@
 	}
 
 	.uploadSection__headingcontent {
-		text-transform: uppercase;
 		letter-spacing: 0.03em;
 	}
 
@@ -184,12 +183,13 @@
 		border-radius: 0.6rem;
 		border-width: 0.25rem;
 		width: 100%;
-		height: 20rem;
+		height: 25rem;
 	}
 
 	.dropzone-text {
-		gap: 1rem;
-		align-items: center;
+		flex-grow: 1;
+		justify-content: center;
+		gap: var(--text-gap-medium);
 	}
 
 	.dropzone-secondary-text {
@@ -300,6 +300,10 @@
 			scale: 2.3;
 			opacity: 0;
 		}
+	}
+
+	.dropzone__icon {
+		align-self: center;
 	}
 
 	.click-button {

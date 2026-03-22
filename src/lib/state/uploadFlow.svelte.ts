@@ -15,6 +15,8 @@ export type FileType = 'image' | 'video';
 
 class UploadState {
 	uploadedFiles: FileUploader[];
+	imageFiles: FileUploader[];
+	videoFiles: FileUploader[];
 	imageLength: number;
 	videoLength: number;
 	MAX_LENGTH: number = 5;
@@ -23,6 +25,8 @@ class UploadState {
 
 	constructor() {
 		this.uploadedFiles = $state<FileUploader[]>([]);
+		this.imageFiles = $state<FileUploader[]>([]);
+		this.videoFiles = $state<FileUploader[]>([]);
 		this.imageLength = 0;
 		this.videoLength = 0;
 		this.batchedFiles = [];
