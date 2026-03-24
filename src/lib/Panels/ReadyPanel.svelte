@@ -15,9 +15,9 @@
 		index = uploadData.getFileTypeFirstId(props.fileType)!;
 	});
 
-	const fileType = $derived(uploadData.getFileType(props.fileType));
-	let selectedImage = $derived(uploadData.getFileBlob(index));
-	const selectedName = $derived(uploadData.getName(index));
+	const fileType = $derived(uploadData.getFilesByType(props.fileType));
+	let selectedImage = $derived(uploadData.getFileBlob(index, props.fileType));
+	const selectedName = $derived(uploadData.getName(index, props.fileType));
 	const length = $derived(uploadData.getLength(props.fileType));
 	const oneImage = $derived(length === 1);
 	const remainingLength = uploadData.getMaxLength();
@@ -51,14 +51,14 @@
 					<p class="sm-font-3 bold">{length} / {remainingLength} images filled</p>
 				</section>
 				<section class="buttons">
-					{#each fileType as image (image.id)}
+					{#each fileType as file (file.id)}
 						<button
 							class="sm-font-4 iconImage transparent flex-column bold"
-							class:selected={image.id === index}
-							onclick={() => changeIndex(image.id)}
+							class:selected={file.id === index}
+							onclick={() => changeIndex(file.id)}
 						>
-							<img src={image.blob} alt={`Image:- ${image.name}`} class="buttonImg" />
-							{image.name}
+							<img src={file.blob} alt={`Image:- ${file.name}`} class="buttonImg" />
+							{file.name}
 						</button>
 					{/each}
 					{#if length !== remainingLength}

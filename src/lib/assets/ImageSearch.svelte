@@ -51,14 +51,7 @@
 	/>
 
 	<!-- Sun dot -->
-	<ellipse
-		cx="211"
-		cy="148"
-		rx="32"
-		ry="32"
-		stroke-miterlimit="10"
-		fill={props.fill}
-	/>
+	<ellipse cx="211" cy="148" rx="32" ry="32" stroke-miterlimit="10" fill={props.fill} />
 
 	<!-- Outer search circle -->
 	<ellipse
