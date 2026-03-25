@@ -29,7 +29,7 @@ class TurnstileResult(BaseModel):
     success: bool
 
 
-@router.post("/captcha")
+@router.post("/captcha", response_model=None)
 async def verify_captcha(
     payload: dict[str, str],
     x_client_ip: str | None = Header(None),
@@ -38,7 +38,7 @@ async def verify_captcha(
     create_sha: str = Depends(get_create_sha),
     ip_rate_limiter_sha: str = Depends(get_ip_rate_limiter_sha),
     activate_token_sha: str = Depends(get_activate_token_sha),
-) -> Union[dict[str, str], JSONResponse]:
+) -> dict[str, str] | JSONResponse:
     cloudflare_token = payload.get("token", None)
 
     if not cloudflare_token:

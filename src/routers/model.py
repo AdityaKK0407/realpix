@@ -96,10 +96,10 @@ async def validate_image(
         await image.seek(0)
 
 
-@router.post("/images")
+@router.post("/images", response_model=None)
 async def start_task_image(
     images: list[UploadFile] = File(...),
-) -> Union[dict[str, str], JSONResponse]:
+) -> dict[str, str] | JSONResponse:
     max_images = MAX_IMAGES
     allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
     max_image_file_size = MAX_IMAGE_FILE_SIZE
@@ -278,10 +278,10 @@ async def validate_video(
         os.remove(tmp_path)
 
 
-@router.post("/videos")
+@router.post("/videos", response_model=None)
 async def start_task_video(
     videos: list[UploadFile] = File(...),
-) -> Union[dict[str, str], JSONResponse]:
+) -> dict[str, str] | JSONResponse:
     max_videos = MAX_VIDEOS
     allowed_extensions = ALLOWED_VIDEO_EXTENSIONS
     max_video_file_size = MAX_VIDEO_FILE_SIZE
@@ -356,8 +356,8 @@ async def start_task_video(
     }
 
 
-@router.get("/status/{task_id}")
-async def check_task_status(task_id: str) -> Union[dict[str, str | list[bool]], JSONResponse]:
+@router.get("/status/{task_id}", response_model=None)
+async def check_task_status(task_id: str) -> dict[str, str | list[bool]] | JSONResponse:
     task_result = task_queue.AsyncResult(task_id)
     if task_result.state == "SUCCESS":
         model_result: list[bool] = task_result.result
