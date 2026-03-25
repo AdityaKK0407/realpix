@@ -12,6 +12,10 @@ export interface FileUploader {
 }
 
 export type FileType = 'image' | 'video';
+export type UploadType = {
+	formData: FormData | undefined;
+	batchId: string[] | undefined;
+};
 
 class UploadState {
 	private imageFiles: FileUploader[];
@@ -120,6 +124,7 @@ class UploadState {
 		let notBatched = 0;
 		let sizeOfBatch = 0;
 		const filesToSend = this.getFilesByType(fileType);
+		const batchIds = [];
 
 		if (filesToSend) {
 			for (const file of filesToSend) {
@@ -131,12 +136,14 @@ class UploadState {
 						batchToSend.push(file.src);
 						sizeOfBatch += file.size;
 						this.batchedFiles.push(file.id);
+						batchIds.push(file.id);
 					}
 				}
 			}
 
 			return {
 				batchFiles: batchToSend,
+				batchIds,
 				noOfNotBatched: notBatched
 			};
 		}
@@ -145,7 +152,7 @@ class UploadState {
 	private generateFormData(fileType: FileType) {
 		const dataToSend = this.generateBatch(fileType);
 		if (dataToSend) {
-			const { batchFiles, noOfNotBatched } = dataToSend;
+			const { batchFiles, noOfNotBatched, batchIds } = dataToSend;
 			const formData = new FormData();
 			batchFiles.forEach((data) => {
 				formData.append(`${fileType}s`, data);
@@ -153,11 +160,19 @@ class UploadState {
 
 			return {
 				noOfNotBatched,
-				formData
+				formData,
+				batchIds
 			};
 		} else {
 			return undefined;
 		}
+	}
+
+	createPackageObject(formData: FormData | undefined, batchIds: string[] | undefined): UploadType {
+		return {
+			formData,
+			batchId: batchIds
+		};
 	}
 
 	createPackages(fileType: FileType) {
@@ -177,8 +192,14 @@ class UploadState {
 			}
 
 			return {
-				package1: package1.formData,
-				package2: package2?.formData,
+				sendData: [
+					this.createPackageObject(package1.formData, package1.batchIds),
+					this.createPackageObject(package2?.formData, package2?.batchIds)
+				],
+				package1FormData: package1.formData,
+				package1BatchIds: package1.batchIds,
+				package2FormData: package2?.formData,
+				package2BatchIds: package2?.batchIds,
 				moreBatchAvailable
 			};
 		}

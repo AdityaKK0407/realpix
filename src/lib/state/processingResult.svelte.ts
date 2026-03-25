@@ -1,7 +1,13 @@
 import { PUBLIC_BASE_TIME_REQUEST, PUBLIC_REQUEST_BIAS } from '$env/static/public';
+// import type { UUID } from 'crypto';
+
+export interface Task_ID {
+	task_id: string;
+	idOfBatchs: string[] | undefined;
+}
 
 class TaskPinging {
-	private task_ids: string[];
+	private task_ids: Task_ID[];
 	private base_time: number;
 	private threshold_pings: number;
 	private pingCount: number;
@@ -19,8 +25,8 @@ class TaskPinging {
 		this.threshold_reached = false;
 	}
 
-	addTasks(tasks: string[]): void {
-		const tasksArray = [...this.task_ids, ...tasks];
+	addTasks(tasks: Task_ID): void {
+		const tasksArray: Task_ID[] = [...this.task_ids, tasks];
 		this.task_ids = tasksArray;
 	}
 

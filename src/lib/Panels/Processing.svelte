@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { processingStatus } from '$lib/state/processingResult.svelte';
-	import { type FileType, uploadData } from '$lib/state/uploadFlow.svelte';
+	import { processingStatus, type Task_ID } from '$lib/state/processingResult.svelte';
+	import { type FileType, uploadData, type UploadType } from '$lib/state/uploadFlow.svelte';
 
 	interface Props {
 		fileType: FileType;
@@ -8,43 +8,46 @@
 
 	const props: Props = $props();
 
+	async function uploadBatch(batch: UploadType): Promise<void> {
+		try {
+			if (batch && batch.formData && batch.batchId) {
+				const batchResponse = await fetch('/api/uploadImage', {
+					method: 'POST',
+					body: batch.formData
+				});
+
+				if (!batchResponse.ok) {
+					alert(batchResponse.statusText);
+					return;
+				} else {
+					const batchResponseData = await batchResponse.json();
+					const processingData: Task_ID = {
+						task_id: batchResponseData.data.task_ids,
+						idOfBatchs: batch.batchId
+					};
+					processingStatus.addTasks(processingData);
+				}
+			}
+		} catch (err) {
+			alert(err);
+		}
+	}
+
 	async function upload() {
 		const packages = uploadData.createPackages(props.fileType);
-		console.log(packages);
 		if (packages) {
-			try {
-				const package1Response = await fetch('/api/uploadImage', {
-					method: 'POST',
-					body: packages.package1
-				});
-				let package2Response = null;
+			const { sendData } = packages;
+			let successTransaction = true;
 
-				if (package1Response.ok) {
-					const package1Data = await package1Response.json();
-					processingStatus.addTasks(package1Data.data.task_ids);
-					if (packages.package2) {
-						package2Response = await fetch('/api/uploadImage', {
-							method: 'POST',
-							body: packages.package2
-						});
-						if (!package2Response.ok) {
-							alert('error');
-							return;
-						} else if (packages.moreBatchAvailable) {
-							alert('More packages available');
-						}
+			const actions = sendData.map(uploadBatch);
 
-						const package2Data = await package2Response.json();
-						processingStatus.addTasks(package2Data.data.task_ids);
+			await Promise.all(actions);
+			if (packages.moreBatchAvailable) {
+				alert('More packages available');
+			}
 
-						processingStatus.startPinging();
-					}
-				} else {
-					alert(package1Response.statusText);
-					return;
-				}
-			} catch (err) {
-				alert(`Error occured: ${err}`);
+			if (successTransaction) {
+				processingStatus.startPinging();
 			}
 		}
 	}
