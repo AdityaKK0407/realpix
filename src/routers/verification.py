@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Union
 
 import httpx
 import redis.asyncio as redis
@@ -37,7 +38,7 @@ async def verify_captcha(
     create_sha: str = Depends(get_create_sha),
     ip_rate_limiter_sha: str = Depends(get_ip_rate_limiter_sha),
     activate_token_sha: str = Depends(get_activate_token_sha),
-) -> dict[str, str] | JSONResponse:
+) -> Union[dict[str, str], JSONResponse]:
     cloudflare_token = payload.get("token", None)
 
     if not cloudflare_token:
@@ -83,8 +84,8 @@ async def verify_captcha(
 
     try:
         success = await verify_turnstile(url, secret_key, cloudflare_token, x_client_ip)
-    except Exception:
-        logger.error("Failed to verify turnstile with cloudflare server")
+    except Exception as e:
+        logger.error(f"Failed to verify turnstile with cloudflare server: {e}")
         return JSONResponse(
             status_code=status.HTTP_502_BAD_GATEWAY,
             content={
@@ -109,8 +110,8 @@ async def verify_captcha(
         uuid_token = await create_rate_limiter_token(redis_client, create_sha)
         return {"status": "success", "user_token": uuid_token}
 
-    except Exception:
-        logger.error("Redis service failed to add rate limiter token")
+    except Exception as e:
+        logger.error(f"Redis service failed to add rate limiter token: {e}")
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content={

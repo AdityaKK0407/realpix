@@ -4,12 +4,12 @@ from src.tasks.app import task_queue
 
 
 @task_queue.task
-def image_task(filepath: str, content: bytes) -> dict[str, str | int]:
+def image_task(contents: tuple[bytes]) -> list[bool]:
     time.sleep(1)
-    return {"filepath": filepath, "content_size": len(content)}
+    return [True] * len(contents)
 
 
 @task_queue.task
-def video_task(filepath: str, content: bytes) -> dict[str, str | int]:
+def video_task(contents: tuple[bytes]) -> list[bool]:
     time.sleep(1)
-    return {"filepath": filepath, "content_size": len(content)}
+    return [True] * len(contents)

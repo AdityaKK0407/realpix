@@ -1,15 +1,17 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import os
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
-from dotenv import load_dotenv
 from fastapi import FastAPI, Response, status
 
 from src.helpers import create_redis_client, load_lua_script, setup_logger
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
 
-load_dotenv()
 PRODUCTION = os.getenv("SERVER") == "production"
 
 setup_logger()
@@ -17,7 +19,6 @@ setup_logger()
 
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
-
     host = os.getenv("REDIS_HOST")
     port = os.getenv("REDIS_PORT")
 

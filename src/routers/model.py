@@ -5,7 +5,7 @@ import os
 import subprocess
 import tempfile
 import json
-from typing import Any
+from typing import Any, Union
 
 from fastapi import (
     APIRouter,
@@ -17,7 +17,6 @@ from fastapi import (
 )
 from fastapi.responses import JSONResponse
 from PIL import Image, UnidentifiedImageError
-from pydantic import BaseModel
 
 from src.middleware.rate_limiter import rate_limiter_middleware
 from src.tasks.app import task_queue
@@ -36,12 +35,6 @@ ALLOWED_VIDEO_EXTENSIONS = ("mp4",)
 MAX_VIDEO_FILE_SIZE = 50 * 1024 * 1024
 VIDEO_CHUNK_SIZE = 1024 * 1024
 ALLOWED_CODECS = ("h264", "hevc", "vp9")
-
-
-class TaskResult(BaseModel):
-    filepath: str
-    content_size: int
-
 
 router = APIRouter(
     prefix="/model", tags=["Model"], dependencies=[Depends(rate_limiter_middleware)]
@@ -106,7 +99,7 @@ async def validate_image(
 @router.post("/images")
 async def start_task_image(
     images: list[UploadFile] = File(...),
-) -> dict[str, str | list[str]] | JSONResponse:
+) -> Union[dict[str, str], JSONResponse]:
     max_images = MAX_IMAGES
     allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
     max_image_file_size = MAX_IMAGE_FILE_SIZE
@@ -132,8 +125,6 @@ async def start_task_image(
             },
         )
 
-    result: list[str] = []
-
     try:
         file_bytes: tuple[bytes, ...] = tuple(
             await asyncio.gather(
@@ -145,6 +136,7 @@ async def start_task_image(
                 ]
             )
         )
+
     except HTTPException as httpError:
         return JSONResponse(
             status_code=httpError.status_code,
@@ -153,27 +145,24 @@ async def start_task_image(
                 "detail": httpError.detail,
             },
         )
-    except Exception:
-        logger.error("Server failed to process the images")
+    except Exception as e:
+        logger.error(f"Server failed to process the images: {e}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"status": "error", "detail": "Failed to process image"},
         )
 
-    for image, file_byte in zip(images, file_bytes):
-        try:
-            task_data = image_task.delay(image.filename, file_byte)
-        except Exception:
-            logger.error("Celery task failed to add images to task queue")
-            return JSONResponse(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                content={
-                    "status": "error",
-                    "detail": "Service temporarily unavailable",
-                },
-            )
-
-        result.append(task_data.id)
+    try:
+        result: str = image_task.delay(file_bytes).id
+    except Exception as e:
+        logger.error(f"Celery task failed to add images to task queue: {e}")
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "error",
+                "detail": "Service temporarily unavailable",
+            },
+        )
 
     return {
         "status": "success",
@@ -292,7 +281,7 @@ async def validate_video(
 @router.post("/videos")
 async def start_task_video(
     videos: list[UploadFile] = File(...),
-) -> dict[str, str | list[str]] | JSONResponse:
+) -> Union[dict[str, str], JSONResponse]:
     max_videos = MAX_VIDEOS
     allowed_extensions = ALLOWED_VIDEO_EXTENSIONS
     max_video_file_size = MAX_VIDEO_FILE_SIZE
@@ -319,8 +308,6 @@ async def start_task_video(
             },
         )
 
-    result: list[str] = []
-
     try:
         file_bytes: tuple[bytes, ...] = tuple(
             await asyncio.gather(
@@ -344,47 +331,37 @@ async def start_task_video(
                 "detail": httpError.detail,
             },
         )
-    except Exception:
-        logger.error("Server failed to process the videos")
+    except Exception as e:
+        logger.error(f"Server failed to process the videos: {e}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"status": "error", "detail": "Failed to process video"},
         )
 
-    for video, file_byte in zip(videos, file_bytes):
-        try:
-            task_data = video_task.delay(video.filename, file_byte)
-        except Exception:
-            logger.error("Celery task failed to add videos to task queue")
-            return JSONResponse(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                content={
-                    "status": "error",
-                    "detail": "Service temporarily unavailable",
-                },
-            )
-
-        result.append(task_data.id)
+    try:
+        result = video_task.delay(file_bytes)
+    except Exception as e:
+        logger.error(f"Celery task failed to add videos to task queue: {e}")
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "error",
+                "detail": "Service temporarily unavailable",
+            },
+        )
 
     return {
         "status": "success",
-        "task_ids": result,
+        "task_ids": result.id,
     }
 
 
 @router.get("/status/{task_id}")
-async def check_task_status(task_id: str) -> dict[str, str | TaskResult] | JSONResponse:
+async def check_task_status(task_id: str) -> Union[dict[str, str | list[bool]], JSONResponse]:
     task_result = task_queue.AsyncResult(task_id)
     if task_result.state == "SUCCESS":
-        try:
-            result = TaskResult.model_validate(task_result.result)
-        except Exception:
-            logger.error("Celery task failed to validate result")
-            return JSONResponse(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content={"status": "error", "detail": "Unexpected server error"},
-            )
-        return {"status": "success", "result": "completed", "data": result}
+        model_result: list[bool] = task_result.result
+        return {"status": "success", "result": "completed", "data": model_result}
     elif task_result.state == "FAILURE":
         return {"status": "success", "result": "failed"}
     else:
