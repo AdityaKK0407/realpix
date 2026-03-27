@@ -1,11 +1,9 @@
 import logging
 import os
-from typing import Union
 
 import httpx
 import redis.asyncio as redis
-from fastapi import APIRouter, Depends, Header, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel
 
 from src.dependencies import (
@@ -38,36 +36,30 @@ async def verify_captcha(
     create_sha: str = Depends(get_create_sha),
     ip_rate_limiter_sha: str = Depends(get_ip_rate_limiter_sha),
     activate_token_sha: str = Depends(get_activate_token_sha),
-) -> dict[str, str] | JSONResponse:
+) -> dict[str, str]:
     cloudflare_token = payload.get("token", None)
 
     if not cloudflare_token:
         logger.warning("Missing cloudflare turnstile token in request body")
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"status": "error", "detail": "Missing CAPTCHA token"},
+            detail="Missing CAPTCHA token",
         )
 
     if not x_client_ip:
         logger.error("Missing Client IP in header")
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "status": "error",
-                "detail": "Missing Client IP",
-            },
+            detail="Missing Client IP",
         )
 
     if not await verify_ip_rate_limiter(
         redis_client, ip_rate_limiter_sha, x_client_ip, "verification"
     ):
         logger.warning("Client IP token exceeded rate limit")
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            content={
-                "status": "error",
-                "detail": "Rate limit exceeded",
-            },
+            detail="Rate limit exceeded",
         )
 
     url = os.getenv("CLOUDFLARE_URL")
@@ -77,28 +69,25 @@ async def verify_captcha(
         logger.error(
             "Failed to read cloudflare url and cloudflare secret key env variables"
         )
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"status": "error", "detail": "Unexpected server error"},
+            detail="Unexpected server error",
         )
 
     try:
         success = await verify_turnstile(url, secret_key, cloudflare_token, x_client_ip)
     except Exception as e:
         logger.error(f"Failed to verify turnstile with cloudflare server: {e}")
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            content={
-                "status": "error",
-                "detail": "Unable to verify request at this time. Please try again later",
-            },
+            detail="Unable to verify request at this time. Please try again later",
         )
 
     if not success:
         logger.warning("Client provided invalid turnstile token in body")
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            content={"status": "error", "detail": "Invalid CAPTCHA token"},
+            detail="Invalid CAPTCHA token",
         )
 
     try:
@@ -112,12 +101,9 @@ async def verify_captcha(
 
     except Exception as e:
         logger.error(f"Redis service failed to add rate limiter token: {e}")
-        return JSONResponse(
+        raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={
-                "status": "error",
-                "detail": "Service temporarily unavailable",
-            },
+            detail="Service temporarily unavailable",
         )
 
 

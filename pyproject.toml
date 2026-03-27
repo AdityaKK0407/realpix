@@ -6,17 +6,17 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "celery>=5.6.2",
-    "celery-types>=0.25.0",
-    "fastapi>=0.135.1",
-    "gunicorn>=25.1.0",
+    "celery-types>=0.26.0",
+    "fastapi>=0.135.2",
+    "gunicorn>=25.2.0",
     "httpx>=0.28.1",
     "numpy>=2.4.3",
     "pillow>=12.1.1",
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.2",
     "python-multipart>=0.0.22",
-    "redis>=7.3.0",
-    "uvicorn>=0.41.0",
+    "redis>=7.4.0",
+    "uvicorn>=0.42.0",
 ]
 
 [tool.mypy]
@@ -28,7 +28,7 @@ dev = [
     "honcho>=2.0.0",
     "mypy>=1.19.1",
     "pytest>=9.0.2",
-    "ruff>=0.15.5",
+    "ruff>=0.15.7",
 ]
 
 [tool.pytest.ini_options]

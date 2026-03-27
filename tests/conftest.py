@@ -18,7 +18,7 @@ from tests.mocks.redis import MockRedis
 
 @pytest.fixture
 async def client():
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=app, raise_app_exceptions=False)
     async with AsyncClient(transport=transport, base_url="http://test") as async_client:
         yield async_client
 
@@ -32,16 +32,15 @@ def mock_redis_client():
 def mock_celery():
     with (
         patch("src.routers.model.image_task.delay") as mock_image_delay,
-        # patch("src.routers.model.video_task.delay") as mock_video_delay,
+        patch("src.routers.model.video_task.delay") as mock_video_delay,
     ):
         mock_image_delay.side_effect = lambda *args, **kwargs: MockCelery(
             str(uuid.uuid4())
         )
-        # mock_video_delay.side_effect = lambda *args, **kwargs: MockCelery(
-        #     str(uuid.uuid4())
-        # )
-        yield mock_image_delay
-        # yield mock_video_delay
+        mock_video_delay.side_effect = lambda *args, **kwargs: MockCelery(
+            str(uuid.uuid4())
+        )
+        yield mock_image_delay, mock_video_delay
 
 
 @pytest.fixture

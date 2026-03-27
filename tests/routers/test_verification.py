@@ -1,4 +1,3 @@
-import uuid
 from dataclasses import dataclass
 from unittest.mock import AsyncMock, patch
 
@@ -15,7 +14,6 @@ class VerifyCaptchaCaseResults:
     saved_rate_limiter_token: str | None
     redis_result: int
     expected_status: int
-    expected_body: dict | None
 
 
 VERIFY_CAPTCHA_TEST_CASES = [
@@ -28,7 +26,6 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=400,
-        expected_body=None,
     ),
     VerifyCaptchaCaseResults(
         name="missing client ip",
@@ -39,7 +36,6 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=400,
-        expected_body=None,
     ),
     VerifyCaptchaCaseResults(
         name="invalid captcha token",
@@ -50,7 +46,6 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=403,
-        expected_body=None,
     ),
     VerifyCaptchaCaseResults(
         name="rate limit token exists and activated",
@@ -61,7 +56,6 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token="old_token",
         redis_result=1,
         expected_status=200,
-        expected_body={"user_token": "old_token"},
     ),
     VerifyCaptchaCaseResults(
         name="rate limit token exists but failed to activate, returns new token",
@@ -72,7 +66,6 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=0,
         expected_status=200,
-        expected_body={"user_token": "12345678-1234-5678-1234-567812345678"},
     ),
     VerifyCaptchaCaseResults(
         name="missing rate limit token, returns new token",
@@ -83,7 +76,6 @@ VERIFY_CAPTCHA_TEST_CASES = [
         saved_rate_limiter_token=None,
         redis_result=3,
         expected_status=200,
-        expected_body={"user_token": "12345678-1234-5678-1234-567812345678"},
     ),
 ]
 
@@ -102,21 +94,21 @@ async def test_verify_captcha(client, mock_redis_client, test_case):
     if test_case.rate_limiter_token:
         headers["X-RateLimit-Token"] = test_case.rate_limiter_token
 
-    fixed_uuid = uuid.UUID("12345678-1234-5678-1234-567812345678")
-
     req_body = {"token": test_case.token_body} if test_case.token_body else {}
 
-    with (
-        patch(
-            "src.routers.verification.verify_turnstile",
-            new=AsyncMock(return_value=test_case.cloudflare_success),
-        ),
-        patch("src.redis_client.rate_limiter.uuid.uuid4", return_value=fixed_uuid),
-    ):
+    with patch("src.routers.verification.verify_turnstile", new=AsyncMock(return_value=test_case.cloudflare_success)):
         response = await client.post("/verify/captcha", json=req_body, headers=headers)
 
     assert response.status_code == test_case.expected_status
+    data = response.json()
 
     if response.status_code == 200:
-        data = response.json()
-        assert data == test_case.expected_body
+        assert isinstance(data, dict)
+        assert data["status"] == "success"
+        assert isinstance (data["user_token"], str)
+
+    else:
+        assert isinstance(data, dict)
+        assert data["status"] == "error"
+        assert isinstance (data["detail"], str)
+

@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from starlette.responses import JSONResponse
 
 load_dotenv()
 
@@ -6,7 +7,8 @@ import os
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import Request
 
 from src.helpers import create_redis_client, load_lua_script, setup_logger
 from src.routers.model import router as model_router
@@ -54,6 +56,16 @@ app = FastAPI(
 )
 app.include_router(model_router)
 app.include_router(verification_router)
+
+@app.exception_handler(HTTPException)
+async def custom_http_exception_handler(_: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "detail": exc.detail,
+        },
+    )
 
 
 @app.head("/")
