@@ -5,10 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "celery>=5.6.2",
+    "celery>=5.6.3",
     "celery-types>=0.26.0",
     "fastapi>=0.135.2",
-    "gunicorn>=25.2.0",
+    "gunicorn>=25.3.0",
     "httpx>=0.28.1",
     "numpy>=2.4.3",
     "pillow>=12.1.1",
@@ -17,6 +17,7 @@ dependencies = [
     "python-multipart>=0.0.22",
     "redis>=7.4.0",
     "uvicorn>=0.42.0",
+    "honcho>=2.0.0",
 ]
 
 [tool.mypy]
@@ -25,10 +26,9 @@ disallow_untyped_defs = true
 
 [dependency-groups]
 dev = [
-    "honcho>=2.0.0",
     "mypy>=1.19.1",
     "pytest>=9.0.2",
-    "ruff>=0.15.7",
+    "ruff>=0.15.8",
 ]
 
 [tool.pytest.ini_options]

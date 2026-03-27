@@ -1,19 +1,17 @@
-from dotenv import load_dotenv
-from starlette.responses import JSONResponse
-
-load_dotenv()
-
 import os
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
-from fastapi import FastAPI, Response, status, HTTPException
-from fastapi import Request
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Request, Response, status
+from starlette.responses import JSONResponse
 
 from src.helpers import create_redis_client, load_lua_script, setup_logger
 from src.routers.model import router as model_router
 from src.routers.verification import router as verification_router
+from src.tasks.app import initialize_task_queue
 
+load_dotenv()
 PRODUCTION = os.getenv("SERVER") == "production"
 
 setup_logger()
@@ -27,6 +25,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, Any]:
     if not host or not port:
         raise RuntimeError("Failed to get env variables")
     try:
+        initialize_task_queue(host, int(port))
         fastapi_app.state.redis_client = create_redis_client(host, int(port))
         fastapi_app.state.create_sha = await load_lua_script(
             fastapi_app.state.redis_client, "src/redis_scripts/create.lua"
@@ -57,8 +56,9 @@ app = FastAPI(
 app.include_router(model_router)
 app.include_router(verification_router)
 
+
 @app.exception_handler(HTTPException)
-async def custom_http_exception_handler(_: Request, exc: HTTPException):
+async def custom_http_exception_handler(_: Request, exc: HTTPException) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={

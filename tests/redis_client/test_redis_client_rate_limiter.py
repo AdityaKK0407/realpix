@@ -12,7 +12,7 @@ from src.redis_client.rate_limiter import (
 
 
 @pytest.mark.anyio
-async def test_create_rate_limiter_token():
+async def test_create_rate_limiter_token() -> None:
     mock_redis = AsyncMock()
     fixed_uuid = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
@@ -27,7 +27,7 @@ async def test_create_rate_limiter_token():
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("test_case", [-1, 0, 1, 2, 3])
-async def test_verify_rate_limiter_token(test_case):
+async def test_verify_rate_limiter_token(test_case: int) -> None:
     mock_redis = AsyncMock()
     mock_redis.evalsha.return_value = test_case
 
@@ -51,7 +51,7 @@ async def test_verify_rate_limiter_token(test_case):
 
 
 @pytest.mark.anyio
-async def test_activate_rate_limiter_token():
+async def test_activate_rate_limiter_token() -> None:
     mock_redis = AsyncMock()
     mock_redis.evalsha.return_value = 1
 

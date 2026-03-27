@@ -6,7 +6,7 @@ from src.redis_client.ip_rate_limiter import verify_ip_rate_limiter
 
 
 @pytest.mark.anyio
-async def test_verify_ip_rate_limiter():
+async def test_verify_ip_rate_limiter() -> None:
     mock_redis = AsyncMock()
     mock_redis.evalsha.return_value = 1
 

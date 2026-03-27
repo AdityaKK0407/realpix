@@ -15,11 +15,12 @@ from tests.mocks.image import (
     create_image_buffer_bomb,
     create_large_image_buffer,
 )
+from tests.mocks.redis import MockRedis
 from tests.mocks.video import (
-    create_video,
-    create_large_video,
     create_corrupted_video,
-    create_invalid_video_stream
+    create_invalid_video_stream,
+    create_large_video,
+    create_video,
 )
 
 
@@ -27,7 +28,7 @@ from tests.mocks.video import (
 class ValidateImageCaseResult:
     name: str
     save_format: str | None
-    buffer_factory: Callable[[str | None], BytesIO]
+    buffer_factory: Callable[[str], BytesIO]
     allowed_extensions: tuple[str, ...]
     exception: tuple[int, str] | None
 
@@ -82,7 +83,7 @@ VALIDATE_IMAGE_TEST_CASES = [
 @pytest.mark.parametrize(
     "test_case", VALIDATE_IMAGE_TEST_CASES, ids=lambda test_case: test_case.name
 )
-async def test_validate_image(test_case):
+async def test_validate_image(test_case: ValidateImageCaseResult) -> None:
     image = UploadFile(
         filename="image.png", file=test_case.buffer_factory(test_case.save_format)
     )
@@ -175,7 +176,9 @@ START_IMAGE_TASK_TEST_CASES = [
 @pytest.mark.parametrize(
     "test_case", START_IMAGE_TASK_TEST_CASES, ids=lambda test_case: test_case.name
 )
-async def test_start_task_image(client, mock_redis_client, test_case):
+async def test_start_task_image(
+    client, mock_redis_client: MockRedis, test_case: StartImageTaskCaseResults
+) -> None:
     key = f"rate_limiter:token:{test_case.token}"
     mock_redis_client.store[key] = test_case.redis_result
 
@@ -238,7 +241,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_video,
         allowed_extensions=("mp4",),
         allowed_codecs=("h264",),
-        exception=None
+        exception=None,
     ),
     ValidateVideoCaseResult(
         name="video file too large",
@@ -250,7 +253,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_large_video,
         allowed_extensions=("mp4",),
         allowed_codecs=("libx264",),
-        exception=(400, "Video too large")
+        exception=(400, "Video too large"),
     ),
     ValidateVideoCaseResult(
         name="invalid video extension file",
@@ -262,7 +265,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_video,
         allowed_extensions=("mp4",),
         allowed_codecs=("h264",),
-        exception=(400, "Unsupported video format")
+        exception=(400, "Unsupported video format"),
     ),
     ValidateVideoCaseResult(
         name="invalid or corrupted video file",
@@ -274,7 +277,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_corrupted_video,
         allowed_extensions=("mp4",),
         allowed_codecs=("h264",),
-        exception=(400, "Invalid or corrupted video")
+        exception=(400, "Invalid or corrupted video"),
     ),
     ValidateVideoCaseResult(
         name="invalid video stream file",
@@ -286,7 +289,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_invalid_video_stream,
         allowed_extensions=("mp4",),
         allowed_codecs=("h264",),
-        exception=(400, "No video stream found")
+        exception=(400, "No video stream found"),
     ),
     ValidateVideoCaseResult(
         name="unsupported video extension file",
@@ -298,7 +301,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_video,
         allowed_extensions=("webm",),
         allowed_codecs=("h264",),
-        exception=(400, "Unsupported video format")
+        exception=(400, "Unsupported video format"),
     ),
     ValidateVideoCaseResult(
         name="unsupported video codec file",
@@ -310,7 +313,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_video,
         allowed_extensions=("mp4",),
         allowed_codecs=tuple(),
-        exception=(400, "Unsupported codec")
+        exception=(400, "Unsupported codec"),
     ),
     ValidateVideoCaseResult(
         name="too large resolution",
@@ -322,7 +325,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_video,
         allowed_extensions=("mp4",),
         allowed_codecs=("h264",),
-        exception=(400, "Resolution too high")
+        exception=(400, "Resolution too high"),
     ),
     ValidateVideoCaseResult(
         name="too long duration",
@@ -334,7 +337,7 @@ VALIDATE_VIDEO_TEST_CASES = [
         buffer_factory=create_video,
         allowed_extensions=("mp4",),
         allowed_codecs=("h264",),
-        exception=(400, "Video too long")
+        exception=(400, "Video too long"),
     ),
 ]
 
@@ -343,10 +346,15 @@ VALIDATE_VIDEO_TEST_CASES = [
 @pytest.mark.parametrize(
     "test_case", VALIDATE_VIDEO_TEST_CASES, ids=lambda test_case: test_case.name
 )
-async def test_validate_video(test_case):
+async def test_validate_video(test_case: ValidateVideoCaseResult) -> None:
     video = UploadFile(
         filename=test_case.filename,
-        file=test_case.buffer_factory(test_case.duration, test_case.codec, test_case.resolution, test_case.extension)
+        file=test_case.buffer_factory(
+            test_case.duration,
+            test_case.codec,
+            test_case.resolution,
+            test_case.extension,
+        ),
     )
 
     max_video_file_size = 5 * 1024 * 1024
@@ -367,7 +375,11 @@ async def test_validate_video(test_case):
 
     else:
         video_bytes = await validate_video(
-            video, test_case.allowed_extensions, max_video_file_size, video_chunk_size, test_case.allowed_codecs
+            video,
+            test_case.allowed_extensions,
+            max_video_file_size,
+            video_chunk_size,
+            test_case.allowed_codecs,
         )
         assert isinstance(video_bytes, bytes)
 
@@ -438,7 +450,9 @@ START_VIDEO_TASK_TEST_CASES = [
 @pytest.mark.parametrize(
     "test_case", START_VIDEO_TASK_TEST_CASES, ids=lambda test_case: test_case.name
 )
-async def test_start_task_video(client, mock_redis_client, test_case):
+async def test_start_task_video(
+    client, mock_redis_client: MockRedis, test_case: StartVideoTaskCaseResults
+) -> None:
     key = f"rate_limiter:token:{test_case.token}"
     mock_redis_client.store[key] = test_case.redis_result
 
@@ -447,7 +461,14 @@ async def test_start_task_video(client, mock_redis_client, test_case):
         headers["X-RateLimit-Token"] = test_case.token
 
     files = [
-        ("videos", (f"video{i + 1}.mp4", create_video(5, "libx264", (640, 480), "mp4").getvalue(), "video/mp4"))
+        (
+            "videos",
+            (
+                f"video{i + 1}.mp4",
+                create_video(5, "libx264", (640, 480), "mp4").getvalue(),
+                "video/mp4",
+            ),
+        )
         for i in range(test_case.no_of_files)
     ]
 
@@ -488,7 +509,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=None,
         expected_status=400,
         state=None,
-        result_state=None
+        result_state=None,
     ),
     CheckTaskCaseResults(
         name="token limit exceeded, key doesn't exist",
@@ -496,7 +517,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=-1,
         expected_status=401,
         state=None,
-        result_state=None
+        result_state=None,
     ),
     CheckTaskCaseResults(
         name="token limit exceeded, global token count depleted",
@@ -504,7 +525,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=-1,
         expected_status=401,
         state=None,
-        result_state=None
+        result_state=None,
     ),
     CheckTaskCaseResults(
         name="rate limit exceeded",
@@ -512,7 +533,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=0,
         expected_status=429,
         state=None,
-        result_state=None
+        result_state=None,
     ),
     CheckTaskCaseResults(
         name="inactive token",
@@ -520,7 +541,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=2,
         expected_status=403,
         state=None,
-        result_state=None
+        result_state=None,
     ),
     CheckTaskCaseResults(
         name="success case, status complete",
@@ -528,7 +549,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=1,
         expected_status=200,
         state="SUCCESS",
-        result_state="completed"
+        result_state="completed",
     ),
     CheckTaskCaseResults(
         name="success case, status failed",
@@ -536,7 +557,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=1,
         expected_status=200,
         state="FAILURE",
-        result_state="failed"
+        result_state="failed",
     ),
     CheckTaskCaseResults(
         name="success case, status pending",
@@ -544,7 +565,7 @@ CHECK_TASK_TEST_CASES = [
         redis_result=1,
         expected_status=200,
         state="PENDING",
-        result_state="pending"
+        result_state="pending",
     ),
 ]
 
@@ -553,7 +574,9 @@ CHECK_TASK_TEST_CASES = [
 @pytest.mark.parametrize(
     "test_case", CHECK_TASK_TEST_CASES, ids=lambda test_case: test_case.name
 )
-async def test_check_task_status(client, mock_redis_client, test_case):
+async def test_check_task_status(
+    client, mock_redis_client: MockRedis, test_case: CheckTaskCaseResults
+) -> None:
     key = f"rate_limiter:token:{test_case.token}"
     mock_redis_client.store[key] = test_case.redis_result
 
@@ -562,8 +585,8 @@ async def test_check_task_status(client, mock_redis_client, test_case):
         headers["X-RateLimit-Token"] = test_case.token
 
     with patch(
-            "src.routers.model.task_queue.AsyncResult",
-            return_value=MockCeleryAsyncResult(test_case.state, [True, False, True]),
+        "src.routers.model.task_queue.AsyncResult",
+        return_value=MockCeleryAsyncResult(test_case.state, [True, False, True]),
     ):
         response = await client.get(
             "/model/status/fake_task_id",
@@ -581,7 +604,6 @@ async def test_check_task_status(client, mock_redis_client, test_case):
             assert isinstance(data["data"], list)
             for item in data["data"]:
                 assert isinstance(item, bool)
-
 
     else:
         assert isinstance(data, dict)

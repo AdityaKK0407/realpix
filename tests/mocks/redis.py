@@ -1,13 +1,16 @@
-class MockRedis:
-    def __init__(self):
-        self.store = {}
+from typing import Any
 
-    def evalsha(self, sha, _, *args):
+
+class MockRedis:
+    def __init__(self) -> None:
+        self.store: dict[str, int] = {}
+
+    def evalsha(self, sha: str, _: Any, *args) -> int | None:
         match sha:
             case "create":
                 return 1
             case "verify":
-                key = args[0]
+                key: str = args[0]
                 return self.store.get(key, None)
             case "activate_token":
                 key = args[0]

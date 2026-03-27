@@ -3,6 +3,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from tests.mocks.redis import MockRedis
+
 
 @dataclass
 class VerifyCaptchaCaseResults:
@@ -84,7 +86,9 @@ VERIFY_CAPTCHA_TEST_CASES = [
 @pytest.mark.parametrize(
     "test_case", VERIFY_CAPTCHA_TEST_CASES, ids=lambda test_case: test_case.name
 )
-async def test_verify_captcha(client, mock_redis_client, test_case):
+async def test_verify_captcha(
+    client, mock_redis_client: MockRedis, test_case: VerifyCaptchaCaseResults
+) -> None:
     key = f"rate_limiter:token:{test_case.saved_rate_limiter_token}"
     mock_redis_client.store[key] = test_case.redis_result
 
@@ -96,7 +100,10 @@ async def test_verify_captcha(client, mock_redis_client, test_case):
 
     req_body = {"token": test_case.token_body} if test_case.token_body else {}
 
-    with patch("src.routers.verification.verify_turnstile", new=AsyncMock(return_value=test_case.cloudflare_success)):
+    with patch(
+        "src.routers.verification.verify_turnstile",
+        new=AsyncMock(return_value=test_case.cloudflare_success),
+    ):
         response = await client.post("/verify/captcha", json=req_body, headers=headers)
 
     assert response.status_code == test_case.expected_status
@@ -105,10 +112,9 @@ async def test_verify_captcha(client, mock_redis_client, test_case):
     if response.status_code == 200:
         assert isinstance(data, dict)
         assert data["status"] == "success"
-        assert isinstance (data["user_token"], str)
+        assert isinstance(data["user_token"], str)
 
     else:
         assert isinstance(data, dict)
         assert data["status"] == "error"
-        assert isinstance (data["detail"], str)
-
+        assert isinstance(data["detail"], str)

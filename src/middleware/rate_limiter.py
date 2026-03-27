@@ -1,9 +1,7 @@
 import logging
-from typing import Optional
 
 import redis.asyncio as redis
-from fastapi import Depends, Header, status, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import Depends, Header, HTTPException, status
 
 from src.dependencies import get_redis, get_verify_sha
 from src.redis_client.rate_limiter import VerifyTokenResult, verify_rate_limiter_token
@@ -12,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 async def rate_limiter_middleware(
-        x_ratelimit_token: str | None = Header(default=None),
-        redis_client: redis.Redis = Depends(get_redis),
-        verify_sha: str = Depends(get_verify_sha),
-) -> Optional[JSONResponse]:
+    x_ratelimit_token: str | None = Header(default=None),
+    redis_client: redis.Redis = Depends(get_redis),
+    verify_sha: str = Depends(get_verify_sha),
+) -> None:
     if not x_ratelimit_token:
         logger.warning("Rate limit token missing in header")
         raise HTTPException(
@@ -61,5 +59,3 @@ async def rate_limiter_middleware(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Service temporarily unavailable",
         )
-
-    return None

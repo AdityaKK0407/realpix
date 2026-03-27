@@ -1,10 +1,10 @@
 import asyncio
 import io
+import json
 import logging
 import os
 import subprocess
 import tempfile
-import json
 from typing import Any
 
 from fastapi import (
@@ -40,10 +40,10 @@ router = APIRouter(
 
 
 async def validate_image(
-        image: UploadFile,
-        allowed_extensions: tuple[str, ...],
-        max_image_file_size: int,
-        image_chunk_size: int,
+    image: UploadFile,
+    allowed_extensions: tuple[str, ...],
+    max_image_file_size: int,
+    image_chunk_size: int,
 ) -> bytes:
     try:
         contents = bytearray()
@@ -96,7 +96,7 @@ async def validate_image(
 
 @router.post("/images", response_model=None)
 async def start_task_image(
-        images: list[UploadFile] = File(...),
+    images: list[UploadFile] = File(...),
 ) -> dict[str, str]:
     max_images = MAX_IMAGES
     allowed_extensions: tuple[str, ...] = ALLOWED_IMAGE_EXTENSIONS
@@ -107,7 +107,7 @@ async def start_task_image(
         logger.warning("Client didn't provide any images")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least one image must be provided"
+            detail="At least one image must be provided",
         )
 
     if len(images) > max_images:
@@ -154,11 +154,11 @@ async def start_task_image(
 
 
 async def validate_video(
-        video: UploadFile,
-        allowed_extensions: tuple[str, ...],
-        max_video_file_size: int,
-        video_chunk_size: int,
-        allowed_codecs: tuple[str, ...],
+    video: UploadFile,
+    allowed_extensions: tuple[str, ...],
+    max_video_file_size: int,
+    video_chunk_size: int,
+    allowed_codecs: tuple[str, ...],
 ) -> bytes:
     contents = bytearray()
     with tempfile.NamedTemporaryFile(delete=False) as tmp:
@@ -194,7 +194,8 @@ async def validate_video(
 
         cmd = [
             "ffprobe",
-            "-v", "error",
+            "-v",
+            "error",
             "-select_streams",
             "v:0",
             "-show_entries",
@@ -207,8 +208,6 @@ async def validate_video(
         result = subprocess.run(cmd, capture_output=True, text=True)
 
         if result.returncode != 0:
-            print("STDERR:", result.stderr)
-            print("STDOUT:", result.stdout)
             logger.warning("Video file provided was invalid or corrupted")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -225,7 +224,7 @@ async def validate_video(
 
         format_names: str = data["format"]["format_name"].lower().split(",")
         if not any(fmt in allowed_extensions for fmt in format_names):
-            logger.warning("Provided video file format is not supported")
+            logger.warning("Provided video file container is not supported")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Unsupported video format",
@@ -241,7 +240,7 @@ async def validate_video(
             logger.warning(f"Client provided codec {codec} which is not allowed")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unsupported codec",
+                detail="Unsupported codec",
             )
 
         if width > 1920 or height > 1080:
@@ -264,7 +263,7 @@ async def validate_video(
 
 @router.post("/videos", response_model=None)
 async def start_task_video(
-        videos: list[UploadFile] = File(...),
+    videos: list[UploadFile] = File(...),
 ) -> dict[str, str]:
     max_videos = MAX_VIDEOS
     allowed_extensions = ALLOWED_VIDEO_EXTENSIONS

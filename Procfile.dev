@@ -1,2 +1,2 @@
 worker: celery -A src.tasks.app worker --loglevel=info
-api: uvicorn src.main:app --reload
+api: uvicorn src.main:app --reload --limit-max-request-size 50
