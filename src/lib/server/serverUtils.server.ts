@@ -1,9 +1,15 @@
 import { MAX_BATCH_SIZE, MAX_SIZE_OF_FILE } from '$env/static/private';
 import { json } from '@sveltejs/kit';
 
-interface Data {
-	task_ids: string[];
+interface TaskInterface {
+	task_ids: string;
 }
+
+interface TurnstileInterface {
+	token: string;
+}
+
+type Data = TaskInterface | TurnstileInterface;
 
 export type TotalPackageLimit = 's' | 'plm';
 export type EachFileLimit = 's' | 'flm';

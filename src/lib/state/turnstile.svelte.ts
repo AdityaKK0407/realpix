@@ -171,6 +171,7 @@ class Turnstile {
 	}
 
 	private async verifyTurnstile() {
+		console.log(this.turnstileToken)
 		const verifyResponse = await fetch('/api/verify-turnstile', {
 			headers: {
 				'Content-Type': 'application/json'

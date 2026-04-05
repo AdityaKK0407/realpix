@@ -88,6 +88,7 @@
 				stroke="currentColor"
 				backgroundStroke="#fafafa"
 				fill="currentColor"
+				strokeWidth={35}
 			/>
 		</div>
 
