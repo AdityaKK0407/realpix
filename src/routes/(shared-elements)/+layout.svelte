@@ -52,7 +52,7 @@
 		background-color: var(--color-bg-app);
 		padding-inline: var(--app-padding-inline);
 		padding-block: var(--app-padding-block);
-		gap: var(--text-gap-small);
+		gap: var(--text-gap);
 	}
 
 	.pageContainer__header {

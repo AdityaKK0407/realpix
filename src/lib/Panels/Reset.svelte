@@ -61,8 +61,7 @@
 								window.turnstile.reset(turnstileWidgetId);
 							}
 						},
-						retry: 'auto',
-						'retry-interval': 15000
+						retry: 'never'
 					});
 					turnstile.changeTurnstileStatus({ status: 'verifying' });
 				}
@@ -84,7 +83,7 @@
 	<section class="wrapper flex-column">
 		<div class="color-pri">
 			<ImageSearch
-				size={185}
+				size={200}
 				stroke="currentColor"
 				backgroundStroke="#fafafa"
 				fill="currentColor"

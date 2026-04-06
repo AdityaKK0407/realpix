@@ -7,23 +7,22 @@ import {
 	type TotalPackageLimit
 } from '$lib/server/serverUtils.server';
 
+const UPLOADSUCCESSTYPE = z.object({
+	status: z.literal('success'),
+	task_id: z.string()
+});
+
+const UPLOADERRORTYPE = z.object({
+	status: z.literal('error'),
+	detail: z.string()
+});
+
+const UPLOADTYPE = z.discriminatedUnion('status', [UPLOADSUCCESSTYPE, UPLOADERRORTYPE]);
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.turnstileSessionToken) {
-		return serverUtils.errorResponse(401, 'Not authenticated. Please authenticated to continue.');
+		return serverUtils.errorResponse(401, 'Not authenticated. Please authenticate to continue.');
 	}
-
-	const uploadImageSuccessResponseType = z.object({
-		task_ids: z.array(z.string()).max(5).min(1)
-	});
-
-	const uploadImageErrorResponseType = z.object({
-		detail: z.string()
-	});
-
-	const uploadImageResponseType = z.union([
-		uploadImageErrorResponseType,
-		uploadImageSuccessResponseType
-	]);
 
 	const formData = await request.formData();
 	const imageFiles = formData.getAll('images') as File[];
@@ -44,18 +43,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	});
 
 	const responseResult = await response.json();
+	console.log(responseResult);
 
-	const uploadState = uploadImageResponseType.safeParse(responseResult);
+	const uploadState = UPLOADTYPE.safeParse(responseResult);
 	if (!uploadState.success) {
 		return serverUtils.errorResponse(500, 'Incompatible result type');
 	}
 
-	// Use 'in' operator to check which part of the union was matched
-	if ('task_ids' in uploadState.data) {
+	if (uploadState.data.status === 'success') {
 		return serverUtils.successResponse({
-			task_ids: uploadState.data.task_ids
+			task_ids: uploadState.data.task_id
 		});
-	} else {
+	}
+
+	if (uploadState.data.status === 'error') {
 		return serverUtils.errorResponse(response.status, uploadState.data.detail);
+	} else {
+		return serverUtils.errorResponse(500, 'Internal server Error');
 	}
 };

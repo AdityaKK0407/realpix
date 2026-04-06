@@ -143,4 +143,8 @@
 	.yellow__text {
 		color: var(--color-warning);
 	}
+
+	.color-text-pri {
+		color: var(--color-primary);
+	}
 </style>

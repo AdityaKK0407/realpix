@@ -24,7 +24,6 @@ declare global {
 					'timeout-callback': () => void;
 					'expired-callback': () => void;
 					retry: 'auto' | 'never';
-					'retry-interval': number;
 				}
 			) => string | undefined;
 			remove: (widgetId: string) => void;

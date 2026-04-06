@@ -5,7 +5,7 @@
 	--color-warm-gray: #f5f3f0;
 
 	--app-padding-inline: 1.1rem;
-	--app-padding-block: 0.3rem;
+	--app-padding-block: 0.5rem;
 
 	--panel-padding-inline: 1.34rem;
 	--panel-padding-block: 0.4rem;
@@ -98,7 +98,7 @@
 	--text-gap: 0.5rem;
 	--text-gap-small: 0.2rem;
 	--text-gap-medium: 1.15rem;
-	--text-gap-large: 1.7rem;
+	--text-gap-large: 1.3rem;
 
 	--panel-opacity-active: 1;
 	--panel-opacity-inactive: 0.8;
