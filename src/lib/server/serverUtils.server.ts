@@ -9,7 +9,12 @@ interface TurnstileInterface {
 	token: string;
 }
 
-type Data = TaskInterface | TurnstileInterface;
+interface ResponseOfTask {
+	status: string;
+	data?: boolean[];
+}
+
+type Data = TaskInterface | TurnstileInterface | ResponseOfTask;
 
 export type TotalPackageLimit = 's' | 'plm';
 export type EachFileLimit = 's' | 'flm';

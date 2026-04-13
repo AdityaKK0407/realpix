@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { processingStatus, type Task_ID } from '$lib/state/processingResult.svelte';
+	import { processingStatus, type InputTask_ID } from '$lib/state/processingResult.svelte';
 	import { type FileType, uploadData, type UploadType } from '$lib/state/uploadFlow.svelte';
 
 	interface Props {
@@ -21,7 +21,7 @@
 					return;
 				} else {
 					const batchResponseData = await batchResponse.json();
-					const processingData: Task_ID = {
+					const processingData: InputTask_ID = {
 						task_id: batchResponseData.data.task_ids,
 						idOfBatchs: batch.batchId
 					};

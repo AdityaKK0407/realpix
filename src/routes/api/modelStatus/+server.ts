@@ -51,4 +51,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const response = await fetch(
 		`${PYTHON_BACKEND_SERVER}/model/status/${requestParse.data.task_id}`
 	);
+
+	const responseData = await response.json();
+
+	const responseParseType = RESPONSETYPE.safeParse(responseData);
+
+	if (!responseParseType.success) {
+		return serverUtils.errorResponse(500, 'Unexpected Server Error');
+	} else if (responseParseType.data.status === 'error') {
+		return serverUtils.errorResponse(response.status, responseParseType.data.detail);
+	} else if (responseParseType.data.result !== 'completed') {
+		return serverUtils.successResponse({
+			status: responseParseType.data.result
+		});
+	}
+
+	return serverUtils.successResponse({
+		status: responseParseType.data.result,
+		data: responseParseType.data.data
+	});
 };

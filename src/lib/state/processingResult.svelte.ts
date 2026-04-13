@@ -4,6 +4,15 @@ import { PUBLIC_BASE_TIME_REQUEST, PUBLIC_REQUEST_BIAS } from '$env/static/publi
 export interface Task_ID {
 	task_id: string;
 	idOfBatchs: string[] | undefined;
+	interval: number;
+	pingCount: number;
+	taskStatus: 'completed' | 'timeout' | 'pending';
+	taskResolve: ((value: string | PromiseLike<string>) => void) | null;
+}
+
+export interface InputTask_ID {
+	task_id: string;
+	idOfBatchs: string[] | undefined;
 }
 
 class TaskPinging {
@@ -17,6 +26,7 @@ class TaskPinging {
 	private threshold_reached: boolean;
 	private task_time: number[];
 	private length: number;
+	private schedulerQueue: string[];
 
 	constructor() {
 		this.task_ids = $state([]);
@@ -27,64 +37,73 @@ class TaskPinging {
 		this.threshold_reached = false;
 		this.task_time = [];
 		this.length = 0;
+		this.schedulerQueue = [];
 	}
 
-	addTasks(tasks: Task_ID): void {
-		const tasksArray: Task_ID[] = [...this.task_ids, tasks];
-		this.task_ids = tasksArray;
+	private getTaskInfo(task_id: string) {
+		return this.task_ids.filter((task) => task.task_id === task_id)[0];
 	}
 
-	private noOfTasksPerTask(index: number) {
-		const value = this.task_ids[index];
-		return value.idOfBatchs?.length;
-	}
+	private taskScheduler() {
+		if (this.schedulerQueue.length === 0) return;
 
-	private determineThresholdPings() {
-		switch (this.length) {
-			case 1:
-			case 2:
-			case 3:
-				this.threshold_pings = this.length;
-				break;
+		const task_id = this.schedulerQueue.pop();
+		if (!task_id) return;
 
-			case 4:
-			case 5:
-				this.threshold_pings = this.length - 1;
-				break;
+		const task = this.getTaskInfo(task_id);
+		setTimeout(async () => {
+			const response = await fetch('/api/modelStatus', {
+				method: 'POST',
+				body: JSON.stringify({
+					task_id: task.task_id
+				})
+			});
 
-			default:
-				this.threshold_pings = 5;
-		}
-	}
+			const responseData = await response.json();
+			switch (response.status) {
+				case 200:
+					if (responseData.status !== 'completed') {
+						this.schedulerQueue.push(task_id);
+						this.taskScheduler();
+					} else {
+						// for task ping success
+					}
+					break;
 
-	private determineTimeLimit() {
-		this.length = this.task_ids.length;
-		for (let len = 0; len < this.length; len++) {
-			const taskLen = this.noOfTasksPerTask(len);
-			if (taskLen) {
-				this.task_time.push(this.base_request_time * taskLen + this.request_bias);
+				case 429:
+					this.schedulerQueue.push(task_id);
+					alert('Rate limiting exceeded. Showing turnstile');
+					break;
+
+				case 500:
+				default:
+					this.taskScheduler();
 			}
+		}, task.interval);
+	}
+
+	addTasks(tasks: InputTask_ID): void {
+		if (tasks.idOfBatchs) {
+			const taskToAdd: Task_ID = {
+				...tasks,
+				interval: tasks.idOfBatchs?.length * this.base_request_time * this.request_bias,
+				taskStatus: 'pending',
+				pingCount: 0,
+				taskResolve: null
+			};
+			this.schedulerQueue.push(taskToAdd.task_id);
+
+			new Promise((resolve) => {
+				taskToAdd.taskResolve = resolve;
+			});
+
+			const tasksArray: Task_ID[] = [...this.task_ids, taskToAdd];
+			this.task_ids = tasksArray;
 		}
-		this.determineThresholdPings();
 	}
 
 	startPinging() {
-		this.determineTimeLimit();
-
-		const request1 = setInterval(() => {
-			if (this.pingCount > this.threshold_pings) {
-				clearInterval(request1);
-				this.threshold_reached = true;
-			} else {
-				this.task_ids.forEach(async (task) => {
-					const response = await fetch('/api/modelStatus', {
-						method: 'POST',
-						body: JSON.stringify({ task_id: task.task_id })
-					});
-				});
-				this.pingCount++;
-			}
-		}, this.base_time);
+		this.taskScheduler();
 	}
 }
 
