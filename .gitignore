@@ -1,0 +1,17 @@
+data/
+*.jpg
+__pycache__
+.venv
+
+.vscode
+MidJourney
+StableDiffusion
+DallE
+
+# Large files — do not push to GitHub
+archive.zip
+archive/
+*.pt
+*.pth
+*.onnx
+*.onnx.data
